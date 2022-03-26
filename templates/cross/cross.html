@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Corrective Action Report</title>
+    <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+      
+      <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+      <script type='text/javascript'>
+        function addFields(){
+            // Number of inputs to create
+            var number = document.getElementById("member").value;
+            // Container <div> where dynamic content will be placed
+            var container = document.getElementById("container");
+            // Clear previous contents of the container
+            while (container.hasChildNodes()) {
+                container.removeChild(container.lastChild);
+            }
+            for (i=0;i<number;i++){
+                // Append a node with a random text
+                container.appendChild(document.createTextNode("Appraiser " + (i+1)));
+                // Create an <input> element, set its type and name attributes
+                var input = document.createElement("input");
+                input.type = "text";
+                input.className += 'form-control';
+                input.name = "cross_karyawan";
+                container.appendChild(input);
+                // Append a line break 
+                container.appendChild(document.createElement("br"));
+            }
+        }
+    </script>
+    <style type="text/css" rel="stylesheet">
+      ul.breadcrumb {
+      padding: 10px 16px;
+      list-style: none;
+      background-color: #eee;
+      }
+      ul.breadcrumb li {
+      display: inline;
+      font-size: 18px;
+      }
+      ul.breadcrumb li+li:before {
+      padding: 8px;
+      color: black;
+      content: "/\00a0";
+      }
+      ul.breadcrumb li a {
+      color: #0275d8;
+      text-decoration: none;
+      }
+      ul.breadcrumb li a:hover {
+      color: #01447e;
+      text-decoration: underline;
+      }
+      body{
+      padding:20px 20px;
+      }
+      .col-xs-6{
+          display:inline-block;
+      }
+      .results tr[visible='false'],
+      .no-result{
+        display:none;
+      }
+
+      .results tr[visible='true']{
+        display:table-row;
+      }
+
+      .counter{
+        padding:8px; 
+        color:#ccc;
+      }
+    </style>
+      
+  </head>
+  <body>
+    <div class="container">
+        <div class="invoice-title">
+          <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
+            <h2>GRR Anova</h2><br>
+          <ul class="breadcrumb">
+            <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
+            <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
+            <li><a href="{% url 'coretoolcrud:viewDetailSurvey' pk %}">Survey Result</a></li>
+            <li>Fill GRR Anova Data</li>
+          </ul>
+              {% if messages %}
+              {% for message in messages %}
+              {% if message.tags == 'error' %}
+              <div class="alert alert-danger" role="alert">
+                <p>{{ message }}</p>
+              </div>
+              {% else %}
+              <div class="alert alert-{{ message.tags }}" role="alert">
+                  <p>{{ message }}</p>
+              </div>
+              {% endif %}
+              {% endfor %}
+              {% endif %}
+            </nav>
+            
+         
+          <hr>
+
+        </div>
+        <form action="{% url 'coretoolcrud:storeCross' pk %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="exampleInputEmail1">Num of Appraiser</label>
+                <input class="form-control" name="cross_nkaryawan" id="member" type="number" required />
+                <a href="#" id="filldetails" onclick="addFields()">Fill appraiser name</a>
+                <div id="container"/>
+            </div>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Num of Part</label>
+              <input class="form-control" name="cross_npart" id="demoFormHorizontalEmail" type="number" min="2" max="20" required />
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail1">Num of Trial</label>
+            <input class="form-control" name="cross_ntrial" id="demoFormHorizontalEmail" type="number" min="2" max="15" required />
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail1">Stdev</label>
+            <input class="form-control" name="cross_stdev" id="demoFormHorizontalEmail" type="number" required />
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail1">Max Stdev</label>
+            <input class="form-control" name="cross_stdevmax" id="demoFormHorizontalEmail" type="number" required />
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail1">Min Stdev</label>
+            <input class="form-control" name="cross_stdevmin" id="demoFormHorizontalEmail" type="number" required />
+          </div> 
+            
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+   
+
+
+    </div>
+ 
+  </body>
+
+</html>
+
+

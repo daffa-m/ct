@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Corrective Action Report</title>
+    <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+      
+      <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+      
+      <style type="text/css" rel="stylesheet">
+    body{
+  padding:20px 20px;
+}
+.col-xs-6{
+    display:inline-block;
+}
+.results tr[visible='false'],
+.no-result{
+  display:none;
+}
+
+.results tr[visible='true']{
+  display:table-row;
+}
+
+.counter{
+  padding:8px; 
+  color:#ccc;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.separator::before,
+.separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #000;
+}
+
+.separator:not(:empty)::before {
+  margin-right: .25em;
+}
+
+.separator:not(:empty)::after {
+  margin-left: .25em;
+}
+      </style>
+      
+  </head>
+  <body>
+    <div class="container">
+        <div class="invoice-title">
+            <nav aria-label="breadcrumb" class="main-breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item active" aria-current="page">Study Survey</li>
+              </ol>
+              {% if messages %}
+              {% for message in messages %}
+              {% if message.tags == 'error' %}
+              <div class="alert alert-danger" role="alert">
+                <p>{{ message }}</p>
+              </div>
+              {% else %}
+              <div class="alert alert-{{ message.tags }}" role="alert">
+                  <p>{{ message }}</p>
+              </div>
+              {% endif %}
+              {% endfor %}
+              {% endif %}
+            </nav>
+            <h2>Study Survey</h2>
+         
+          <hr>
+
+        </div>
+        <form action="{% url 'coretoolcrud:storeSurvey' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-sm">
+                  <div class="separator">Part Information</div><br>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Date Project</label>
+                        <input class="form-control" name="survey_date_project" id="demoFormHorizontalEmail" type="date" required />
+                    </div>
+                </div>
+                <div class="col-sm">
+                  <div class="separator">Data Type</div><br>
+                    <label class="radio control-label">Data</label><br>
+                    <div class="form-check form-check-inline">
+                        
+                        <input class="form-check-input" type="radio" name="survey_data" id="att_main" value="att" onchange="check()">
+                        <label class="form-check-label" for="inlineRadio1">Attribute</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="survey_data" id="var_main" value="var" onchange="check()">
+                        <label class="form-check-label" for="inlineRadio2">Variable</label>
+                      </div>
+                </div>
+                <div class="col-sm">
+                    
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm">
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Customer Name</label>
+                    <input class="form-control" name="survey_cust_name" id="demoFormHorizontalEmail" type="text" required />
+                    </div>
+                </div>
+                <div class="col-sm">
+                  <div class="separator">SPC Attribute</div><br>
+                    <label class="radio control-label">Defect Unit for One Part / Unit </label><br>
+                    <div class="form-check form-check-inline">
+                        
+                        <input class="form-check-input" type="radio" name="survey_att_prod_unit" id="att_pu0" value="yes">
+                        <label class="form-check-label" for="inlineRadio1">Unit</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="survey_att_prod_unit" id="att_pu1" value="no">
+                        <label class="form-check-label" for="inlineRadio2">Not in Unit</label>
+                      </div>
+                </div>
+                <div class="col-sm">
+                  <div class="separator">MSA Variable</div><br>
+                    <label class="radio control-label">Working Range</label><br>
+                    <div class="form-check form-check-inline">
+                        
+                        <input class="form-check-input" type="radio" name="survey_var_bias_working" id="var_wb0" value="yes">
+                        <label class="form-check-label" for="inlineRadio1">Yes</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="survey_var_bias_working" id="var_wb1" value="no">
+                        <label class="form-check-label" for="inlineRadio2">No</label>
+                      </div>
+                </div>
+              </div>
+            
+              <div class="row">
+                <div class="col-sm">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Part Name</label>
+                        <input class="form-control" name="survey_part_name" id="demoFormHorizontalEmail" type="text" required />
+                        </div>
+                </div>
+                <div class="col-sm"><br>
+                    <label class="radio control-label">Sample Qty</label><br>
+                    <div class="form-check form-check-inline">
+                        
+                        <input class="form-check-input" type="radio" name="survey_att_qty" id="att_qty0" value="yes">
+                        <label class="form-check-label" for="inlineRadio1">Constant</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="survey_att_qty" id="att_qty1" value="no">
+                        <label class="form-check-label" for="inlineRadio2">Not Constant</label>
+                      </div>
+                </div>
+                <div class="col-sm"><br>
+                    <label class="radio control-label">Bias Over Time</label><br>
+                    <div class="form-check form-check-inline">
+                        
+                        <input class="form-check-input" type="radio" name="survey_var_bias_over" id="var_bo0" value="yes">
+                        <label class="form-check-label" for="inlineRadio1">Yes</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="survey_var_bias_over" id="var_bo1" value="no">
+                        <label class="form-check-label" for="inlineRadio2">No</label>
+                      </div>
+                    </div>
+              </div>
+            
+          
+              <div class="row">
+                <div class="col-sm">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Part Number</label>
+                        <input class="form-control" name="survey_part_number" id="demoFormHorizontalEmail" type="text" required />
+                        </div>
+                </div>
+                <div class="col-sm">
+                  <br><label class="radio control-label">Category Sample</label><br>
+                    <div class="form-check form-check-inline">
+                        
+                        <input class="form-check-input" type="radio" name="survey_att_cat" id="att_cat0" value="yes">
+                        <label class="form-check-label" for="inlineRadio1">Has Category</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="survey_att_cat" id="att_cat1" value="no">
+                        <label class="form-check-label" for="inlineRadio2">Has No Category</label>
+                      </div>
+                </div>
+                <div class="col-sm">
+                    <hr>
+                    <label class="radio control-label">Variation Due to the Measurement System</label><br>
+                    <div class="form-check form-check-inline">
+                        
+                        <input class="form-check-input" type="radio" name="survey_var_variation" id="var_var0" value="yes" onchange="check()">
+                        <label class="form-check-label" for="inlineRadio1">Yes</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="survey_var_variation" id="var_var1" value="no" onchange="check()">
+                        <label class="form-check-label" for="inlineRadio2">No</label>
+                      </div>
+                    </div>
+                </div>
+          
+              <div class="row">
+                <div class="col-sm"><br>
+                  <div class="separator">Identifying Character</div><br>
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Character</label>
+                        <input class="form-control" name="survey_character" id="demoFormHorizontalEmail" type="text" required />
+                        </div>
+                </div>
+                <div class="col-sm"><br>
+                  <div class="separator">Measurement</div><br>
+                  <div class="form-group">
+                    <label for="exampleInputEmail1">Name</label>
+                    <input class="form-control" name="survey_name" id="demoFormHorizontalEmail" type="text" required />
+                    </div>
+                </div>
+                <div class="col-sm"><br>
+                    <label class="radio control-label">Part Sample</label><br>
+                    <div class="form-check form-check-inline">
+                        
+                        <input class="form-check-input" type="radio" name="survey_var_part_sample" id="var_ps0" value="cross" onchange="check()">
+                        <label class="form-check-label" for="inlineRadio1">Cross</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="survey_var_part_sample" id="var_ps1" value="nested" onchange="check()">
+                        <label class="form-check-label" for="inlineRadio2">Nested</label>
+                      </div>
+                    </div>
+                </div>
+          
+              <div class="row">
+                <div class="col-sm">
+                    <div class="form-group">
+                        <label for="exampleInputPassword1">Category</label>
+                        <select name="survey_category" id="demoSelectbox" class="form-control">
+                            <option value="" selected disabled hidden>Silahkan Pilih</option>
+                            <option>Process</option>
+                            <option>Product</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Serial Number</label>
+                        <input class="form-control" name="survey_sn" id="demoFormHorizontalEmail" type="text" required />
+                        </div>
+                </div>
+                <div class="col-sm">
+                  <label class="radio control-label">Need to Review Interaction Between Part and Appraisal</label><br>
+                  <div class="form-check form-check-inline">
+                      
+                      <input class="form-check-input" type="radio" name="survey_var_review" id="var_rev0" value="yes">
+                      <label class="form-check-label" for="inlineRadio1">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="survey_var_review" id="var_rev1" value="no">
+                      <label class="form-check-label" for="inlineRadio2">No</label>
+                    </div>
+                  </div>
+                </div>
+
+              <div class="row">
+                <div class="col-sm">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Process Name</label>
+                        <input class="form-control" name="survey_process_name" id="demoFormHorizontalEmail" type="text" required />
+                        </div>
+                </div>
+                <div class="col-sm">
+                    <div class="form-group">
+                        <label for="exampleInputEmail1">Resolution</label>
+                        <input class="form-control" name="survey_resolution" id="demoFormHorizontalEmail" type="text" required />
+                        </div>
+                </div>
+                <div class="col-sm"><br>
+                  <div class="separator">SPC Variable</div><br>
+                  <label class="radio control-label">Homogenity Sample</label><br>
+                  <div class="form-check form-check-inline">
+                      
+                      <input class="form-check-input" type="radio" name="survey_var_homogen" id="var_h0" value="yes" onchange="check()">
+                      <label class="form-check-label" for="inlineRadio1">Yes</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="survey_var_homogen" id="var_h1" value="no" onchange="check()">
+                      <label class="form-check-label" for="inlineRadio2">No</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Symbol</label>
+                            <input class="form-control" name="survey_symbol" id="demoFormHorizontalEmail" type="text" required />
+                            </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Unit</label>
+                            <input class="form-control" name="survey_unit" id="demoFormHorizontalEmail" type="text" required />
+                            </div>
+                    </div>
+                    <div class="col-sm"><br>
+                      <label class="radio control-label">Number of Subgroup</label><br>
+                      <div class="form-check form-check-inline">
+                          
+                          <input class="form-check-input" type="radio" name="survey_var_subgroup" id="var_subgroup0" value="less than 10">
+                          <label class="form-check-label" for="inlineRadio1">Less Than 10</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="survey_var_subgroup" id="var_subgroup1" value="more or equal than 10">
+                          <label class="form-check-label" for="inlineRadio2">More or Equal Than 10</label>
+                        </div>
+                      </div>
+                    
+                </div>
+
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Reference</label>
+                            <input class="form-control" name="survey_ref" id="demoFormHorizontalEmail" type="text" required />
+                          </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Next Calibration Date</label>
+                            <input class="form-control" name="survey_next_cal" id="demoFormHorizontalEmail" type="date" required />
+                            </div>
+                    </div>
+                    <div class="col-sm">
+                      <label class="radio control-label">Average is Easily Identified</label><br>
+                      <div class="form-check form-check-inline">
+                          
+                          <input class="form-check-input" type="radio" name="survey_var_ave" id="var_ave0" value="yes">
+                          <label class="form-check-label" for="inlineRadio1">Yes</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="survey_var_ave" id="var_ave1" value="no">
+                          <label class="form-check-label" for="inlineRadio2">No</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                              <label for="inputEmail4">Max Range Spec</label>
+                              <input type="text" class="form-control" name="survey_range_max" id="inputEmail4" placeholder="Max">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputEmail4">Min Range Spec</label>
+                              <input type="text" class="form-control" name="survey_range_min" id="inputPassword4" placeholder="Min">
+                            </div>
+                          </div>
+                    </div>
+                    <div class="col-sm">
+                      <div class="form-group"><hr>
+                        <label for="exampleInputEmail1">Plan Date</label>
+                        <input class="form-control" name="survey_plan" id="demoFormHorizontalEmail" type="date" required />
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">FMEA Number</label>
+                            <input class="form-control" name="survey_fmea" id="demoFormHorizontalEmail" type="text" required />
+                            </div>
+                    </div>
+                    <div class="col-sm">
+                      <div class="form-group">
+                        <label for="exampleInputEmail1">Actual Date</label>
+                        <input class="form-control" name="survey_actual" id="demoFormHorizontalEmail" type="date" required />
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Control Plan Number</label>
+                            <input class="form-control" name="survey_control_plan" id="demoFormHorizontalEmail" type="text" required />
+                            </div>
+                    </div>
+                    <div class="col-sm">
+                      <div class="form-group">
+                        <label for="exampleInputPassword1">Reason For Rev</label>
+                        <select name="survey_reason" id="demoSelectbox" class="form-control">
+                            <option value="" selected disabled hidden>Silahkan Pilih</option>
+                            <option>New Model</option>
+                            <option>Others</option>
+                        </select>
+                    </div>
+                    </div>
+                    <div class="col-sm">
+                        
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            
+            
+          </form>
+   
+
+
+    </div>
+ 
+    <script>
+      function check() {
+          if (document.getElementById('att_main').checked) {
+              document.getElementById('att_pu0').disabled = false;
+              document.getElementById('att_pu1').disabled = false;
+              document.getElementById('att_qty0').disabled = false;
+              document.getElementById('att_qty1').disabled = false;
+              document.getElementById('att_cat0').disabled = false;
+              document.getElementById('att_cat1').disabled = false;
+              document.getElementById('var_wb0').disabled = true;
+              document.getElementById('var_wb1').disabled = true;
+              document.getElementById('var_bo0').disabled = true;
+              document.getElementById('var_bo1').disabled = true;
+              document.getElementById('var_var0').disabled = true;
+              document.getElementById('var_var1').disabled = true;
+              document.getElementById('var_ps0').disabled = true;
+              document.getElementById('var_ps1').disabled = true;
+              document.getElementById('var_h0').disabled = true;
+              document.getElementById('var_h1').disabled = true;
+              document.getElementById('var_subgroup0').disabled = true;
+              document.getElementById('var_subgroup1').disabled = true;
+          }
+          else if (document.getElementById('var_main').checked) {
+            document.getElementById('att_pu0').disabled = true;
+              document.getElementById('att_pu1').disabled = true;
+              document.getElementById('att_qty0').disabled = true;
+              document.getElementById('att_qty1').disabled = true;
+              document.getElementById('att_cat0').disabled = true;
+              document.getElementById('att_cat1').disabled = true;
+              document.getElementById('var_wb0').disabled = false;
+              document.getElementById('var_wb1').disabled = false;
+              document.getElementById('var_bo0').disabled = false;
+              document.getElementById('var_bo1').disabled = false;
+              document.getElementById('var_var0').disabled = false;
+              document.getElementById('var_var1').disabled = false;
+              if (document.getElementById('var_var0').checked) {
+                document.getElementById('var_ps0').disabled = false;
+                document.getElementById('var_ps1').disabled = false;
+              }
+              if (document.getElementById('var_var1').checked) {
+                document.getElementById('var_ps0').disabled = true;
+                document.getElementById('var_ps1').disabled = true;
+              }
+              document.getElementById('var_h0').disabled = false;
+              document.getElementById('var_h1').disabled = false;
+              if (document.getElementById('var_h0').checked) {
+                document.getElementById('var_subgroup0').disabled = true;
+                document.getElementById('var_subgroup1').disabled = true;
+              }
+              if (document.getElementById('var_h1').checked) {
+                document.getElementById('var_subgroup0').disabled = false;
+                document.getElementById('var_subgroup1').disabled = false;
+              }
+              if (document.getElementById('var_ps0').checked) {
+                document.getElementById('var_rev0').disabled = false;
+                document.getElementById('var_rev1').disabled = false;
+              }
+              if (document.getElementById('var_ps1').checked) {
+                document.getElementById('var_rev0').disabled = true;
+                document.getElementById('var_rev1').disabled = true;
+              }
+
+          }
+      }
+      
+  </script>
+
+
+  </body>
+
+</html>
+
+

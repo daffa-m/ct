@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Corrective Action Report</title>
+    <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
+      <style>
+        ul.breadcrumb {
+        padding: 10px 16px;
+        list-style: none;
+        background-color: #eee;
+        }
+        ul.breadcrumb li {
+        display: inline;
+        font-size: 18px;
+        }
+        ul.breadcrumb li+li:before {
+        padding: 8px;
+        color: black;
+        content: "/\00a0";
+        }
+        ul.breadcrumb li a {
+        color: #0275d8;
+        text-decoration: none;
+        }
+        ul.breadcrumb li a:hover {
+        color: #01447e;
+        text-decoration: underline;
+        }
+        .separator {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        }
+
+        .separator::before,
+        .separator::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #000;
+        }
+
+        .separator:not(:empty)::before {
+        margin-right: .25em;
+        }
+
+        .separator:not(:empty)::after {
+        margin-left: .25em;
+        }
+      </style>
+      
+  </head>
+  <body>
+    <div class="container">
+        <div class="invoice-title">
+          <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
+            <h2>Linearity</h2><br>
+        <ul class="breadcrumb">
+          <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
+          <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
+          <li><a href="{% url 'coretoolcrud:viewDetailSurvey' linearity.linearity_survey_id %}">Survey Result</a></li>
+          <li>Fill Linearity Data</li>
+        </ul>
+          {% if messages %}
+          {% for message in messages %}
+          {% if message.tags == 'error' %}
+          <div class="alert alert-danger" role="alert">
+            <p>{{ message }}</p>
+          </div>
+          {% else %}
+          <div class="alert alert-{{ message.tags }}" role="alert">
+              <p>{{ message }}</p>
+          </div>
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+        </nav>
+         
+          <hr>
+
+        </div>
+        <form action="{% url 'coretoolcrud:storeAllLinearity' linearity.linearity_survey_id %}" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+        
+        
+        
+        <table class="table table-hover table-bordered results" id="table">
+            <thead>
+              <tr>
+                <td scope="col">Sample</td>
+                {% for j in measurement %}
+                <td scope="col">M-{{j}}</td>
+                {% endfor %}
+              </tr>
+             
+            </thead>
+            <tbody>
+                
+              
+              
+                {% for i in part %} 
+              <tr>
+                <td>S-{{i}}</td>
+                {% for j in measurement %}
+                <td><input class="form-control" name="linearity_all" id="demoFormHorizontalEmail" type="text" step="any" required /></td>
+                {% endfor %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+
+        
+            
+            
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+   
+
+
+    </div>
+ 
+
+    <script>
+      $(document).ready(function() {
+           $('td input').bind('paste', null, function (e) {
+               $this = $(this);
+               setTimeout(function () {
+                   var columns = $this.val().split(/\s+/);
+                   var i;
+                   var npart = "{{ linearity.linearity_nmeasurement }}";
+                   var input = $this;
+                   for (i = 0; i < columns.length; i++) {
+                       input.val(columns[i]);
+                       if( i % npart !== npart - 1){
+                           input = input.parent().next().find('input');
+                           } else{
+                               input = input.parent().parent().next().find('input');
+                           }
+                       }
+               }, 0);
+           });
+       } );
+   
+       var active = 0;
+   //$('#navigate td').each(function(idx){$(this).html(idx);});
+   rePosition();
+   
+   $(document).keydown(function(e) {
+     var inp = String.fromCharCode(event.keyCode);
+     if (!(e.keyCode > 47 && e.keyCode < 191 || e.keyCode == 0)) {
+       reCalculate(e);
+       rePosition();
+       // if key is an arrow key, don't type the user input.
+       // if it is any other key (a, b, c, etc)
+       // edit the text
+       if (e.keyCode > 36 && e.keyCode < 41) {
+         return false;
+       }
+     }
+   });
+   
+   $('td').click(function() {
+     active = $(this).closest('table tbody').find('td').index(this);
+     rePosition();
+   });
+   
+   
+   function reCalculate(e) {
+     var rows = $('#table tbody tr').length;
+     var columns = $('#table tbody tr:eq(0) td').length;
+     var temp;
+   
+     if (e.keyCode == 37) { //move left or wrap
+       temp = active;
+       while (temp > 0) {
+         temp = temp - 1;
+         // only advance if there is an input field in the td
+         if ($('#table tbody tr td').eq(temp).find('input').length != 0) {
+           active = temp;
+           break;
+         }
+       }
+     }
+     if (e.keyCode == 38) { // move up
+       temp = active;
+       while (temp - columns >= 0) {
+         temp = temp - columns;
+         // only advance if there is an input field in the td
+         if ($('#table tbody tr td').eq(temp).find('input').length != 0) {
+           active = temp;
+           break;
+         }
+       }
+     }
+     if (e.keyCode == 39) { // move right or wrap
+       temp = active;
+       while (temp < (columns * rows) - 1) {
+         temp = temp + 1;
+         // only advance if there is an input field in the td
+         if ($('#table tbody tr td').eq(temp).find('input').length != 0) {
+           active = temp;
+           break;
+         }
+       }
+     }
+     if (e.keyCode == 40) { // move down
+       temp = active;
+       while (temp + columns <= (rows * columns) - 1) {
+         temp = temp + columns;
+         // only advance if there is an input field in the td
+         if ($('#table tbody tr td').eq(temp).find('input').length != 0) {
+           active = temp;
+           break;
+         }
+       }
+     }
+   }
+   
+   function rePosition() {
+     $("#input1, #input3").prop("disabled", true);
+   
+     console.log(active);
+     $('.active').removeClass('active');
+     $('#table tbody tr td').eq(active).addClass('active');
+     $('#table tbody tr td').find('input').removeClass('textClass');
+     $('#table tbody tr td').eq(active).find('input').addClass('textClass');
+     $('#table tbody tr td').eq(active).find('input').select();
+     var input = $('#table tbody tr td').eq(active).find('input').focus();
+     scrollInView();
+   }
+   
+   function scrollInView() {
+     var target = $('#table tbody tr td:eq(' + active + ')');
+     if (target.length) {
+       var top = target.offset().top;
+   
+       $('html,body').stop().animate({
+         scrollTop: top - 100
+       }, 400);
+       return false;
+     }
+   }
+    </script>
+
+  </body>
+
+</html>
+
+

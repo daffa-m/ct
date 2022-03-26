@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>GRR Xbar R</title>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
+    <style type="text/css" rel="stylesheet">
+    .invoice-title h2, .invoice-title h3 {
+    display: inline-block;
+    }
+    p {
+    font-size: 11px;
+    }
+    .card {
+      display:inline-block;
+      width:47%;
+      margin-right: 1%;
+      margin-left: 1%;
+    } 
+    </style>
+    
+</head>
+<body onload="window.print()">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="invoice-title">
+                    <h2>GRR Xbar R</h2><h2 class="float-end">Report No. {{xbarr.id}}</h3>
+                </div>
+                <hr>
+
+                <table class="table table-hover table-bordered results">
+                    <thead>
+                      <tr>
+                        <th scope="col">Customer Name: {{ survey.survey_cust_name }}</th>
+                        <th scope="col">Part No: {{ survey.survey_part_number }}</th>
+                        <th scope="col">Gage Name: JOHANA</th>
+                        <th scope="col">Gage Number: 222222222</th>
+                        <th scope="col">Gage Type: ROUGHNESS</th>
+                      </tr>
+                      <tr>
+                        <th scope="col">Characteristic: {{ survey.survey_character }}</th>
+                        <th scope="col">Date: {{ survey.survey_date_project }}</th>
+                        <th scope="col">Performed By:</th>
+                        <th scope="col">Num Appraiser: {{xbarr.xbarr_nkaryawan}}</th>
+                        <th scope="col">Num Part: {{xbarr.xbarr_npart}}</th>
+                      </tr>
+                      <tr>
+                        <th scope="col">Stdev: {{xbarr.xbarr_stdev}}</th>
+                        <th scope="col">Max Stdev: {{xbarr.xbarr_stdevmax}}</th>
+                        <th scope="col">Min Stdev: {{xbarr.xbarr_stdevmin}}</th>
+                        <th scope="col">Num Trial: {{xbarr.xbarr_ntrial}}</th>
+                        <th scope="col"></th>
+                      </tr>
+                      
+                    </thead>
+                    <tbody>
+                        
+                      
+                      
+                        
+                    </tbody>
+                  </table>
+
+                  <table class="table table-hover table-condensed mv-20">
+                    <thead>
+                        <tr>
+                        <th scope="col">Jenis</th>
+                        <th scope="col">% Study Var</th>
+                        <th scope="col">% Contribution</th>
+                        <th scope="col">% Tolerance</th>
+                        <th scope="col">% Process</th>
+                        
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        {% for resume in xbarr.xbarr_resume %}
+                        <tr>
+                        <td>{{ resume.0 }}</td>
+                        <td>{{ resume.1 }}</td>
+                        <td>{{ resume.2 }}</td>
+                        <td>{{ resume.3 }}</td>
+                        <td>{{ resume.4 }}</td>
+                        </tr>
+                        {% endfor %}
+        
+                    </table>
+
+
+                      <div class="card">
+                        <h5 class="card-header">Featured</h5>
+                        <div class="card-body">
+                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                          <img src="data:image/png;base64,{{ psvc }}" alt="Admin"  width="95%", height="50%">
+                          <br><br><br>
+                          <p>GRR &lt; 10% or  10 &lt;= GRR &lt;=30
+                          <br>NDC &gt; 5 Need Correction</p>
+                          <p>Comment:          
+                          <br>{{ xbarr.xbarr_psvc }}</p>
+                        </div>
+                      </div>
+  
+                      
+                      
+                      <div class="card">
+                        <h5 class="card-header">Decision and Recommendation</h5>
+                        <div class="card-body">
+                          <h6 class="card-subtitle mb-2 text-muted">Decision</h6>
+                          {% if xbarr.xbarr_resume.0.1 < 10 %}
+                            <p>Measurement method is accepted / metoda pengukuran diterima</p>
+                          {% elif xbarr.xbarr_resume.0.1 < 30 %}
+                          <p>Measurement method need correction / metoda pengukuran perlu perbaikan</p>
+                          {% elif xbarr.xbarr_resume.0.1 >= 30 %}
+                          <p>Measurement method is rejected / metoda pengukuran tidak bisa dipakai</p>
+                          {% endif %}
+                          
+                            <br><br><h6 class="card-subtitle mb-2 text-muted">Recommendation</h6>
+                            <p>
+                          {% for ele in xbarr.xbarr_recommendation %} 
+                          <br>- {{ ele }}
+                          {% endfor %}
+                          </p>
+                        </div>
+                      </div>
+
+                      
+
+        </div>
+        
+    </div>
+
+</body>
+</html>
+

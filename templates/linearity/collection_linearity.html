@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>GRR Xbar R</title>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
+    <style type="text/css" rel="stylesheet">
+    ul.breadcrumb {
+    padding: 10px 16px;
+    list-style: none;
+    background-color: #eee;
+    }
+    ul.breadcrumb li {
+    display: inline;
+    font-size: 18px;
+    }
+    ul.breadcrumb li+li:before {
+    padding: 8px;
+    color: black;
+    content: "/\00a0";
+    }
+    ul.breadcrumb li a {
+    color: #0275d8;
+    text-decoration: none;
+    }
+    ul.breadcrumb li a:hover {
+    color: #01447e;
+    text-decoration: underline;
+    }
+    .invoice-title h2, .invoice-title h3 {
+    display: inline-block;
+    }
+    p {
+    font-size: 11px;
+    }
+    .card {
+      display:inline-block;
+      width:47%;
+      margin-right: 1%;
+      margin-left: 1%;
+      } 
+    .btn{
+      margin-right: 1%;
+      margin-left: 1%;
+    }    
+    input{
+      margin-top: 1%;
+      margin-bottom: 1%;
+      margin-right: 1%;
+      margin-left: 1%;
+    }
+    table {
+        text-align: center;
+    }
+    table thead th {
+        text-align: center;
+    }
+
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+      <div class="invoice-title">
+        <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
+          <h2>Linearity</h2><br>
+      <ul class="breadcrumb">
+        <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
+        <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
+        <li><a href="{% url 'coretoolcrud:viewDetailSurvey' linearity.linearity_survey_id %}">Survey Result</a></li>
+        <li>Linearity Result</li>
+      </ul>
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">
+          <p>{{ message }}</p>
+        </div>
+        {% else %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+            <p>{{ message }}</p>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+      </nav>
+       
+        <hr>
+
+      </div>
+
+                <table class="table table-hover table-bordered results">
+                  <thead>
+                    <tr>
+                      <th scope="col">Measurement</th>
+                      <th scope="col">Identifying Character</th>
+                      <th scope="col">Part Information</th>
+                      <th scope="col">Statistical Study</th>
+                    </tr>
+                    
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td>Name: {{ survey.survey_name }}</td>
+                          <td>Character: {{ survey.survey_character }}</td>
+                          <td>Date Project: {{ survey.survey_date_project }}</td>
+                          <td>Plan Date: {{ survey.survey_plan }}</td>
+                      </tr>
+                      <tr>
+                          <td>Serial Number: {{ survey.survey_sn }}</td>
+                          <td>Category: {{ survey.survey_category }}</td>
+                          <td>Customer Name: {{ survey.survey_cust_name }}</td>
+                          <td>Actual Date: {{ survey.survey_actual }}</td>
+                      </tr>
+                      <tr>
+                          <td>Resolution: {{ survey.survey_resolution }}</td>
+                          <td>Process Name: {{ survey.survey_process_name }}</td>
+                          <td>Part Name: {{ survey.survey_part_name }}</td>
+                          <td>Reason For Rev: {{ survey.survey_reason }}</td>
+                      </tr>
+                      <tr>
+                          <td>Unit: {{ survey.survey_unit }}</td>
+                          <td>Symbol: {{ survey.survey_symbol }}</td>
+                          <td>Part Number: {{ survey.survey_part_number }}</td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td>Next Calibration Date: {{ survey.survey_next_cal }}</td>
+                          <td>Reference: {{ survey.survey_ref }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td></td>
+                          <td>Range (Max to Min): {{ survey.survey_range_max }} to {{ survey.survey_range_min }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td></td>
+                          <td>FMEA Number: {{ survey.survey_fmea }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td></td>
+                          <td>Control Plan Number: {{ survey.survey_control_plan }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                  </tbody>
+                </table>
+
+                <table class="table table-hover table-bordered results">
+                  <thead>
+                    <tr>
+                      <th scope="col">Confidence Level: {{linearity.linearity_confidence}}</th>
+                      <th scope="col">Working Range (Max to Min): {{linearity.linearity_working_max}} to {{linearity.linearity_working_min}}</th>
+                      <th scope="col">Num Measurement (m): {{linearity.linearity_nmeasurement}}</th>
+                      <th scope="col">Num Part (g): {{linearity.linearity_npart}}</th>
+                      <th scope="col">Reference: {{linearity.linearity_ref}}</th>
+                    </tr>
+                    <tr>
+                      <th scope="col">Measured By: {{linearity.linearity_measured}}</th>
+                      <th scope="col">Reviewed By: {{linearity.linearity_reviewed}}</th>
+                      <th scope="col">a: {{a|floatformat:2}}</th>
+                      <th scope="col">b: {{b|floatformat:2}}</th>
+                      <th scope="col">S: {{s|floatformat:2}}</th>
+                    </tr>
+                    <tr>
+                      <th scope="col">Master Measured By: {{linearity.linearity_ave_measured}}</th>
+                      <th scope="col">Master Reviewed By: {{linearity.linearity_ave_reviewed}}</th>
+                      <th scope="col">Serial Number Gauge: {{linearity.linearity_ave_sn}}</th>
+                      <th scope="col">Resolution: {{linearity.linearity_ave_res}}</th>
+                      <th scope="col">t abs: {{tabs|floatformat:2}}</th>
+                    </tr>
+                    
+                    
+                  </thead>
+                  <tbody>
+                      
+                    
+                    
+                      
+                  </tbody>
+                </table>
+                <h6>Measurement</h6>
+                  <table class="table table-hover table-bordered results" id="table">
+                    <thead>
+                      <tr>
+                        <td scope="col"></td>
+                        {% for i in nmeasurement %}
+                          <td scope="col">M-{{i}}</td>
+                        {% endfor %}
+                      </tr>
+                     
+                    </thead>
+                    <tbody>
+                  
+
+                      
+                      {% for j, k in gabung %} 
+                      <tr>
+                        <td>S-{{k}}</td>
+                        {% for i in j %}
+                        <td>{{i}}</td>
+                        {% endfor %}
+                      </tr>
+                     
+                      {% endfor %}
+                    </tbody>
+                  </table>
+
+                  <h6>Bias</h6>
+                  <table class="table table-hover table-bordered results">
+                    <thead>
+                      <tr>
+                        <td scope="col"></td>
+                        {% for i in nmeasurement %}
+                          <td scope="col">M-{{i}}</td>
+                        {% endfor %}
+                      </tr>
+                     
+                    </thead>
+                    <tbody>
+                  
+
+                      
+                      {% for j, k in gabung2 %} 
+                      <tr>
+                        <td>S-{{k}}</td>
+                        {% for i in j %}
+                        <td>{{i|floatformat:2 }}</td>
+                        {% endfor %}
+                      </tr>
+                     
+                      {% endfor %}
+                    </tbody>
+                  </table>
+
+                  
+                  <table class="table table-hover table-bordered results">
+                    <thead>
+                      <tr>
+                        <td scope="col"></td>
+                        
+                          <td scope="col">Xbar</td>
+                          <td scope="col">Average Bias</td>
+                        
+                      </tr>
+                     
+                    </thead>
+                    <tbody>
+                  
+
+                      
+                      {% for j, k, l in gabung3 %} 
+                      <tr>
+                        <td>S-{{l}}</td>
+                        <td>{{j|floatformat:2 }}</td>
+                        <td>{{k|floatformat:2 }}</td>
+                      </tr>
+                     
+                      {% endfor %}
+                    </tbody>
+                  </table>
+
+                   
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        <img src="data:image/png;base64,{{ biasref }}" alt="Admin"  width="95%", height="50%">
+                        <br><br><br>
+                        <p>Bias in Gauge is unacceptable since the bias = 0 line does not fall within the confidence bounds
+                        <br>Numerically this can be analyzed by looking at the slope and intercept</P>          
+                        
+                      </div>
+                    </div>
+
+                    
+                    <div class="card">
+                        <h5 class="card-header">Decision and Recommendation</h5>
+                        <div class="card-body">
+                          <h6 class="card-subtitle mb-2 text-muted">Decision</h6>
+                          {% if tabs > t or tb > t %}
+                            <p>Bias is significant</p>
+                          {% else %}
+                          <p>Bias is not sifnificant</p>
+                          
+                          {% endif %}
+                          
+                            <br><br><h6 class="card-subtitle mb-2 text-muted">Recommendation</h6>
+                            <p>
+                         
+                          <br>{{ linearity.linearity_recommendation }}
+                          
+                          </p>
+                        </div>
+                      </div>
+
+                     
+                   
+                    <br><br>
+                    
+                    <a href="{% url 'coretoolcrud:deleteLinearity' linearity.linearity_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    <a href="{% url 'coretoolcrud:viewPrintLinearity' linearity.linearity_survey_id %}" class="btn btn-info">Print</a>
+                    <br><br>
+
+        </div>
+        
+    </div>
+
+</body>
+</html>

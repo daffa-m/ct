@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>GRR Xbar R</title>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
+    <style type="text/css" rel="stylesheet">
+    ul.breadcrumb {
+    padding: 10px 16px;
+    list-style: none;
+    background-color: #eee;
+    }
+    ul.breadcrumb li {
+    display: inline;
+    font-size: 18px;
+    }
+    ul.breadcrumb li+li:before {
+    padding: 8px;
+    color: black;
+    content: "/\00a0";
+    }
+    ul.breadcrumb li a {
+    color: #0275d8;
+    text-decoration: none;
+    }
+    ul.breadcrumb li a:hover {
+    color: #01447e;
+    text-decoration: underline;
+    }
+    .invoice-title h2, .invoice-title h3 {
+    display: inline-block;
+    }
+    p {
+    font-size: 11px;
+    }
+    .card {
+      display:inline-block;
+      width:47%;
+      margin-right: 1%;
+      margin-left: 1%;
+      } 
+    .btn{
+      margin-right: 1%;
+      margin-left: 1%;
+    }    
+    input{
+      margin-top: 1%;
+      margin-bottom: 1%;
+      margin-right: 1%;
+      margin-left: 1%;
+    }
+    table {
+        text-align: center;
+    }
+    table thead th {
+        text-align: center;
+    }
+
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+      <div class="invoice-title">
+        <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
+          <h2>GRR Xbar-R</h2><br>
+      <ul class="breadcrumb">
+        <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
+        <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
+        <li><a href="{% url 'coretoolcrud:viewDetailSurvey' xbarr.xbarr_survey_id %}">Survey Result</a></li>
+        <li>Fill GRR Xbar-R Data</li>
+      </ul>
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">
+          <p>{{ message }}</p>
+        </div>
+        {% else %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+            <p>{{ message }}</p>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+      </nav>
+       
+        <hr>
+
+      </div>
+
+                <table class="table table-hover table-bordered results">
+                  <thead>
+                    <tr>
+                      <th scope="col">Measurement</th>
+                      <th scope="col">Identifying Character</th>
+                      <th scope="col">Part Information</th>
+                      <th scope="col">Statistical Study</th>
+                    </tr>
+                    
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td>Name: {{ survey.survey_name }}</td>
+                          <td>Character: {{ survey.survey_character }}</td>
+                          <td>Date Project: {{ survey.survey_date_project }}</td>
+                          <td>Plan Date: {{ survey.survey_plan }}</td>
+                      </tr>
+                      <tr>
+                          <td>Serial Number: {{ survey.survey_sn }}</td>
+                          <td>Category: {{ survey.survey_category }}</td>
+                          <td>Customer Name: {{ survey.survey_cust_name }}</td>
+                          <td>Actual Date: {{ survey.survey_actual }}</td>
+                      </tr>
+                      <tr>
+                          <td>Resolution: {{ survey.survey_resolution }}</td>
+                          <td>Process Name: {{ survey.survey_process_name }}</td>
+                          <td>Part Name: {{ survey.survey_part_name }}</td>
+                          <td>Reason For Rev: {{ survey.survey_reason }}</td>
+                      </tr>
+                      <tr>
+                          <td>Unit: {{ survey.survey_unit }}</td>
+                          <td>Symbol: {{ survey.survey_symbol }}</td>
+                          <td>Part Number: {{ survey.survey_part_number }}</td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td>Next Calibration Date: {{ survey.survey_next_cal }}</td>
+                          <td>Reference: {{ survey.survey_ref }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td></td>
+                          <td>Range (Max to Min): {{ survey.survey_range_max }} to {{ survey.survey_range_min }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td></td>
+                          <td>FMEA Number: {{ survey.survey_fmea }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td></td>
+                          <td>Control Plan Number: {{ survey.survey_control_plan }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                  </tbody>
+                </table>
+
+                <table class="table table-hover table-bordered results">
+                    <thead>
+                      
+                      <tr>
+                        <th scope="col">Stdev: {{xbarr.xbarr_stdev}}</th>
+                        <th scope="col">Tolerance (Max to Min): {{xbarr.xbarr_stdevmax}} to {{xbarr.xbarr_stdevmin}}</th>
+                        <th scope="col">Num Trial: {{xbarr.xbarr_ntrial}}</th>
+                        <th scope="col">Num Appraiser: {{xbarr.xbarr_nkaryawan}}</th>
+                        <th scope="col">Num Part: {{xbarr.xbarr_npart}}</th>
+                        <th scope="col">Performed By: {{xbarr.xbarr_npart}}</th>
+                      </tr>
+                    
+                      
+                      
+                    </thead>
+                    <tbody>
+                        
+                      
+                      
+                        
+                    </tbody>
+                  </table>
+
+                  <h6>Appraiser Name: 
+                    
+                    {% for j, k in gabung %}
+                    {{ j}}
+                    {% if k == xbarr.xbarr_nkaryawan %}
+                    .
+                    {% else %}
+                    ,
+                    {% endif %}
+                    {% endfor %}
+                  </h6>
+
+                  <table class="table table-hover table-condensed mv-20">
+                    <thead>
+                        <tr>
+                        <th scope="col">Jenis</th>
+                        <th scope="col">% Study Var</th>
+                        <th scope="col">% Contribution</th>
+                        <th scope="col">% Tolerance</th>
+                        <th scope="col">% Process</th>
+                        
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        {% for resume in xbarr.xbarr_resume %}
+                        <tr>
+                        <td>{{ resume.0 }}</td>
+                        <td>{{ resume.1 }}</td>
+                        <td>{{ resume.2 }}</td>
+                        <td>{{ resume.3 }}</td>
+                        <td>{{ resume.4 }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <form action="{% url 'coretoolcrud:storeCommentGrrXbarr' xbarr.id %}" method="POST" enctype="multipart/form-data">
+                      {% csrf_token %}
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        <img src="data:image/png;base64,{{ psvc }}" alt="Admin"  width="95%", height="50%">
+                        <br><br><br>
+                        <p>GRR &lt; 10% or  10 &lt;= GRR &lt;=30
+                        <br>NDC &gt; 5 Need Correction</P>          
+                        <textarea class="form-control" name="xbarr_psvc" id="textAreaExample" rows="4">{{ xbarr.xbarr_psvc }}</textarea>
+                      </div>
+                    </div>
+
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        <img src="data:image/png;base64,{{ rva }}" alt="Admin"  width="95%", height="50%">
+                        <br><br><br>
+                        <p>Range value is within UCL/LCL range
+                        <br>Nilai R berada di dalam UCL/LCL, yang berarti:
+                        <br>- No special cause / Tidak ada special cause
+                        <br>- Same method / Metoda ukur sama
+                        <br>- Consistency of measurement (repeatability) / pengulangan konsisten</p>
+                        <textarea class="form-control" name="xbarr_rva" id="textAreaExample" rows="4">{{ xbarr.xbarr_rva }}</textarea>
+                      </div>
+                    </div>
+                    <br><br><br>
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        <img src="data:image/png;base64,{{ dbs }}" alt="Admin"  width="95%", height="50%">
+                        <br><br><br>
+                        <p>Standard:
+                        <br>- No noise means / tidak ada data aneh
+                        <br>- Part variation is small / variasi part kecil
+                        <br>- No outlier reading / tidak ada kesalahan ukur</p>
+                        <textarea class="form-control" name="xbarr_dbs" id="textAreaExample" rows="4">{{ xbarr.xbarr_dbs }}</textarea>
+                      </div>
+                    </div>
+
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        <img src="data:image/png;base64,{{ dba }}" alt="Admin"  width="95%", height="50%">
+                        <br><br><br>
+                        <p>Standard:
+                        <br>Mean line is straight line, ,means / arti garis lurus:
+                        <br>- No appraiser may have lower/higher reading than the other / tidak ada operattor punya pembacaan lebih tinggi/ lebih rendah</p>
+                        <textarea class="form-control" name="xbarr_dba" id="textAreaExample" rows="4">{{ xbarr.xbarr_dba }}</textarea>
+                      </div>
+                    </div>
+                    <br><br><br>
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        <img src="data:image/png;base64,{{ aabp }}" alt="Admin"  width="95%", height="50%">
+                        <br><br><br>
+                        <p>Standard:
+                        <br>There is no tendency for measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</p>
+                        <textarea class="form-control" name="xbarr_aabp" id="textAreaExample" rows="4">{{ xbarr.xbarr_aabp }}</textarea>
+                      </div>
+                    </div>
+
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        <img src="data:image/png;base64,{{ xva }}" alt="Admin"  width="95%", height="50%">
+                        <br><br><br>
+                        <p>Standard:
+                        <br>Minimal 50% Xbar fall outside the control (adequate to detect part to part variation / Sufficient Discrimination & controlling the process sample represent the expected process Variation)
+                        <br>Minimal 50% Xbarr berada di luar control limit, ini menunjukkan pengukuran dapat mendeteksi variasi (resolusi mencukupi)</p>
+                        <textarea class="form-control" name="xbarr_xva" id="textAreaExample" rows="4">{{ xbarr.xbarr_xva }}</textarea>
+                      </div>
+                    </div>
+                    <br><br><br>
+                    <div class="card">
+                      <h5 class="card-header">Recommendation</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        
+                        <br><br><br>
+                        <div class="container1">
+                          <button class="add_form_field btn btn-primary">Add New Field &nbsp; 
+                            <span style="font-size:16px; font-weight:bold;">+ </span>
+                          </button>
+                          <div><input class="form-control" type="text" name="xbarr_recommendation"></div>
+                      </div>
+
+                      </div>
+                    </div>
+                    <br><br><br>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </form>
+
+        </div>
+        
+    </div>
+
+
+
+
+
+    <script>
+    $(document).ready(function() {
+    var max_fields = 10;
+    var wrapper = $(".container1");
+    var add_button = $(".add_form_field");
+
+    var x = 1;
+    $(add_button).click(function(e) {
+        e.preventDefault();
+        if (x < max_fields) {
+            x++;
+            $(wrapper).append('<div class="input-group"><input class="form-control" type="text" name="xbarr_recommendation"/> <a href="#" class="delete btn btn-danger">Delete</a></div>'); //add input box
+        } else {
+            alert('You Reached the limits')
+        }
+    });
+
+    $(wrapper).on("click", ".delete", function(e) {
+        e.preventDefault();
+        $(this).parent('div').remove();
+        x--;
+    })
+});
+    </script>
+</body>
+</html>
