@@ -30,6 +30,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = ['https://crop-framing-bp-citation.trycloudflare.com']
+
 
 # Application definition
 
