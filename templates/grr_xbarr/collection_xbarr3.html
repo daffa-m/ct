@@ -10,7 +10,29 @@
     <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
     <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
     <style type="text/css" rel="stylesheet">
-    .invoice-title h2, .invoice-title h3, .invoice-title a {
+    ul.breadcrumb {
+    padding: 10px 16px;
+    list-style: none;
+    background-color: #eee;
+    }
+    ul.breadcrumb li {
+    display: inline;
+    font-size: 18px;
+    }
+    ul.breadcrumb li+li:before {
+    padding: 8px;
+    color: black;
+    content: "/\00a0";
+    }
+    ul.breadcrumb li a {
+    color: #0275d8;
+    text-decoration: none;
+    }
+    ul.breadcrumb li a:hover {
+    color: #01447e;
+    text-decoration: underline;
+    }
+    .invoice-title h2, .invoice-title h3 {
     display: inline-block;
     }
     p {
@@ -29,17 +51,35 @@
     </style>
     
 </head>
-<body onload="window.print()">
+<body>
     <div class="container">
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="invoice-title">
-                  <a class="navbar-brand" href="#">
-                    <img src="https://mdbootstrap.com/img/logo/mdb-transparent.png" height="30" alt="mdb logo">
-                  </a>
-                    <h2>{{ request.session.company }}</h2><h2 class="float-end">GRR ANOVA</h3>
-                </div>
-                <hr>
+      <div class="invoice-title">
+        <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
+          <h2>GRR Xbar-R</h2><br>
+      <ul class="breadcrumb">
+        <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
+        <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
+        <li><a href="{% url 'coretoolcrud:viewDetailSurvey' xbarr.xbarr_survey_id %}">Survey Result</a></li>
+        <li>GRR Xbar-R Result</li>
+      </ul>
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">
+          <p>{{ message }}</p>
+        </div>
+        {% else %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+            <p>{{ message }}</p>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+      </nav>
+       
+        <hr>
+
+      </div>
 
                 <table class="table table-hover table-bordered results">
                   <thead>
@@ -107,12 +147,12 @@
                   <thead>
                     
                     <tr>
-                      <th scope="col">Stdev: {{nested.nested_stdev}}</th>
-                      <th scope="col">Tolerance (Max to Min): {{nested.nested_stdevmax}} to {{nested.nested_stdevmin}}</th>
-                      <th scope="col">Num Trial: {{nested.nested_ntrial}}</th>
-                      <th scope="col">Num Appraiser: {{nested.nested_nkaryawan}}</th>
-                      <th scope="col">Num Part: {{nested.nested_npart}}</th>
-                      <th scope="col">Performed By: {{nested.nested_npart}}</th>
+                      <th scope="col">Stdev: {{xbarr.xbarr_stdev}}</th>
+                      <th scope="col">Tolerance (Max to Min): {{xbarr.xbarr_stdevmax}} to {{xbarr.xbarr_stdevmin}}</th>
+                      <th scope="col">Num Trial: {{xbarr.xbarr_ntrial}}</th>
+                      <th scope="col">Num Appraiser: {{xbarr.xbarr_nkaryawan}}</th>
+                      <th scope="col">Num Part: {{xbarr.xbarr_npart}}</th>
+                      <th scope="col">Performed By: {{xbarr.xbarr_npart}}</th>
                     </tr>
                   
                     
@@ -130,7 +170,7 @@
                   
                   {% for j, k in gabung2 %}
                   {{ j}}
-                  {% if k == nested.nested_nkaryawan %}
+                  {% if k == xbarr.xbarr_nkaryawan %}
                   .
                   {% else %}
                   ,
@@ -138,13 +178,92 @@
                   {% endfor %}
                 </h6>
 
-                  {{ dfinteraksi|safe }}
-                  <h6>NDC : {{ndc}}</h6>
-                    {{ aov|safe }}
-                   
+                  <table class="table table-hover table-bordered results">
+                    <thead>
+                      <tr>
+                        <th scope="col">Measurement Unit Analysis</th>
+                        <th scope="col">Compared to TV</th>
+                        <th scope="col">Value Comp</th>
+                        <th scope="col">% Var Comp</th>
+                        <th scope="col">% Tolerance</th>
+                        <th scope="col">% Process</th>
+                      </tr>
+                     
+                      
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td scope="col">EV = {{ tabeltambahan.27 }}</td>
+                        <td scope="col">% EV = {{ tabeltambahan.2 }}</td>
+                        <td scope="col">{{ tabeltambahan.7 }}</td>
+                        <td scope="col">{{ tabeltambahan.12 }}</td>
+                        <td scope="col">{{ tabeltambahan.17 }}</td>
+                        <td scope="col">{{ tabeltambahan.22 }}</td>
+                      </tr>
+                      <tr>
+                        <td scope="col">AV = {{ tabeltambahan.28 }}</td>
+                        <td scope="col">% AV = {{ tabeltambahan.3 }}</td>
+                        <td scope="col">{{ tabeltambahan.8 }}</td>
+                        <td scope="col">{{ tabeltambahan.13 }}</td>
+                        <td scope="col">{{ tabeltambahan.18 }}</td>
+                        <td scope="col">{{ tabeltambahan.23 }}</td>
+                      </tr>
+                      <tr>
+                        <td scope="col">GRR = {{ tabeltambahan.29 }}</td>
+                        <td scope="col">% GRR = {{ tabeltambahan.4 }}</td>
+                        <td scope="col">{{ tabeltambahan.9 }}</td>
+                        <td scope="col">{{ tabeltambahan.14 }}</td>
+                        <td scope="col">{{ tabeltambahan.19 }}</td>
+                        <td scope="col">{{ tabeltambahan.24 }}</td>
+                      </tr>
+                      <tr>
+                        <td scope="col">PV = {{ tabeltambahan.30 }}</td>
+                        <td scope="col">% PV = {{ tabeltambahan.5 }}</td>
+                        <td scope="col">{{ tabeltambahan.10 }}</td>
+                        <td scope="col">{{ tabeltambahan.15 }}</td>
+                        <td scope="col">{{ tabeltambahan.20 }}</td>
+                        <td scope="col">{{ tabeltambahan.25 }}</td>
+                      </tr>
+                      <tr>
+                        <td scope="col">TV = {{ tabeltambahan.0 }}</td>
+                        <td scope="col">NDC = {{ tabeltambahan.6 }}</td>
+                        <td scope="col">{{ tabeltambahan.11 }}</td>
+                        <td scope="col">{{ tabeltambahan.16 }}</td>
+                        <td scope="col">{{ tabeltambahan.21 }}</td>
+                        <td scope="col">{{ tabeltambahan.26 }}</td>
+                      </tr>
+                      
+                      
+                        
+                    </tbody>
+                  </table>
 
-                  
+                  <table class="table table-hover table-condensed mv-20">
+                    <thead>
+                        <tr>
+                        <th scope="col">Jenis</th>
+                        <th scope="col">% Study Var</th>
+                        <th scope="col">% Contribution</th>
+                        <th scope="col">% Tolerance</th>
+                        <th scope="col">% Process</th>
+                        
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        {% for resume in xbarr.xbarr_resume %}
+                        <tr>
+                        <td>{{ resume.0 }}</td>
+                        <td>{{ resume.1 }}</td>
+                        <td>{{ resume.2 }}</td>
+                        <td>{{ resume.3 }}</td>
+                        <td>{{ resume.4 }}</td>
+                        </tr>
+                        {% endfor %}
+        
+                    </table>
 
+                    <h6>Measurement</h6>
                     <table class="table table-hover table-bordered results" id="table">
                       <thead>
                         <tr>
@@ -232,11 +351,12 @@
                         <div class="card-body">
                           <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
                           <img src="data:image/png;base64,{{ psvc }}" alt="Admin"  width="95%", height="50%">
+                          
                           <br><br><br>
                           <p>GRR &lt; 10% or  10 &lt;= GRR &lt;=30
                           <br>NDC &gt; 5 Need Correction</p>
                           <p>Comment:          
-                          <br>{{ nested.nested_psvc }}</p>
+                          <br>{{ xbarr.xbarr_psvc }}</p>
                         </div>
                       </div>
                       <br><br>
@@ -251,8 +371,7 @@
                           <br>- No special cause / Tidak ada special cause
                           <br>- Same method / Metoda ukur sama
                           <br>- Consistency of measurement (repeatability) / pengulangan konsisten</p>
-                          <p>Comment:                                    
-                          <br>{{ nested.nested_rva }}</p>
+                          <p>Comment:                                    <br>{{ xbarr.xbarr_rva }}</p>
                         </div>
                       </div>
                       <br><br>
@@ -261,13 +380,13 @@
                         <div class="card-body">
                           <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
                           {{divdbs| safe}}
-                          <br><br><br>
+                          <br><br>
                           <p>Standard:
                           <br>- No noise means / tidak ada data aneh
                           <br>- Part variation is small / variasi part kecil
                           <br>- No outlier reading / tidak ada kesalahan ukur</p>
                           <p>Comment:          
-                          <br>{{ nested.nested_dbs }}</p>
+                          <br>{{ xbarr.xbarr_dbs }}</p>
                         </div>
                       </div>
                       <br><br>
@@ -276,12 +395,12 @@
                         <div class="card-body">
                           <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
                           {{divdba| safe}}
-                          <br><br><br>
+                          <br><br>
                           <p>Standard:
                           <br>Mean line is straight line, ,means / arti garis lurus:
                           <br>- No appraiser may have lower/higher reading than the other / tidak ada operattor punya pembacaan lebih tinggi/ lebih rendah</p>
                           <p>Comment:          
-                            <br>{{ nested.nested_dba }}</p>
+                            <br>{{ xbarr.xbarr_dba }}</p>
                         </div>
                       </div>
                       <br><br>
@@ -292,9 +411,9 @@
                           {{divaabp| safe}}
                           <br><br><br>
                           <p>Standard:
-                          <br>There is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</p>
+                          <br>there is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</p>
                           <p>Comment:          
-                            <br>{{ nested.nested_aabp }}</p>
+                            <br>{{ xbarr.xbarr_aabp }}</p>
                         </div>
                       </div>
                       <br><br>
@@ -305,10 +424,9 @@
                           {{divxva| safe}}
                           <br><br><br>
                           <p>Standard:
-                            <br>Minimal 50% Xbar fall outside the control (adequate to detect part to part variation / Sufficient Discrimination & controlling the process sample represent the expected process Variation)
-                            <br>Minimal 50% Xbarr berada di luar control limit, ini menunjukkan pengukuran dapat mendeteksi variasi (resolusi mencukupi)</p>
+                          <br>There is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</p>
                           <p>Comment:          
-                            <br>{{ nested.nested_xva }}</p>
+                            <br>{{ xbarr.xbarr_xva }}</p>
                         </div>
                       </div>
                       <br><br>
@@ -316,17 +434,17 @@
                         <h5 class="card-header">Decision and Recommendation</h5>
                         <div class="card-body">
                           <h6 class="card-subtitle mb-2 text-muted">Decision</h6>
-                          <!-- {% if xbarr.xbarr_resume.0.1 < 10 %}
+                          {% if xbarr.xbarr_resume.0.1 < 10 %}
                             <p>Measurement method is accepted / metoda pengukuran diterima</p>
                           {% elif xbarr.xbarr_resume.0.1 < 30 %}
                           <p>Measurement method need correction / metoda pengukuran perlu perbaikan</p>
                           {% elif xbarr.xbarr_resume.0.1 >= 30 %}
                           <p>Measurement method is rejected / metoda pengukuran tidak bisa dipakai</p>
-                          {% endif %} -->
+                          {% endif %}
                           
                             <br><br><h6 class="card-subtitle mb-2 text-muted">Recommendation</h6>
                             <p>
-                          {% for ele in nested.nested_recommendation %} 
+                          {% for ele in xbarr.xbarr_recommendation %} 
                           <br>- {{ ele }}
                           {% endfor %}
                           </p>
@@ -335,9 +453,9 @@
 
                       <br><br>
                     
-                      <a href="{% url 'coretoolcrud:deleteNested' nested.nested_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                      <br><br>
-
+                    <a href="{% url 'coretoolcrud:deleteGrrXbarr' xbarr.xbarr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    <a href="{% url 'coretoolcrud:viewPrintGrrXbarr' xbarr.xbarr_survey_id %}" class="btn btn-info">Print</a>
+                    <br><br>
         </div>
         
     </div>

@@ -87,8 +87,15 @@
           {% csrf_token %}
           
         
-        
-        
+          <div class="form-group"><br>
+            <label for="exampleInputEmail1">Measured By</label>
+            <input class="form-control" name="linearity_ave_measured" id="demoFormHorizontalEmail" type="text" required />
+          </div>
+          <div class="form-group"><br>
+            <label for="exampleInputEmail1">Reviewed By</label>
+            <input class="form-control" name="linearity_ave_reviewed" id="demoFormHorizontalEmail" type="text" required />
+          </div>
+          <br>
         <table class="table table-hover table-bordered results" id="table">
             <thead>
               <tr>

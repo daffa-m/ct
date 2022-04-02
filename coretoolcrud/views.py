@@ -24,6 +24,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import io
 import urllib, base64
+from bokeh.plotting import figure, show
+from bokeh.embed import components
+from bokeh.models import LinearAxis
 
 from random import randint
 
@@ -47,40 +50,45 @@ def login(request):
         if 'user' in request.session:
             if request.session['user'] == uname:
                 messages.error(request, "Akun sedang digunakan di perangkat lain")
-                return redirect('/')
+                return redirect('/logout')
         else:
             user = User.objects.get(user_username=uname)
             request.session['user'] = uname
+            request.session['company'] = user.user_company
+            request.session['id'] = user.id
             request.session['role'] = user.user_role
 
         return redirect('/viewListSurvey')
     else:
         messages.error(request, "Username atau password salah")
-        return redirect('/')
+        return redirect('/logout')
 
 def logout(request):
     try:
         del request.session['user']
     except:
         return redirect('/')
-    return redirect('/')
+    return redirect('/logout')
 
 
 # Survey
 
 def viewListSurvey(request):
     if 'user' in request.session:
-        survey = Survey.objects.all()
+        survey = Survey.objects.filter(survey_user_id=request.session['id'])
         return render(request,'survey/list_survey.html',{'survey':survey})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewDetailSurvey(request, pk):
     if 'user' in request.session:
         survey = Survey.objects.get(id = pk)
-        return render(request,'survey/survey_result.html',{'survey':survey})
+        if survey.survey_user_id == request.session['id']:
+            return render(request,'survey/survey_result.html',{'survey':survey})
+        else:
+            return redirect('/logout')
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def deleteSurvey(request, pk):
     if 'user' in request.session:
@@ -89,38 +97,46 @@ def deleteSurvey(request, pk):
         messages.success(request, "Survey berhasil dihapus")
         return redirect('coretoolcrud:viewListSurvey')
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewSurvey(request):
     if 'user' in request.session:
         return render(request,'survey/survey1.html')
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewEditSurvey(request, pk):
     if 'user' in request.session:
         survey = Survey.objects.get(id = pk)
-        return render(request,'survey/edit_survey.html',{'survey':survey})
+        if survey.survey_user_id == request.session['id']:
+            return render(request,'survey/edit_survey.html',{'survey':survey})
+        else:
+            return redirect('/logout')
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewManual(request):
     if 'user' in request.session:
         return render(request,'survey/manual.html')
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewEditManual(request, pk):
     if 'user' in request.session:
         survey = Survey.objects.get(id = pk)
-        return render(request,'survey/edit_manual.html',{'survey':survey})
+        if survey.survey_user_id == request.session['id']:
+            return render(request,'survey/edit_manual.html',{'survey':survey})
+        else:
+            return redirect('/logout')
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeManual(request):
     if 'user' in request.session:
         survey = Survey()
+        user = User.objects.get(user_username=request.session['user'])
 
+        survey.survey_user_id = user.id
         survey.survey_date_project = request.POST.get('survey_date_project')
         survey.survey_cust_name = request.POST.get('survey_cust_name')
         survey.survey_part_name = request.POST.get('survey_part_name')
@@ -151,12 +167,14 @@ def storeManual(request):
         messages.success(request, "Data Survey Berhasil Disimpan")
         return redirect('coretoolcrud:viewDetailSurvey',survey.id )
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeEditManual(request, pk):
     if 'user' in request.session:
         survey = Survey.objects.get(id = pk)
+        user = User.objects.get(user_username=request.session['user'])
 
+        survey.survey_user_id = user.id
         survey.survey_date_project = request.POST.get('survey_date_project')
         survey.survey_cust_name = request.POST.get('survey_cust_name')
         survey.survey_part_name = request.POST.get('survey_part_name')
@@ -187,12 +205,14 @@ def storeEditManual(request, pk):
         messages.success(request, "Data Survey Berhasil Disimpan")
         return redirect('coretoolcrud:viewDetailSurvey',survey.id )
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeSurvey(request):
     if 'user' in request.session:
         survey = Survey()
+        user = User.objects.get(user_username=request.session['user'])
 
+        survey.survey_user_id = user.id
         survey.survey_date_project = request.POST.get('survey_date_project')
         survey.survey_cust_name = request.POST.get('survey_cust_name')
         survey.survey_part_name = request.POST.get('survey_part_name')
@@ -316,12 +336,14 @@ def storeSurvey(request):
         # return render(request,'survey/survey_result.html',{'survey':survey})
         return redirect('coretoolcrud:viewDetailSurvey',survey.id )
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeEditSurvey(request, pk):
     if 'user' in request.session:
         survey = Survey.objects.get(id = pk)
+        user = User.objects.get(user_username=request.session['user'])
 
+        survey.survey_user_id = user.id
         survey.survey_date_project = request.POST.get('survey_date_project')
         survey.survey_cust_name = request.POST.get('survey_cust_name')
         survey.survey_part_name = request.POST.get('survey_part_name')
@@ -415,7 +437,7 @@ def storeEditSurvey(request, pk):
         # return render(request,'survey/survey_result.html',{'survey':survey})
         return redirect('coretoolcrud:viewDetailSurvey',survey.id )
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 # GRR Xbarr
 
@@ -436,7 +458,7 @@ def viewGrrXbarr(request, pk):
         except Xbarr.DoesNotExist:
             return render(request,'grr_xbarr/xbarr.html',{'pk':pk})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeGrrXbarr(request, pk):
     if 'user' in request.session:
@@ -465,7 +487,7 @@ def storeGrrXbarr(request, pk):
         karyawan = range(int(xbarr.xbarr_nkaryawan))
         return render(request,'grr_xbarr/all_xbarr.html',{'part':part, 'karyawan':karyawan, 'trial':trial, 'namas':namas, 'xbarr':xbarr})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeAllGrrXbarr(request, pk):
     if 'user' in request.session:
@@ -500,7 +522,7 @@ def storeAllGrrXbarr(request, pk):
         xbarr.save()
         return redirect('coretoolcrud:viewCommentGrrXbarr', pk)    
     else:
-        return redirect('/')        
+        return redirect('/logout')        
 
 def viewCommentGrrXbarr(request, pk):
     if 'user' in request.session:
@@ -1024,7 +1046,7 @@ def viewCommentGrrXbarr(request, pk):
         return render(request,'grr_xbarr/comment_xbarr.html',{'psvc':psvc, 'rva':rva, 'xva':xva, 'dbs':dbs, 'dba':dba, 'aabp':aabp, 'xbarr':xbarr, 'survey':survey, 'gabung':gabung})
         # return render(request,'xbarr/result_xbarr.html',{'resumes':resumes})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeCommentGrrXbarr(request, pk):
     if 'user' in request.session:
@@ -1041,7 +1063,7 @@ def storeCommentGrrXbarr(request, pk):
         return redirect('coretoolcrud:viewFinalGrrXbarr',xbarr.xbarr_survey_id )
         # return render(request,'xbarr/final_xbarr.html',{'psvc':psvc, 'rva':rva, 'dbs':dbs, 'dba':dba, 'aabp':aabp, 'xbarr':xbarr, 'survey':survey})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewFinalGrrXbarr(request, pk):
     if 'user' in request.session:
@@ -1298,7 +1320,7 @@ def viewFinalGrrXbarr(request, pk):
             dfres = pd.DataFrame(data={'% Study Var': a, '% Var Comp': b, '% Tolerance': c, '% Process': d}, index=x)
         plt.figure()
         dfres.plot(kind='bar', rot=0, ylabel='Value', title='Resume', figsize=(6, 4))
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
+        plt.legend(loc='upper center', ncol=5)
 
         fig = plt.gcf()
         buf = io.BytesIO()
@@ -1308,6 +1330,14 @@ def viewFinalGrrXbarr(request, pk):
 
         psvc = urllib.parse.quote(string)
 
+        ####bokeh#######
+
+        p = figure(title="Resume", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Trial')
+        # p.vbar(x = dfres.Jenis, source = dfres)
+
+        scriptresume, divresume = components(p)
+
+        ###################
 
         listulcr = []
         listlclr = []
@@ -1317,10 +1347,9 @@ def viewFinalGrrXbarr(request, pk):
                 listulcr.append(ulcr)
                 listlclr.append(lclr)
 
-        ##################
+
 
         bot = []
-        top = []
         urut = []
         temp = 0
 
@@ -1331,55 +1360,17 @@ def viewFinalGrrXbarr(request, pk):
         for i in range(int(xbarr.xbarr_nkaryawan)):
             for j in range(int(xbarr.xbarr_npart)):
                 urut.append(temp)
-                bot.append(str(j+1))
-                # if int(xbarr.xbarr_npart) % 2 == 0:
-                #     if j == 0 or j == int(xbarr.xbarr_npart) - 1:
-                #         top.append("|")
-                #     elif j == (int(xbarr.xbarr_npart) / 2):
-                #         top.append(xbarr.xbarr_karyawan[i])
-                #     else:
-                #         top.append("")
-                # elif int(xbarr.xbarr_npart) % 2 != 0:
-                #     if j == 0 or j == int(xbarr.xbarr_npart) - 1:
-                #         top.append("|")
-                #     elif j == int(round(int(xbarr.xbarr_npart) / 2, 0)):
-                #         top.append(xbarr.xbarr_karyawan[i])
-                #     else:
-                #         top.append("")
-                if j == 0:
-                    top.append(xbarr.xbarr_karyawan[i])
-                elif j == int(xbarr.xbarr_npart) - 1:
-                    top.append("|")
-                else:
-                    top.append("")
-                temp = temp + 1
+                bot.append(xbarr.xbarr_karyawan[i] + "-" + str(j+1))
 
+        ####bokeh#######
 
+        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = bot, y_axis_label='Measurement', x_axis_label='Appraiser-Trial')
+        p.line(bot, flat, legend_label="Range", line_width=2)
+        p.line(bot, listulcr, legend_label="UCLRbar", color="green", line_width=2)
+        p.line(bot, listlclr, legend_label="LCLRbar", color="red", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
 
-        # urut = np.array(urut)
-        plt.clf()
-        fig, ax = plt.subplots()
-
-        ax.plot(flat, label='Range')
-        ax.plot(listulcr, label='UCLRbar')
-        ax.plot(listlclr, label='LCLRbar')
-        ax.set_xticks(urut)
-        ax.set_xticklabels(bot)
-        x1, x2 = ax.get_xlim() 
-        ax2 = ax.twiny()
-        ax2.set_xlim(x1,x2)
-        ax2.set_xticks(urut)
-        ax2.set_xticklabels(top)
-        ax.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
-        plt.title("Range vs Appraisal")
-        ax.set_ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        rva = urllib.parse.quote(string)
+        scriptrva, divrva = components(p)
         
         ####################################
 
@@ -1429,27 +1420,15 @@ def viewFinalGrrXbarr(request, pk):
         #colors = np.array(["red","green","blue","yellow","pink","black","orange","purple","beige","brown","gray","cyan","magenta"])
         colors = []
         
-        plt.clf()
+
+        ####bokeh#######
+
+        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p.line(urutline, avepertrial, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_nkaryawan) * int(xbarr.xbarr_ntrial)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
-            plt.scatter(urutlineline[i], pertrial[i],c=colors[i])
-
-        # for i in range(int(xbarr.xbarr_npart)):
-        #     plt.scatter((sum(urut)))
-        plt.plot(urutline, avepertrial, label='Average')
-        # plt.xlabel('Part No')
-        plt.ylabel('Measurement')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(xbarr.xbarr_nkaryawan))
-        plt.ylabel("Value")
-        plt.title('Data by Sample')
-
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dbs = urllib.parse.quote(string)
+            p.scatter(urutlineline[i], pertrial[i], color=colors[i], marker="circle")
+        scriptdbs, divdbs = components(p)
 
         #####################################
 
@@ -1468,25 +1447,17 @@ def viewFinalGrrXbarr(request, pk):
         for ele in perkaryawan:
             aveperkaryawan.append(sum(ele) / len(ele))
 
-        plt.clf()
-        colors = []
+       
+        ######bokeh######
+
+        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = xbarr.xbarr_karyawan, x_axis_label='Appraiser', y_axis_label='Measurement')
+        p.line(xbarr.xbarr_karyawan, aveperkaryawan, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_npart) * int(xbarr.xbarr_ntrial)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
-            plt.scatter(namaline[i], perperkaryawan[i],c=colors[i])
+            p.scatter(namaline[i], perperkaryawan[i], color=colors[i], marker="circle")
 
-        plt.plot(xbarr.xbarr_karyawan, aveperkaryawan, label='Average')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(xbarr.xbarr_nkaryawan))
-        plt.title('Data by Appraisal')
-        # plt.xlabel('Appraisal')
-        plt.ylabel('Measurement')
-
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dba = urllib.parse.quote(string)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptdba, divdba = components(p)
 
         #####################################
 
@@ -1496,25 +1467,16 @@ def viewFinalGrrXbarr(request, pk):
         for i in range(int(xbarr.xbarr_nkaryawan)):
             urutlineline.append(urutline)
 
-        plt.clf()
-        colors = []
+        ####bokeh#######
+
+        p = figure(title="Average Appraiser by Part", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        # p.line(urutline, avepertrial, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_nkaryawan)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
-            plt.scatter(urutlineline[i], avepart[i], c=colors[i])
-            plt.plot(urutlineline[i], avepart[i], c=colors[i], label=xbarr.xbarr_karyawan[i])
-        plt.title('Average Appraisal By Part')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(xbarr.xbarr_nkaryawan))
-        # plt.xlabel('Part No')
-        plt.ylabel('Measurement')
+            p.scatter(urutlineline[i], avepart[i], color="(0.5, 0.75, 0.5)", marker="circle")
+            p.line(urutlineline[i], avepart[i], legend_label=xbarr.xbarr_karyawan[i], color=colors[i], line_width=2)
+        scriptaabp, divaabp = components(p)
 
-
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        aabp = urllib.parse.quote(string)
         ####################################
 
         listuclx = []
@@ -1535,30 +1497,15 @@ def viewFinalGrrXbarr(request, pk):
                 
                 temp = temp + 1
 
-        plt.clf()
-        fig, ax3 = plt.subplots()
+        ####bokeh#######
 
-        ax3.plot(flat, label='Xbar')
-        ax3.plot(listuclx, label='UCLXbar2')
-        ax3.plot(listlclx, label='LCLXbar2')
+        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = bot, y_axis_label='Measurement', x_axis_label='Appraiser-Trial')
+        p.line(bot, flat, legend_label="Xbar", line_width=2)
+        p.line(bot, listuclx, legend_label="UCLXbar2", color="green", line_width=2)
+        p.line(bot, listlclx, legend_label="LCLXbar2", color="red", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
 
-        ax3.set_xticks(urut)
-        ax3.set_xticklabels(bot)
-        x1, x2 = ax3.get_xlim() 
-        ax4 = ax3.twiny()
-        ax4.set_xlim(x1,x2)
-        ax4.set_xticks(urut)
-        ax4.set_xticklabels(top)
-        ax3.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(xbarr.xbarr_nkaryawan))
-
-        plt.title('Xbar vs Appraisal')
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        xva = urllib.parse.quote(string)
+        scriptxva, divxva = components(p)
 
         ####################################
         namas = xbarr.xbarr_karyawan
@@ -1576,9 +1523,9 @@ def viewFinalGrrXbarr(request, pk):
 
         tabeltambahan = [tv, vartv, pev, pav, pgrr, ppv, ndc, vcev, vcav, vcgrr, vcpv, vcndc, pvcev, pvcav, pvcgrr, pvcpv, pvcndc, ptev, ptav, ptgrr, ptpv, ptndc, ppev, ppav, ppgrr, pppv, ppndc, ev, av, grr, pv]
 
-        return render(request,'grr_xbarr/collection_xbarr.html',{'tabeltambahan':tabeltambahan, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'namas': namas, 'part1':part1, 'part':part, 'karyawan':karyawan, 'trial':trial, 'psvc':psvc, 'rva':rva, 'xva':xva, 'dbs':dbs, 'dba':dba, 'aabp':aabp, 'xbarr':xbarr, 'survey':survey})
+        return render(request,'grr_xbarr/collection_xbarr3.html',{'tabeltambahan':tabeltambahan, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'namas': namas, 'part1':part1, 'part':part, 'karyawan':karyawan, 'trial':trial, 'xbarr':xbarr, 'survey':survey, 'psvc':psvc, 'scriptdbs':scriptdbs, 'divdbs':divdbs, 'scriptdba':scriptdba, 'divdba':divdba, 'scriptrva':scriptrva, 'divrva':divrva, 'scriptresume':scriptresume, 'divresume':divresume, 'scriptaabp':scriptaabp, 'divaabp':divaabp, 'scriptxva':scriptxva, 'divxva':divxva})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewPrintGrrXbarr(request, pk):
     if 'user' in request.session:
@@ -1845,6 +1792,14 @@ def viewPrintGrrXbarr(request, pk):
 
         psvc = urllib.parse.quote(string)
 
+        ####bokeh#######
+
+        p = figure(title="Resume", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Trial')
+        # p.vbar(x = dfres.Jenis, source = dfres)
+
+        scriptresume, divresume = components(p)
+
+        ###################
 
         listulcr = []
         listlclr = []
@@ -1854,10 +1809,9 @@ def viewPrintGrrXbarr(request, pk):
                 listulcr.append(ulcr)
                 listlclr.append(lclr)
 
-        ##################
+
 
         bot = []
-        top = []
         urut = []
         temp = 0
 
@@ -1868,55 +1822,17 @@ def viewPrintGrrXbarr(request, pk):
         for i in range(int(xbarr.xbarr_nkaryawan)):
             for j in range(int(xbarr.xbarr_npart)):
                 urut.append(temp)
-                bot.append(str(j+1))
-                # if int(xbarr.xbarr_npart) % 2 == 0:
-                #     if j == 0 or j == int(xbarr.xbarr_npart) - 1:
-                #         top.append("|")
-                #     elif j == (int(xbarr.xbarr_npart) / 2):
-                #         top.append(xbarr.xbarr_karyawan[i])
-                #     else:
-                #         top.append("")
-                # elif int(xbarr.xbarr_npart) % 2 != 0:
-                #     if j == 0 or j == int(xbarr.xbarr_npart) - 1:
-                #         top.append("|")
-                #     elif j == int(round(int(xbarr.xbarr_npart) / 2, 0)):
-                #         top.append(xbarr.xbarr_karyawan[i])
-                #     else:
-                #         top.append("")
-                if j == 0:
-                    top.append(xbarr.xbarr_karyawan[i])
-                elif j == int(xbarr.xbarr_npart) - 1:
-                    top.append("|")
-                else:
-                    top.append("")
-                temp = temp + 1
+                bot.append(xbarr.xbarr_karyawan[i] + "-" + str(j+1))
 
+        ####bokeh#######
 
+        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = bot, y_axis_label='Measurement', x_axis_label='Appraiser-Trial')
+        p.line(bot, flat, legend_label="Range", line_width=2)
+        p.line(bot, listulcr, legend_label="UCLRbar", color="green", line_width=2)
+        p.line(bot, listlclr, legend_label="LCLRbar", color="red", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
 
-        # urut = np.array(urut)
-        plt.clf()
-        fig, ax = plt.subplots()
-
-        ax.plot(flat, label='Range')
-        ax.plot(listulcr, label='UCLRbar')
-        ax.plot(listlclr, label='LCLRbar')
-        ax.set_xticks(urut)
-        ax.set_xticklabels(bot)
-        x1, x2 = ax.get_xlim() 
-        ax2 = ax.twiny()
-        ax2.set_xlim(x1,x2)
-        ax2.set_xticks(urut)
-        ax2.set_xticklabels(top)
-        ax.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
-        plt.title("Range vs Appraisal")
-        ax.set_ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        rva = urllib.parse.quote(string)
+        scriptrva, divrva = components(p)
         
         ####################################
 
@@ -1966,27 +1882,15 @@ def viewPrintGrrXbarr(request, pk):
         #colors = np.array(["red","green","blue","yellow","pink","black","orange","purple","beige","brown","gray","cyan","magenta"])
         colors = []
         
-        plt.clf()
+
+        ####bokeh#######
+
+        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p.line(urutline, avepertrial, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_nkaryawan) * int(xbarr.xbarr_ntrial)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
-            plt.scatter(urutlineline[i], pertrial[i],c=colors[i])
-
-        # for i in range(int(xbarr.xbarr_npart)):
-        #     plt.scatter((sum(urut)))
-        plt.plot(urutline, avepertrial, label='Average')
-        # plt.xlabel('Part No')
-        plt.ylabel('Measurement')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(xbarr.xbarr_nkaryawan))
-        plt.ylabel("Value")
-        plt.title('Data by Sample')
-
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dbs = urllib.parse.quote(string)
+            p.scatter(urutlineline[i], pertrial[i], color=colors[i], marker="circle")
+        scriptdbs, divdbs = components(p)
 
         #####################################
 
@@ -2005,25 +1909,17 @@ def viewPrintGrrXbarr(request, pk):
         for ele in perkaryawan:
             aveperkaryawan.append(sum(ele) / len(ele))
 
-        plt.clf()
-        colors = []
+       
+        ######bokeh######
+
+        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = xbarr.xbarr_karyawan, x_axis_label='Appraiser', y_axis_label='Measurement')
+        p.line(xbarr.xbarr_karyawan, aveperkaryawan, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_npart) * int(xbarr.xbarr_ntrial)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
-            plt.scatter(namaline[i], perperkaryawan[i],c=colors[i])
+            p.scatter(namaline[i], perperkaryawan[i], color=colors[i], marker="circle")
 
-        plt.plot(xbarr.xbarr_karyawan, aveperkaryawan, label='Average')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(xbarr.xbarr_nkaryawan))
-        plt.title('Data by Appraisal')
-        # plt.xlabel('Appraisal')
-        plt.ylabel('Measurement')
-
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dba = urllib.parse.quote(string)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptdba, divdba = components(p)
 
         #####################################
 
@@ -2033,25 +1929,16 @@ def viewPrintGrrXbarr(request, pk):
         for i in range(int(xbarr.xbarr_nkaryawan)):
             urutlineline.append(urutline)
 
-        plt.clf()
-        colors = []
+        ####bokeh#######
+
+        p = figure(title="Average Appraiser by Part", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        # p.line(urutline, avepertrial, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_nkaryawan)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
-            plt.scatter(urutlineline[i], avepart[i], c=colors[i])
-            plt.plot(urutlineline[i], avepart[i], c=colors[i], label=xbarr.xbarr_karyawan[i])
-        plt.title('Average Appraisal By Part')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(xbarr.xbarr_nkaryawan))
-        # plt.xlabel('Part No')
-        plt.ylabel('Measurement')
+            p.scatter(urutlineline[i], avepart[i], color="(0.5, 0.75, 0.5)", marker="circle")
+            p.line(urutlineline[i], avepart[i], legend_label=xbarr.xbarr_karyawan[i], color=colors[i], line_width=2)
+        scriptaabp, divaabp = components(p)
 
-
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        aabp = urllib.parse.quote(string)
         ####################################
 
         listuclx = []
@@ -2072,30 +1959,15 @@ def viewPrintGrrXbarr(request, pk):
                 
                 temp = temp + 1
 
-        plt.clf()
-        fig, ax3 = plt.subplots()
+        ####bokeh#######
 
-        ax3.plot(flat, label='Xbar')
-        ax3.plot(listuclx, label='UCLXbar2')
-        ax3.plot(listlclx, label='LCLXbar2')
+        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = bot, y_axis_label='Measurement', x_axis_label='Appraiser-Trial')
+        p.line(bot, flat, legend_label="Xbar", line_width=2)
+        p.line(bot, listuclx, legend_label="UCLXbar2", color="green", line_width=2)
+        p.line(bot, listlclx, legend_label="LCLXbar2", color="red", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
 
-        ax3.set_xticks(urut)
-        ax3.set_xticklabels(bot)
-        x1, x2 = ax3.get_xlim() 
-        ax4 = ax3.twiny()
-        ax4.set_xlim(x1,x2)
-        ax4.set_xticks(urut)
-        ax4.set_xticklabels(top)
-        ax3.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(xbarr.xbarr_nkaryawan))
-
-        plt.title('Xbar vs Appraisal')
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        xva = urllib.parse.quote(string)
+        scriptxva, divxva = components(p)
 
         ####################################
         namas = xbarr.xbarr_karyawan
@@ -2113,9 +1985,9 @@ def viewPrintGrrXbarr(request, pk):
 
         tabeltambahan = [tv, vartv, pev, pav, pgrr, ppv, ndc, vcev, vcav, vcgrr, vcpv, vcndc, pvcev, pvcav, pvcgrr, pvcpv, pvcndc, ptev, ptav, ptgrr, ptpv, ptndc, ppev, ppav, ppgrr, pppv, ppndc, ev, av, grr, pv]
 
-        return render(request,'grr_xbarr/print_xbarr.html',{'tabeltambahan':tabeltambahan, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'namas': namas, 'part1':part1, 'part':part, 'karyawan':karyawan, 'trial':trial, 'psvc':psvc, 'rva':rva, 'xva':xva, 'dbs':dbs, 'dba':dba, 'aabp':aabp, 'xbarr':xbarr, 'survey':survey})
+        return render(request,'grr_xbarr/print_xbarr.html',{'tabeltambahan':tabeltambahan, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'namas': namas, 'part1':part1, 'part':part, 'karyawan':karyawan, 'trial':trial, 'xbarr':xbarr, 'survey':survey, 'psvc':psvc, 'scriptdbs':scriptdbs, 'divdbs':divdbs, 'scriptdba':scriptdba, 'divdba':divdba, 'scriptrva':scriptrva, 'divrva':divrva, 'scriptresume':scriptresume, 'divresume':divresume, 'scriptaabp':scriptaabp, 'divaabp':divaabp, 'scriptxva':scriptxva, 'divxva':divxva})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def deleteGrrXbarr(request, pk):
     if 'user' in request.session:
@@ -2124,7 +1996,7 @@ def deleteGrrXbarr(request, pk):
         messages.success(request, "Xbarr berhasil dihapus")
         return redirect('coretoolcrud:viewDetailSurvey', pk)
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 # GRR Cross
 
@@ -2143,7 +2015,7 @@ def viewCross(request, pk):
         except Cross.DoesNotExist:
             return render(request,'cross/cross.html',{'pk':pk})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeCross(request, pk):
     if 'user' in request.session:
@@ -2173,7 +2045,7 @@ def storeCross(request, pk):
         trial = range(int(cross.cross_ntrial))
         return render(request,'cross/all_cross.html',{'part':part, 'karyawan':karyawan, 'trial':trial, 'namas':namas, 'cross':cross})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeAllCross(request, pk):
     if 'user' in request.session:
@@ -2208,7 +2080,7 @@ def storeAllCross(request, pk):
         cross.save()
         return redirect('coretoolcrud:viewCommentCross', pk)
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewCommentCross(request, pk):
     if 'user' in request.session:
@@ -2711,7 +2583,7 @@ def viewCommentCross(request, pk):
 
         return render(request,'cross/comment_cross.html', {'cross':cross, 'survey':survey, 'dfinteraksi': dfinteraksi2, 'gabung':gabung, 'aov':aov1, 'psvc':psvc, 'rva':rva, 'xva':xva, 'dbs':dbs, 'dba':dba, 'aabp':aabp})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeCommentCross(request, pk):
     if 'user' in request.session:
@@ -2727,7 +2599,7 @@ def storeCommentCross(request, pk):
 
         return redirect('coretoolcrud:viewFinalCross',cross.cross_survey_id )
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewFinalCross(request, pk):
     if 'user' in request.session:
@@ -3079,7 +2951,7 @@ def viewFinalCross(request, pk):
         avekaryawan = []
         for i in range(int(cross.cross_nkaryawan)):
             for j in range(int(cross.cross_npart) * int(cross.cross_ntrial)):
-                temp.append(i+1)
+                temp.append(cross.cross_karyawan[i])
             urutnama.append(temp)
             temp = []
 
@@ -3131,7 +3003,7 @@ def viewFinalCross(request, pk):
 
         plt.figure()
         dfdisplay.plot(kind='bar', x='Source', rot=0, ylabel='Value', title='Resume', figsize=(6, 4))
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
+        plt.legend(loc='upper center', ncol=5)
 
         fig = plt.gcf()
         buf = io.BytesIO()
@@ -3140,91 +3012,64 @@ def viewFinalCross(request, pk):
         string = base64.b64encode(buf.read())
 
         psvc = urllib.parse.quote(string)
+
         
         ###################################
-        plt.clf()
-        rpart0 = plt.scatter(urutflat, rpartflat)
-        ulcr = plt.scatter(urutflat, ulcrflat)
-        lclr = plt.scatter(urutflat, lclrflat)
-        plt.legend((rpart0, ulcr, lclr), ('R', 'UCLRbar', 'LCLRbar'), bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
-        plt.title("Range vs Appraisal")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
 
-        rva = urllib.parse.quote(string)
+        bot = []
+
+        for i in range(int(cross.cross_nkaryawan)):
+            for j in range(int(cross.cross_npart)):
+                bot.append(cross.cross_karyawan[i] + "-" + str(j+1))
+
+        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p.scatter(bot, rpartflat, legend_label="R", marker="circle")
+        p.scatter(bot, ulcrflat, color="green", legend_label="UCLRbar", marker="circle")
+        p.scatter(bot, lclrflat, color="red", legend_label="LCLRbar", marker="circle")
+        p.xaxis.major_label_orientation = "vertical"
+        scriptrva, divrva = components(p)
 
         ####################################
-        
-        plt.clf()
-        plt.plot(urutflat, avepartflat, label='Xbar')
-        plt.plot(urutflat, uclxflat, label='UCLxbar2')
-        plt.plot(urutflat, lclxflat, label='LCLxbar2')
-        plt.plot(urutflat, xbar2flat, label='Xbar2')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
-        plt.title("Xbar vs Appraisal")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
 
-        xva = urllib.parse.quote(string)
+        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p.line(bot, avepartflat, legend_label="Xbar", line_width=2)
+        p.line(bot, uclxflat, legend_label="UCLXbar2", color="green", line_width=2)
+        p.line(bot, lclxflat, legend_label="LCLXbar2", color="red", line_width=2)
+        p.line(bot, xbar2flat, legend_label="Xbar2", color="black", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxva, divxva = components(p)
 
         #####################################
 
-        plt.clf()
-        plt.scatter(urutallpart, pertrial)
-        plt.plot(urutpart, avepartall, label='Average')
-        plt.title('Data by Sample')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(cross.cross_nkaryawan))
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dbs = urllib.parse.quote(string)
+        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        for i in range(len(urutallpart)):
+            p.scatter(urutallpart[i], pertrial[i], marker="circle")
+        
+        p.line(urutpart, avepartall, legend_label="Average", line_width=2)
+        scriptdbs, divdbs = components(p)
 
         #####################################
 
-        plt.clf()
-        plt.xticks(temp, cross.cross_karyawan)
-        plt.scatter(urutnama, perkaryawan)
-        plt.plot(temp, avekaryawan, label='Average')
-        plt.title('Data by Appraiser')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(cross.cross_nkaryawan))
-        plt.ylabel("Value")
+        p = figure(title="Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=cross.cross_karyawan, y_axis_label='Measurement', x_axis_label='Appraiser')
+        for i in range(len(urutnama)):
+            p.scatter(urutnama[i], perkaryawan[i], marker="circle")
         
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dba = urllib.parse.quote(string)
+        p.line(cross.cross_karyawan, avekaryawan, legend_label="Average", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptdba, divdba = components(p)
 
         ######################################
 
-        plt.clf()
-        for i in range(int(cross.cross_nkaryawan)):
-            plt.scatter(urutpart2[i], avepart[i])
-            plt.plot(urutpart2[i], avepart[i], label=cross.cross_karyawan[i])
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(cross.cross_nkaryawan))
-        plt.title("Average Data by Appraiser")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
 
-        aabp = urllib.parse.quote(string)
+        colors = []
+
+        p = figure(title="Average Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        for i in range(int(cross.cross_nkaryawan)):
+            colors.append('#%06X' % randint(0, 0xFFFFFF))
+            p.scatter(urutpart2[i], avepart[i], marker="circle")
+            p.line(urutpart2[i], avepart[i], color=colors[i], legend_label=cross.cross_karyawan[i], line_width=2)
+        
+        scriptaabp, divaabp = components(p)
 
 
         gabung = zip(cross.cross_all, cross.cross_karyawan)
@@ -3234,9 +3079,9 @@ def viewFinalCross(request, pk):
         gabungave = zip(cross.cross_karyawan, avepart)
         gabungr = zip(cross.cross_karyawan, rpart)
 
-        return render(request,'cross/collection_cross.html', {'cross':cross, 'survey':survey, 'ndc':ndc, 'dfinteraksi': dfinteraksi2, 'aov':aov1, 'part1':part1, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'psvc':psvc, 'rva':rva, 'xva':xva, 'dbs':dbs, 'dba':dba, 'aabp':aabp})
+        return render(request,'cross/collection_cross.html', {'cross':cross, 'survey':survey, 'ndc':ndc, 'dfinteraksi': dfinteraksi2, 'aov':aov1, 'part1':part1, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'psvc':psvc, 'scriptrva':scriptrva, 'divrva':divrva, 'scriptxva':scriptxva, 'divxva':divxva, 'scriptdbs':scriptdbs, 'divdbs':divdbs, 'scriptdba':scriptdba, 'divdba':divdba, 'scriptaabp':scriptaabp, 'divaabp':divaabp})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewPrintCross(request, pk):
     if 'user' in request.session:
@@ -3588,7 +3433,7 @@ def viewPrintCross(request, pk):
         avekaryawan = []
         for i in range(int(cross.cross_nkaryawan)):
             for j in range(int(cross.cross_npart) * int(cross.cross_ntrial)):
-                temp.append(i+1)
+                temp.append(cross.cross_karyawan[i])
             urutnama.append(temp)
             temp = []
 
@@ -3640,7 +3485,7 @@ def viewPrintCross(request, pk):
 
         plt.figure()
         dfdisplay.plot(kind='bar', x='Source', rot=0, ylabel='Value', title='Resume', figsize=(6, 4))
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
+        plt.legend(loc='upper center', ncol=5)
 
         fig = plt.gcf()
         buf = io.BytesIO()
@@ -3649,91 +3494,64 @@ def viewPrintCross(request, pk):
         string = base64.b64encode(buf.read())
 
         psvc = urllib.parse.quote(string)
+
         
         ###################################
-        plt.clf()
-        rpart0 = plt.scatter(urutflat, rpartflat)
-        ulcr = plt.scatter(urutflat, ulcrflat)
-        lclr = plt.scatter(urutflat, lclrflat)
-        plt.legend((rpart0, ulcr, lclr), ('R', 'UCLRbar', 'LCLRbar'), bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
-        plt.title("Range vs Appraisal")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
 
-        rva = urllib.parse.quote(string)
+        bot = []
+
+        for i in range(int(cross.cross_nkaryawan)):
+            for j in range(int(cross.cross_npart)):
+                bot.append(cross.cross_karyawan[i] + "-" + str(j+1))
+
+        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p.scatter(bot, rpartflat, legend_label="R", marker="circle")
+        p.scatter(bot, ulcrflat, color="green", legend_label="UCLRbar", marker="circle")
+        p.scatter(bot, lclrflat, color="red", legend_label="LCLRbar", marker="circle")
+        p.xaxis.major_label_orientation = "vertical"
+        scriptrva, divrva = components(p)
 
         ####################################
-        
-        plt.clf()
-        plt.plot(urutflat, avepartflat, label='Xbar')
-        plt.plot(urutflat, uclxflat, label='UCLxbar2')
-        plt.plot(urutflat, lclxflat, label='LCLxbar2')
-        plt.plot(urutflat, xbar2flat, label='Xbar2')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
-        plt.title("Xbar vs Appraisal")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
 
-        xva = urllib.parse.quote(string)
+        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p.line(bot, avepartflat, legend_label="Xbar", line_width=2)
+        p.line(bot, uclxflat, legend_label="UCLXbar2", color="green", line_width=2)
+        p.line(bot, lclxflat, legend_label="LCLXbar2", color="red", line_width=2)
+        p.line(bot, xbar2flat, legend_label="Xbar2", color="black", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxva, divxva = components(p)
 
         #####################################
 
-        plt.clf()
-        plt.scatter(urutallpart, pertrial)
-        plt.plot(urutpart, avepartall, label='Average')
-        plt.title('Data by Sample')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(cross.cross_nkaryawan))
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dbs = urllib.parse.quote(string)
+        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        for i in range(len(urutallpart)):
+            p.scatter(urutallpart[i], pertrial[i], marker="circle")
+        
+        p.line(urutpart, avepartall, legend_label="Average", line_width=2)
+        scriptdbs, divdbs = components(p)
 
         #####################################
 
-        plt.clf()
-        plt.xticks(temp, cross.cross_karyawan)
-        plt.scatter(urutnama, perkaryawan)
-        plt.plot(temp, avekaryawan, label='Average')
-        plt.title('Data by Appraiser')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(cross.cross_nkaryawan))
-        plt.ylabel("Value")
+        p = figure(title="Data by Appraiser", sizing_mode="stretch_width", x_range=cross.cross_karyawan, y_axis_label='Measurement', x_axis_label='Appraiser')
+        for i in range(len(urutnama)):
+            p.scatter(urutnama[i], perkaryawan[i], marker="circle")
         
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dba = urllib.parse.quote(string)
+        p.line(cross.cross_karyawan, avekaryawan, legend_label="Average", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptdba, divdba = components(p)
 
         ######################################
 
-        plt.clf()
-        for i in range(int(cross.cross_nkaryawan)):
-            plt.scatter(urutpart2[i], avepart[i])
-            plt.plot(urutpart2[i], avepart[i], label=cross.cross_karyawan[i])
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(cross.cross_nkaryawan))
-        plt.title("Average Data by Appraiser")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
 
-        aabp = urllib.parse.quote(string)
+        colors = []
+
+        p = figure(title="Average Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        for i in range(int(cross.cross_nkaryawan)):
+            colors.append('#%06X' % randint(0, 0xFFFFFF))
+            p.scatter(urutpart2[i], avepart[i], marker="circle")
+            p.line(urutpart2[i], avepart[i], color=colors[i], legend_label=cross.cross_karyawan[i], line_width=2)
+        
+        scriptaabp, divaabp = components(p)
 
 
         gabung = zip(cross.cross_all, cross.cross_karyawan)
@@ -3743,9 +3561,9 @@ def viewPrintCross(request, pk):
         gabungave = zip(cross.cross_karyawan, avepart)
         gabungr = zip(cross.cross_karyawan, rpart)
 
-        return render(request,'cross/print_cross.html', {'cross':cross, 'survey':survey, 'ndc':ndc, 'dfinteraksi': dfinteraksi2, 'aov':aov1, 'part1':part1, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'psvc':psvc, 'rva':rva, 'xva':xva, 'dbs':dbs, 'dba':dba, 'aabp':aabp})
+        return render(request,'cross/print_cross.html', {'cross':cross, 'survey':survey, 'ndc':ndc, 'dfinteraksi': dfinteraksi2, 'aov':aov1, 'part1':part1, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'psvc':psvc, 'scriptrva':scriptrva, 'divrva':divrva, 'scriptxva':scriptxva, 'divxva':divxva, 'scriptdbs':scriptdbs, 'divdbs':divdbs, 'scriptdba':scriptdba, 'divdba':divdba, 'scriptaabp':scriptaabp, 'divaabp':divaabp})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def deleteCross(request, pk):
     if 'user' in request.session:
@@ -3754,7 +3572,7 @@ def deleteCross(request, pk):
         messages.success(request, "GRR Cross berhasil dihapus")
         return redirect('coretoolcrud:viewDetailSurvey', pk)
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 # GRR Nested
 
@@ -3773,7 +3591,7 @@ def viewNested(request, pk):
         except Nested.DoesNotExist:
             return render(request,'nested/nested.html',{'pk':pk})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeNested(request, pk):
     if 'user' in request.session:
@@ -3803,7 +3621,7 @@ def storeNested(request, pk):
         trial = range(int(nested.nested_ntrial))
         return render(request,'nested/all_nested.html',{'part':part, 'karyawan':karyawan, 'trial':trial, 'namas':namas, 'nested':nested})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeAllNested(request, pk):
     if 'user' in request.session:
@@ -3838,7 +3656,7 @@ def storeAllNested(request, pk):
         nested.save()
         return redirect('coretoolcrud:viewCommentNested', pk)
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewCommentNested(request, pk):
     if 'user' in request.session:
@@ -4434,7 +4252,7 @@ def viewCommentNested(request, pk):
 
         return render(request,'nested/comment_nested.html', {'nested':nested, 'survey':survey, 'dfinteraksi': dfinteraksi2, 'gabung':gabung, 'aov':aov1, 'psvc':psvc, 'rva':rva, 'xva':xva, 'dbs':dbs, 'dba':dba, 'aabp':aabp})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeCommentNested(request, pk):
     if 'user' in request.session:
@@ -4451,7 +4269,7 @@ def storeCommentNested(request, pk):
 
         return redirect('coretoolcrud:viewFinalNested',nested.nested_survey_id )
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewFinalNested(request, pk):
     if 'user' in request.session:
@@ -4804,7 +4622,7 @@ def viewFinalNested(request, pk):
         avekaryawan = []
         for i in range(int(nested.nested_nkaryawan)):
             for j in range(int(nested.nested_npart) * int(nested.nested_ntrial)):
-                temp.append(i+1)
+                temp.append(nested.nested_karyawan[i])
             urutnama.append(temp)
             temp = []
 
@@ -4942,15 +4760,15 @@ def viewFinalNested(request, pk):
         dfdisplay = dfdisplay.drop('Var Comp', 1)
         dfdisplay = dfdisplay.drop('6 x Stdev', 1)
         if int(nested.nested_stdev) == 0:
-            dfdisplay = dfdisplay.drop('% Tolerance', 1)
-        if int(nested.nested_stdevmax) == 0 and int(nested.nested_stdevmin) == 0:
             dfdisplay = dfdisplay.drop('% Process', 1)
+        if int(nested.nested_stdevmax) == 0 and int(nested.nested_stdevmin) == 0:
+            dfdisplay = dfdisplay.drop('% Tolerance', 1)
 
         ###########graf
 
         plt.figure()
         dfdisplay.plot(kind='bar', x='Source', rot=0, ylabel='Value', title='Resume', figsize=(6, 4))
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
+        plt.legend(loc='upper center', ncol=5)
 
         fig = plt.gcf()
         buf = io.BytesIO()
@@ -4961,88 +4779,61 @@ def viewFinalNested(request, pk):
         psvc = urllib.parse.quote(string)
         
         ###################################
-        plt.clf()
-        rpart0 = plt.scatter(urutflat, rpartflat)
-        ulcr = plt.scatter(urutflat, ulcrflat)
-        lclr = plt.scatter(urutflat, lclrflat)
-        plt.legend((rpart0, ulcr, lclr), ('R', 'UCLRbar', 'LCLRbar'), bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
-        plt.title("Range vs Appraisal")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
 
-        rva = urllib.parse.quote(string)
+        bot = []
+
+        for i in range(int(nested.nested_nkaryawan)):
+            for j in range(int(nested.nested_npart)):
+                bot.append(nested.nested_karyawan[i] + "-" + str(j+1))
+
+        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p.scatter(bot, rpartflat, legend_label="R", marker="circle")
+        p.scatter(bot, ulcrflat, color="green", legend_label="UCLRbar", marker="circle")
+        p.scatter(bot, lclrflat, color="red", legend_label="LCLRbar", marker="circle")
+        p.xaxis.major_label_orientation = "vertical"
+        scriptrva, divrva = components(p)
 
         ####################################
+
+        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p.line(bot, avepartflat, legend_label="Xbar", line_width=2)
+        p.line(bot, uclxflat, legend_label="UCLXbar2", color="green", line_width=2)
+        p.line(bot, lclxflat, legend_label="LCLXbar2", color="red", line_width=2)
+        p.line(bot, xbar2flat, legend_label="Xbar2", color="black", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxva, divxva = components(p)
+
+        #####################################
+
+        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        for i in range(len(urutallpart)):
+            p.scatter(urutallpart[i], pertrial[i], marker="circle")
         
-        plt.clf()
-        plt.plot(urutflat, avepartflat, label='Xbar')
-        plt.plot(urutflat, uclxflat, label='UCLxbar2')
-        plt.plot(urutflat, lclxflat, label='LCLxbar2')
-        plt.plot(urutflat, xbar2flat, label='Xbar2')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
-        plt.title("Xbar vs Appraisal")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        xva = urllib.parse.quote(string)
+        p.line(urutpart, avepartall, legend_label="Average", line_width=2)
+        scriptdbs, divdbs = components(p)
 
         #####################################
 
-        plt.clf()
-        plt.scatter(urutallpart, pertrial)
-        plt.plot(urutpart, avepartall, label='Average')
-        plt.title('Data by Sample')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(nested.nested_nkaryawan))
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dbs = urllib.parse.quote(string)
-
-        #####################################
-
-        plt.clf()
-        plt.xticks(temp, nested.nested_karyawan)
-        plt.scatter(urutnama, perkaryawan)
-        plt.plot(temp, avekaryawan, label='Average')
-        plt.title('Data by Appraiser')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(nested.nested_nkaryawan))
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dba = urllib.parse.quote(string)
+        p = figure(title="Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=nested.nested_karyawan, y_axis_label='Measurement', x_axis_label='Appraiser')
+        for i in range(len(urutnama)):
+            p.scatter(urutnama[i], perkaryawan[i], marker="circle")
+        
+        p.line(nested.nested_karyawan, avekaryawan, legend_label="Average", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptdba, divdba = components(p)
 
         ######################################
 
-        plt.clf()
-        for i in range(int(nested.nested_nkaryawan)):
-            plt.scatter(urutpart2[i], avepart[i])
-            plt.plot(urutpart2[i], avepart[i], label=nested.nested_karyawan[i])
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(nested.nested_nkaryawan))
-        plt.title("Average Data by Appraiser")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
+        colors = []
 
-        aabp = urllib.parse.quote(string)
+        p = figure(title="Average Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        for i in range(int(nested.nested_nkaryawan)):
+            colors.append('#%06X' % randint(0, 0xFFFFFF))
+            p.scatter(urutpart2[i], avepart[i], color=colors[i], marker="circle")
+            p.line(urutpart2[i], avepart[i], color=colors[i], legend_label=nested.nested_karyawan[i], line_width=2)
+        
+        scriptaabp, divaabp = components(p)
+
 
 
         gabung = zip(nested.nested_all, nested.nested_karyawan)
@@ -5053,9 +4844,9 @@ def viewFinalNested(request, pk):
         gabungr = zip(nested.nested_karyawan, rpart)
         
 
-        return render(request,'nested/collection_nested.html', {'nested':nested, 'survey':survey, 'dfinteraksi': dfinteraksi2, 'aov':aov1, 'ndc':ndc, 'psvc':psvc, 'rva':rva, 'xva':xva, 'dbs':dbs, 'dba':dba, 'aabp':aabp, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'part1':part1})
+        return render(request,'nested/collection_nested.html', {'nested':nested, 'survey':survey, 'dfinteraksi': dfinteraksi2, 'aov':aov1, 'ndc':ndc, 'psvc':psvc, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'part1':part1, 'scriptrva':scriptrva, 'divrva':divrva, 'scriptxva':scriptxva, 'divxva':divxva, 'scriptdbs':scriptdbs, 'divdbs':divdbs, 'scriptdba':scriptdba, 'divdba':divdba, 'scriptaabp':scriptaabp, 'divaabp':divaabp})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewPrintNested(request, pk):
     if 'user' in request.session:
@@ -5408,7 +5199,7 @@ def viewPrintNested(request, pk):
         avekaryawan = []
         for i in range(int(nested.nested_nkaryawan)):
             for j in range(int(nested.nested_npart) * int(nested.nested_ntrial)):
-                temp.append(i+1)
+                temp.append(nested.nested_karyawan[i])
             urutnama.append(temp)
             temp = []
 
@@ -5530,7 +5321,7 @@ def viewPrintNested(request, pk):
 
         plt.figure()
         dfdisplay.plot(kind='bar', x='Source', rot=0, ylabel='Value', title='Resume', figsize=(6, 4))
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
+        plt.legend(loc='upper center', ncol=5)
 
         fig = plt.gcf()
         buf = io.BytesIO()
@@ -5541,88 +5332,60 @@ def viewPrintNested(request, pk):
         psvc = urllib.parse.quote(string)
         
         ###################################
-        plt.clf()
-        rpart0 = plt.scatter(urutflat, rpartflat)
-        ulcr = plt.scatter(urutflat, ulcrflat)
-        lclr = plt.scatter(urutflat, lclrflat)
-        plt.legend((rpart0, ulcr, lclr), ('R', 'UCLRbar', 'LCLRbar'), bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
-        plt.title("Range vs Appraisal")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
 
-        rva = urllib.parse.quote(string)
+        bot = []
+
+        for i in range(int(nested.nested_nkaryawan)):
+            for j in range(int(nested.nested_npart)):
+                bot.append(nested.nested_karyawan[i] + "-" + str(j+1))
+
+        p = figure(title="Range vs Appraiser", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p.scatter(bot, rpartflat, legend_label="R", marker="circle")
+        p.scatter(bot, ulcrflat, color="green", legend_label="UCLRbar", marker="circle")
+        p.scatter(bot, lclrflat, color="red", legend_label="LCLRbar", marker="circle")
+        p.xaxis.major_label_orientation = "vertical"
+        scriptrva, divrva = components(p)
 
         ####################################
+
+        p = figure(title="Xbar vs Appraiser", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p.line(bot, avepartflat, legend_label="Xbar", line_width=2)
+        p.line(bot, uclxflat, legend_label="UCLXbar2", color="green", line_width=2)
+        p.line(bot, lclxflat, legend_label="LCLXbar2", color="red", line_width=2)
+        p.line(bot, xbar2flat, legend_label="Xbar2", color="black", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxva, divxva = components(p)
+
+        #####################################
+
+        p = figure(title="Data by Sample", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        for i in range(len(urutallpart)):
+            p.scatter(urutallpart[i], pertrial[i], marker="circle")
         
-        plt.clf()
-        plt.plot(urutflat, avepartflat, label='Xbar')
-        plt.plot(urutflat, uclxflat, label='UCLxbar2')
-        plt.plot(urutflat, lclxflat, label='LCLxbar2')
-        plt.plot(urutflat, xbar2flat, label='Xbar2')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
-        plt.title("Xbar vs Appraisal")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        xva = urllib.parse.quote(string)
+        p.line(urutpart, avepartall, legend_label="Average", line_width=2)
+        scriptdbs, divdbs = components(p)
 
         #####################################
 
-        plt.clf()
-        plt.scatter(urutallpart, pertrial)
-        plt.plot(urutpart, avepartall, label='Average')
-        plt.title('Data by Sample')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(nested.nested_nkaryawan))
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dbs = urllib.parse.quote(string)
-
-        #####################################
-
-        plt.clf()
-        plt.xticks(temp, nested.nested_karyawan)
-        plt.scatter(urutnama, perkaryawan)
-        plt.plot(temp, avekaryawan, label='Average')
-        plt.title('Data by Appraiser')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(nested.nested_nkaryawan))
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        dba = urllib.parse.quote(string)
+        p = figure(title="Data by Appraiser", sizing_mode="stretch_width", x_range=nested.nested_karyawan, y_axis_label='Measurement', x_axis_label='Appraiser')
+        for i in range(len(urutnama)):
+            p.scatter(urutnama[i], perkaryawan[i], marker="circle")
+        
+        p.line(nested.nested_karyawan, avekaryawan, legend_label="Average", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptdba, divdba = components(p)
 
         ######################################
 
-        plt.clf()
-        for i in range(int(nested.nested_nkaryawan)):
-            plt.scatter(urutpart2[i], avepart[i])
-            plt.plot(urutpart2[i], avepart[i], label=nested.nested_karyawan[i])
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=int(nested.nested_nkaryawan))
-        plt.title("Average Data by Appraiser")
-        plt.ylabel("Value")
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
+        colors = []
 
-        aabp = urllib.parse.quote(string)
+        p = figure(title="Average Data by Appraiser", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        for i in range(int(nested.nested_nkaryawan)):
+            colors.append('#%06X' % randint(0, 0xFFFFFF))
+            p.scatter(urutpart2[i], avepart[i], color=colors[i], marker="circle")
+            p.line(urutpart2[i], avepart[i], color=colors[i], legend_label=nested.nested_karyawan[i], line_width=2)
+        
+        scriptaabp, divaabp = components(p)
 
 
         gabung = zip(nested.nested_all, nested.nested_karyawan)
@@ -5633,9 +5396,9 @@ def viewPrintNested(request, pk):
         gabungr = zip(nested.nested_karyawan, rpart)
         
 
-        return render(request,'nested/print_nested.html', {'nested':nested, 'survey':survey, 'dfinteraksi': dfinteraksi2, 'aov':aov1, 'ndc':ndc, 'psvc':psvc, 'rva':rva, 'xva':xva, 'dbs':dbs, 'dba':dba, 'aabp':aabp, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'part1':part1})
+        return render(request,'nested/print_nested.html', {'nested':nested, 'survey':survey, 'dfinteraksi': dfinteraksi2, 'aov':aov1, 'ndc':ndc, 'psvc':psvc, 'gabung':gabung, 'gabung2':gabung2, 'gabungave':gabungave, 'gabungr':gabungr, 'part1':part1, 'scriptrva':scriptrva, 'divrva':divrva, 'scriptxva':scriptxva, 'divxva':divxva, 'scriptdbs':scriptdbs, 'divdbs':divdbs, 'scriptdba':scriptdba, 'divdba':divdba, 'scriptaabp':scriptaabp, 'divaabp':divaabp})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def deleteNested(request, pk):
     if 'user' in request.session:
@@ -5644,7 +5407,7 @@ def deleteNested(request, pk):
         messages.success(request, "GRR Nested berhasil dihapus")
         return redirect('coretoolcrud:viewDetailSurvey', pk)
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 #Linearity
 
@@ -5661,13 +5424,13 @@ def viewLinearity(request, pk):
         except Linearity.DoesNotExist:
             return render(request,'linearity/linearity.html',{'pk':pk})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewAverageLinearity(request):
     if 'user' in request.session:
         return render(request,'linearity/average_linearity.html')
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeLinearity(request, pk):
     if 'user' in request.session:
@@ -5685,7 +5448,9 @@ def storeLinearity(request, pk):
         linearity.linearity_working_max = request.POST.get('linearity_working_max')
         linearity.linearity_working_min = request.POST.get('linearity_working_min')
         linearity.linearity_ref = request.POST.get('linearity_ref')
-        
+        linearity.linearity_measured = request.POST.get('linearity_measured')
+        linearity.linearity_reviewed = request.POST.get('linearity_reviewed')
+
         linearity.save()
         # karyawan = range(int(cross.cross_nkaryawan))
         # return render(request,'cross/karyawan_cross.html',{'karyawan':karyawan})
@@ -5700,7 +5465,7 @@ def storeLinearity(request, pk):
             return redirect('coretoolcrud:viewAverageLinearity',pk )
             # return render(request,'linearity/all_linearity.html',{'part':part, 'measurement':measurement, 'linearity':linearity})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewMasterLinearity(request, pk):
     if 'user' in request.session:
@@ -5709,7 +5474,7 @@ def viewMasterLinearity(request, pk):
         measurement = range(1, int(linearity.linearity_nmeasurement)+1)
         return render(request,'linearity/master_linearity.html',{'part':part, 'measurement':measurement, 'linearity':linearity})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewAverageLinearity(request, pk):
     if 'user' in request.session:
@@ -5718,7 +5483,7 @@ def viewAverageLinearity(request, pk):
         measurement = range(1, int(linearity.linearity_nmeasurement)+1)
         return render(request,'linearity/average_linearity.html',{'part':part, 'measurement':measurement, 'linearity':linearity})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeMasterLinearity(request, pk):
     if 'user' in request.session:
@@ -5728,12 +5493,14 @@ def storeMasterLinearity(request, pk):
 
         return redirect('coretoolcrud:viewLinearity',pk )
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeAverageLinearity(request, pk):
     if 'user' in request.session:
         linearity = Linearity.objects.get(linearity_survey_id = pk)
         linearity.linearity_average = request.POST.getlist('linearity_average')
+        linearity.linearity_ave_measured = request.POST.get('linearity_ave_measured')
+        linearity.linearity_ave_reviewed = request.POST.get('linearity_ave_reviewed')
 
         temppart = []
         temptrial = []
@@ -5770,7 +5537,7 @@ def storeAverageLinearity(request, pk):
         measurement = range(int(linearity.linearity_nmeasurement))
         return render(request,'linearity/all_linearity.html',{'part':part, 'measurement':measurement, 'linearity':linearity})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeAllLinearity(request, pk):
     if 'user' in request.session:
@@ -5803,7 +5570,7 @@ def storeAllLinearity(request, pk):
         linearity.save()
         return redirect('coretoolcrud:viewCommentLinearity', pk)
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewCommentLinearity(request, pk):
     if 'user' in request.session:
@@ -5975,29 +5742,32 @@ def viewCommentLinearity(request, pk):
         tabs = abs(abs(a) / (s / (sumxoxbar ** 0.5)))
         tb =  abs(b) / (sgm + avemaster ** 2 / sumxoxbar2) ** 0.5 / s
 
+        p = figure(title="Linearity", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Bias', x_axis_label='Reference Value')
         for i in range(int(linearity.linearity_nmeasurement)):
-            linear = plt.scatter(x[i], y[i], color="blue")
-
-        linear = plt.scatter(linearity.linearity_master, upper, color="orange", label='Upper')
-        linear = plt.plot(linearity.linearity_master, upper, color="orange", label='Upper')
-        linear = plt.scatter(linearity.linearity_master, lower, color="gray", label='Lower')
-        linear = plt.plot(linearity.linearity_master, lower, color="gray", label='Lower')
-
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        biasref = urllib.parse.quote(string)
+            p.scatter(x[i], y[i], marker="circle")
+        
+        p.scatter(linearity.linearity_master, upper, color="green")
+        p.line(linearity.linearity_master, upper, color="green", legend_label='Upper', line_width=2)
+        p.scatter(linearity.linearity_master, lower, color="red")
+        p.line(linearity.linearity_master, lower, color="red", legend_label='Lower', line_width=2)
+        p.scatter(linearity.linearity_master, averagebias, color="orange")
+        p.line(linearity.linearity_master, averagebias, color="orange", legend_label='Average Bias', line_width=2)
+        
+        scriptbiasref, divbiasref = components(p)
 
         survey = Survey.objects.get(id = linearity.linearity_survey_id)
-
+        
+        npart = range(1, int(linearity.linearity_npart)+1)
+        nmeasurement = range(1, int(linearity.linearity_nmeasurement)+1)
+        gabung = zip(linearity.linearity_all, range(1, int(linearity.linearity_npart)+1))
+        gabung2 = zip(bias, range(1, int(linearity.linearity_npart)+1))
+        gabung3 = zip(xbar, averagebias, range(1, int(linearity.linearity_npart)+1))
+        gabung4 = zip(linearity.linearity_master, averagebias, pvalue, range(1, int(linearity.linearity_npart)+1))
         
 
-        return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey, 'biasref':biasref})
+        return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3, 'gabung4':gabung4, 'scriptbiasref':scriptbiasref, 'divbiasref':divbiasref})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def storeCommentLinearity(request, pk):
     if 'user' in request.session:
@@ -6010,7 +5780,7 @@ def storeCommentLinearity(request, pk):
         # return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey})
         return redirect('coretoolcrud:viewFinalLinearity',linearity.linearity_survey_id )
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewFinalLinearity(request, pk):
     if 'user' in request.session:
@@ -6183,26 +5953,18 @@ def viewFinalLinearity(request, pk):
         tabs = abs(abs(a) / (s / (sumxoxbar ** 0.5)))
         tb =  abs(b) / (sgm + avemaster ** 2 / sumxoxbar2) ** 0.5 / s
 
-        plt.clf()
-
+        p = figure(title="Linearity", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Bias', x_axis_label='Reference Value')
         for i in range(int(linearity.linearity_nmeasurement)):
-            linear = plt.scatter(x[i], y[i], color="blue")
-
-        linear = plt.scatter(linearity.linearity_master, upper, color="orange")
-        linear = plt.plot(linearity.linearity_master, upper, color="orange", label='Upper')
-        linear = plt.scatter(linearity.linearity_master, lower, color="gray")
-        linear = plt.plot(linearity.linearity_master, lower, color="gray", label='Lower')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=4)
-        plt.title("Linearity")
-        plt.ylabel("Value")
-
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        biasref = urllib.parse.quote(string)
+            p.scatter(x[i], y[i], marker="circle")
+        
+        p.scatter(linearity.linearity_master, upper, color="green")
+        p.line(linearity.linearity_master, upper, color="green", legend_label='Upper', line_width=2)
+        p.scatter(linearity.linearity_master, lower, color="red")
+        p.line(linearity.linearity_master, lower, color="red", legend_label='Lower', line_width=2)
+        p.scatter(linearity.linearity_master, averagebias, color="orange")
+        p.line(linearity.linearity_master, averagebias, color="orange", legend_label='Average Bias', line_width=2)
+        
+        scriptbiasref, divbiasref = components(p)
 
         survey = Survey.objects.get(id = linearity.linearity_survey_id)
         
@@ -6211,11 +5973,12 @@ def viewFinalLinearity(request, pk):
         gabung = zip(linearity.linearity_all, range(1, int(linearity.linearity_npart)+1))
         gabung2 = zip(bias, range(1, int(linearity.linearity_npart)+1))
         gabung3 = zip(xbar, averagebias, range(1, int(linearity.linearity_npart)+1))
+        gabung4 = zip(linearity.linearity_master, averagebias, pvalue, range(1, int(linearity.linearity_npart)+1))
         
 
-        return render(request,'linearity/collection_linearity.html', {'linearity':linearity, 'survey':survey, 'biasref':biasref, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3})
+        return render(request,'linearity/collection_linearity.html', {'linearity':linearity, 'survey':survey, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3, 'gabung4':gabung4, 'scriptbiasref':scriptbiasref, 'divbiasref':divbiasref})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def viewPrintLinearity(request, pk):
     if 'user' in request.session:
@@ -6388,26 +6151,16 @@ def viewPrintLinearity(request, pk):
         tabs = abs(abs(a) / (s / (sumxoxbar ** 0.5)))
         tb =  abs(b) / (sgm + avemaster ** 2 / sumxoxbar2) ** 0.5 / s
 
-        plt.clf()
-
+        p = figure(title="Linearity", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Bias', x_axis_label='Reference Value')
         for i in range(int(linearity.linearity_nmeasurement)):
-            linear = plt.scatter(x[i], y[i], color="blue")
-
-        linear = plt.scatter(linearity.linearity_master, upper, color="orange")
-        linear = plt.plot(linearity.linearity_master, upper, color="orange", label='Upper')
-        linear = plt.scatter(linearity.linearity_master, lower, color="gray")
-        linear = plt.plot(linearity.linearity_master, lower, color="gray", label='Lower')
-        plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=4)
-        plt.title("Linearity")
-        plt.ylabel("Value")
-
-        fig = plt.gcf()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        buf.seek(0)
-        string = base64.b64encode(buf.read())
-
-        biasref = urllib.parse.quote(string)
+            p.scatter(x[i], y[i], marker="circle")
+        
+        p.scatter(linearity.linearity_master, upper, color="green")
+        p.line(linearity.linearity_master, upper, color="green", legend_label='Upper', line_width=2)
+        p.scatter(linearity.linearity_master, lower, color="red")
+        p.line(linearity.linearity_master, lower, color="red", legend_label='Lower', line_width=2)
+        
+        scriptbiasref, divbiasref = components(p)
 
         survey = Survey.objects.get(id = linearity.linearity_survey_id)
         
@@ -6418,9 +6171,9 @@ def viewPrintLinearity(request, pk):
         gabung3 = zip(xbar, averagebias, range(1, int(linearity.linearity_npart)+1))
         
 
-        return render(request,'linearity/print_linearity.html', {'linearity':linearity, 'survey':survey, 'biasref':biasref, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3})
+        return render(request,'linearity/print_linearity.html', {'linearity':linearity, 'survey':survey, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3, 'scriptbiasref':scriptbiasref, 'divbiasref':divbiasref})
     else:
-        return redirect('/')
+        return redirect('/logout')
 
 def deleteLinearity(request, pk):
     if 'user' in request.session:
@@ -6429,4 +6182,4 @@ def deleteLinearity(request, pk):
         messages.success(request, "Linearity berhasil dihapus")
         return redirect('coretoolcrud:viewDetailSurvey', pk)
     else:
-        return redirect('/')
+        return redirect('/logout')

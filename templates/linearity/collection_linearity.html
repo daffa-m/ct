@@ -8,6 +8,8 @@
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
     <style type="text/css" rel="stylesheet">
     ul.breadcrumb {
     padding: 10px 16px;
@@ -39,9 +41,7 @@
     }
     .card {
       display:inline-block;
-      width:47%;
-      margin-right: 1%;
-      margin-left: 1%;
+      width:100%;
       } 
     .btn{
       margin-right: 1%;
@@ -167,8 +167,8 @@
                     <tr>
                       <th scope="col">Measured By: {{linearity.linearity_measured}}</th>
                       <th scope="col">Reviewed By: {{linearity.linearity_reviewed}}</th>
-                      <th scope="col">a: {{a|floatformat:2}}</th>
-                      <th scope="col">b: {{b|floatformat:2}}</th>
+                      <th scope="col">|t|: {{tabs|floatformat:2}} tb: {{tb|floatformat:2}}</th>
+                      <th scope="col">a: {{a|floatformat:2}} b: {{b|floatformat:2}}</th>
                       <th scope="col">S: {{s|floatformat:2}}</th>
                     </tr>
                     <tr>
@@ -176,7 +176,7 @@
                       <th scope="col">Master Reviewed By: {{linearity.linearity_ave_reviewed}}</th>
                       <th scope="col">Serial Number Gauge: {{linearity.linearity_ave_sn}}</th>
                       <th scope="col">Resolution: {{linearity.linearity_ave_res}}</th>
-                      <th scope="col">t abs: {{tabs|floatformat:2}}</th>
+                      <th scope="col">t: {{t|floatformat:2}}</th>
                     </tr>
                     
                     
@@ -247,17 +247,11 @@
                     <thead>
                       <tr>
                         <td scope="col"></td>
-                        
                           <td scope="col">Xbar</td>
                           <td scope="col">Average Bias</td>
-                        
                       </tr>
-                     
                     </thead>
                     <tbody>
-                  
-
-                      
                       {% for j, k, l in gabung3 %} 
                       <tr>
                         <td>S-{{l}}</td>
@@ -269,28 +263,47 @@
                     </tbody>
                   </table>
 
+                  <h6>Gage Bias</h6>
+                  <table class="table table-hover table-bordered results">
+                    <thead>
+                      <tr>
+                          <td scope="col">Reference Average</td>
+                          <td scope="col">Bias</td>
+                          <td scope="col">P</td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for i, j, k, l in gabung4 %} 
+                      <tr>
+                        <td>{{i|floatformat:2 }}</td>
+                        <td>{{j|floatformat:2 }}</td>
+                        <td>{{k|floatformat:2 }}</td>
+                      </tr>
+                     
+                      {% endfor %}
+                    </tbody>
+                  </table>
+
                    
                     <div class="card">
-                      <h5 class="card-header">Featured</h5>
+                      <h5 class="card-header">Linearity Graph</h5>
                       <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                        <img src="data:image/png;base64,{{ biasref }}" alt="Admin"  width="95%", height="50%">
+                        {{divbiasref| safe}}
                         <br><br><br>
                         <p>Bias in Gauge is unacceptable since the bias = 0 line does not fall within the confidence bounds
                         <br>Numerically this can be analyzed by looking at the slope and intercept</P>          
                         
                       </div>
                     </div>
-
-                    
+                    <br><br>
                     <div class="card">
                         <h5 class="card-header">Decision and Recommendation</h5>
                         <div class="card-body">
                           <h6 class="card-subtitle mb-2 text-muted">Decision</h6>
                           {% if tabs > t or tb > t %}
-                            <p>Bias is significant</p>
+                            <p>|t| value is higher than t value, indicated Bias is significant / there is a Linearity problem</p>
                           {% else %}
-                          <p>Bias is not sifnificant</p>
+                          <p>|t| value is lower than t value, indicated Bias is insignificant / there is no Linearity problem</p>
                           
                           {% endif %}
                           
@@ -316,4 +329,9 @@
     </div>
 
 </body>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.2.min.js"></script>
+{{scriptbiasref| safe}}
 </html>

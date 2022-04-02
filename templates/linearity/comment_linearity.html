@@ -8,6 +8,8 @@
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
     <style type="text/css" rel="stylesheet">
     ul.breadcrumb {
     padding: 10px 16px;
@@ -39,9 +41,7 @@
     }
     .card {
       display:inline-block;
-      width:47%;
-      margin-right: 1%;
-      margin-left: 1%;
+      width:100%;
       } 
     .btn{
       margin-right: 1%;
@@ -168,16 +168,16 @@
                       <tr>
                         <th scope="col">Measured By: {{linearity.linearity_measured}}</th>
                         <th scope="col">Reviewed By: {{linearity.linearity_reviewed}}</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
+                        <th scope="col">|t|: {{tabs|floatformat:2}} tb: {{tb|floatformat:2}}</th>
+                        <th scope="col">a: {{a|floatformat:2}} b: {{b|floatformat:2}}</th>
+                        <th scope="col">S: {{s|floatformat:2}}</th>
                       </tr>
                       <tr>
                         <th scope="col">Master Measured By: {{linearity.linearity_ave_measured}}</th>
                         <th scope="col">Master Reviewed By: {{linearity.linearity_ave_reviewed}}</th>
                         <th scope="col">Serial Number Gauge: {{linearity.linearity_ave_sn}}</th>
                         <th scope="col">Resolution: {{linearity.linearity_ave_res}}</th>
-                        <th scope="col"></th>
+                        <th scope="col">t: {{t|floatformat:2}}</th>
                       </tr>
                       
                       
@@ -189,38 +189,127 @@
                         
                     </tbody>
                   </table>
-
+                  <h6>Measurement</h6>
+                    <table class="table table-hover table-bordered results" id="table">
+                      <thead>
+                        <tr>
+                          <td scope="col"></td>
+                          {% for i in nmeasurement %}
+                            <td scope="col">M-{{i}}</td>
+                          {% endfor %}
+                        </tr>
+                       
+                      </thead>
+                      <tbody>
                     
-
-                    <form action="{% url 'coretoolcrud:storeCommentLinearity' linearity.linearity_survey_id %}" method="POST" enctype="multipart/form-data">
-                      {% csrf_token %}
-                    <div class="card">
-                      <h5 class="card-header">Featured</h5>
-                      <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                        <img src="data:image/png;base64,{{ biasref }}" alt="Admin"  width="95%", height="50%">
-                        <br><br><br>
-                        <p>Bias in Gauge is unacceptable since the bias = 0 line does not fall within the confidence bounds
-                        <br>Numerically this can be analyzed by looking at the slope and intercept</P>          
-                        <!-- <textarea class="form-control" name="linearity_biasref" id="textAreaExample" rows="4">{{ linearity.linearity_biasref }}</textarea> -->
+  
+                        
+                        {% for j, k in gabung %} 
+                        <tr>
+                          <td>S-{{k}}</td>
+                          {% for i in j %}
+                          <td>{{i}}</td>
+                          {% endfor %}
+                        </tr>
+                       
+                        {% endfor %}
+                      </tbody>
+                    </table>
+  
+                    <h6>Bias</h6>
+                    <table class="table table-hover table-bordered results">
+                      <thead>
+                        <tr>
+                          <td scope="col"></td>
+                          {% for i in nmeasurement %}
+                            <td scope="col">M-{{i}}</td>
+                          {% endfor %}
+                        </tr>
+                       
+                      </thead>
+                      <tbody>
+                    
+  
+                        
+                        {% for j, k in gabung2 %} 
+                        <tr>
+                          <td>S-{{k}}</td>
+                          {% for i in j %}
+                          <td>{{i|floatformat:2 }}</td>
+                          {% endfor %}
+                        </tr>
+                       
+                        {% endfor %}
+                      </tbody>
+                    </table>
+  
+                    
+                    <table class="table table-hover table-bordered results">
+                      <thead>
+                        <tr>
+                          <td scope="col"></td>
+                            <td scope="col">Xbar</td>
+                            <td scope="col">Average Bias</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for j, k, l in gabung3 %} 
+                        <tr>
+                          <td>S-{{l}}</td>
+                          <td>{{j|floatformat:2 }}</td>
+                          <td>{{k|floatformat:2 }}</td>
+                        </tr>
+                       
+                        {% endfor %}
+                      </tbody>
+                    </table>
+  
+                    <h6>Gage Bias</h6>
+                    <table class="table table-hover table-bordered results">
+                      <thead>
+                        <tr>
+                            <td scope="col">Reference Average</td>
+                            <td scope="col">Bias</td>
+                            <td scope="col">P</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for i, j, k, l in gabung4 %} 
+                        <tr>
+                          <td>{{i|floatformat:2 }}</td>
+                          <td>{{j|floatformat:2 }}</td>
+                          <td>{{k|floatformat:2 }}</td>
+                        </tr>
+                       
+                        {% endfor %}
+                      </tbody>
+                    </table>
+  
+                     
+                      <div class="card">
+                        <h5 class="card-header">Linearity Graph</h5>
+                        <div class="card-body">
+                          
+                          {{divbiasref| safe}}
+                          <br><br><br>
+                          <p>Bias in Gauge is unacceptable since the bias = 0 line does not fall within the confidence bounds
+                          <br>Numerically this can be analyzed by looking at the slope and intercept</P>          
+                          
+                        </div>
                       </div>
-                    </div>
+                      <br><br>
 
-                    
+                      <form action="{% url 'coretoolcrud:storeCommentLinearity' linearity.linearity_survey_id %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
                     <div class="card">
                       <h5 class="card-header">Recommendation</h5>
                       <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                        
                         
                         <div class="container1">
-                          
-                          
-
                           <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="linearity_recommendation" value="Repair / needs to be recalibrated to achieve zero bias through the modification of the hardware, software or both.">
                             <label class="form-check-label" for="inlineRadio1">Repair / needs to be recalibrated to achieve zero bias through the modification of the hardware, software or both.</label>
-                        </div>
+                        </div><br>
                         <div class="form-check form-check-inline">
                         <input class="form-check-input" type="radio" name="linearity_recommendation" value="Gauge / Measurement can be used on range ...">
                         <label class="form-check-label" for="inlineRadio2">Gauge / Measurement can be used on range ...</label>
@@ -236,34 +325,10 @@
         </div>
         
     </div>
-
-
-
-
-
-    <script>
-    $(document).ready(function() {
-    var max_fields = 20;
-    var wrapper = $(".container1");
-    var add_button = $(".add_form_field");
-
-    var x = 1;
-    $(add_button).click(function(e) {
-        e.preventDefault();
-        if (x < max_fields) {
-            x++;
-            $(wrapper).append('<div class="input-group"><input class="form-control" type="text" name="linearity_recommendation"/> <a href="#" class="delete btn btn-danger">Delete</a></div>'); //add input box
-        } else {
-            alert('You Reached the limits')
-        }
-    });
-
-    $(wrapper).on("click", ".delete", function(e) {
-        e.preventDefault();
-        $(this).parent('div').remove();
-        x--;
-    })
-});
-    </script>
 </body>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.2.min.js"></script>
+{{scriptbiasref| safe}}
 </html>

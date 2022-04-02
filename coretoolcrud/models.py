@@ -8,6 +8,7 @@ class User(models.Model):
     user_username = models.TextField()
     user_password = models.TextField()
     user_role = models.TextField()
+    user_company = models.TextField()
 
 
 class Xbarr(models.Model):
@@ -81,8 +82,6 @@ class Linearity(models.Model):
     linearity_all = models.JSONField(null=True)
     linearity_biasref = models.TextField(null=True)
     linearity_recommendation = models.TextField(null=True)
-    linearity_ave_sn = models.TextField(null=True)
-    linearity_ave_res = models.TextField(null=True)
     linearity_ave_reviewed = models.TextField(null=True)
     linearity_ave_measured = models.TextField(null=True)
     linearity_reviewed = models.TextField()
@@ -91,6 +90,7 @@ class Linearity(models.Model):
     
 
 class Survey(models.Model):
+    survey_user_id = models.IntegerField()
     survey_date_project = models.DateField()
     survey_data = models.TextField()
     survey_cust_name = models.TextField()

@@ -7,8 +7,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
     <style type="text/css" rel="stylesheet">
-    .invoice-title h2, .invoice-title h3 {
+    .invoice-title h2, .invoice-title h3, .invoice-title a {
     display: inline-block;
     }
     p {
@@ -16,9 +18,7 @@
     }
     .card {
       display:inline-block;
-      width:47%;
-      margin-right: 1%;
-      margin-left: 1%;
+      width:100%;
     } 
     table {
         text-align: center;
@@ -37,7 +37,7 @@
                     <a class="navbar-brand" href="#">
                         <img src="https://mdbootstrap.com/img/logo/mdb-transparent.png" height="30" alt="mdb logo">
                       </a>
-                    <h2>PT. MENCARI CINTA SEJATI</h2><h2 class="float-end">GRR ANOVA</h3>
+                    <h2>{{ request.session.company }}</h2><h2 class="float-end">GRR ANOVA</h3>
                 </div>
                 <hr>
 
@@ -227,117 +227,126 @@
                     </table>
 
                     <div class="card">
-                        <h5 class="card-header">Featured</h5>
-                        <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                          <img src="data:image/png;base64,{{ psvc }}" alt="Admin"  width="95%", height="50%">
-                          <br><br><br>
-                          <p>GRR &lt; 10% or  10 &lt;= GRR &lt;=30
-                          <br>NDC &gt; 5 Need Correction</p>
-                          <p>Comment:          
-                          <br>{{ cross.cross_psvc }}</p>
-                        </div>
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        <img src="data:image/png;base64,{{ psvc }}" alt="Admin"  width="95%", height="50%">
+                        <br><br><br>
+                        <p>GRR &lt; 10% or  10 &lt;= GRR &lt;=30
+                        <br>NDC &gt; 5 Need Correction</p>
+                        <p>Comment:          
+                        <br>{{ cross.cross_psvc }}</p>
                       </div>
-  
-                      <div class="card">
-                        <h5 class="card-header">Featured</h5>
-                        <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                          <img src="data:image/png;base64,{{ rva }}" alt="Admin"  width="95%", height="50%">
-                          <br><br><br>
-                          <p>Range value is within UCL/LCL range
-                          <br>Nilai R berada di dalam UCL/LCL, yang berarti:
-                          <br>- No special cause / Tidak ada special cause
-                          <br>- Same method / Metoda ukur sama
-                          <br>- Consistency of measurement (repeatability) / pengulangan konsisten</p>
-                          <p>Comment:                                    
-                          <br>{{ cross.cross_rva }}</p>
-                        </div>
+                    </div>
+                    <br><br>
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        {{divrva| safe}}
+                        <br><br><br>
+                        <p>Range value is within UCL/LCL range
+                        <br>Nilai R berada di dalam UCL/LCL, yang berarti:
+                        <br>- No special cause / Tidak ada special cause
+                        <br>- Same method / Metoda ukur sama
+                        <br>- Consistency of measurement (repeatability) / pengulangan konsisten</p>
+                        <p>Comment:                                    
+                        <br>{{ cross.cross_rva }}</p>
                       </div>
-                      <br><br><br>
-                      <div class="card">
-                        <h5 class="card-header">Featured</h5>
-                        <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                          <img src="data:image/png;base64,{{ dbs }}" alt="Admin"  width="95%", height="50%">
-                          <br><br><br>
-                          <p>Standard:
-                          <br>- No noise means / tidak ada data aneh
-                          <br>- Part variation is small / variasi part kecil
-                          <br>- No outlier reading / tidak ada kesalahan ukur</p>
-                          <p>Comment:          
-                          <br>{{ cross.cross_dbs }}</p>
-                        </div>
+                    </div>
+                    <br><br>
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        {{divdbs| safe}}
+                        <br><br><br>
+                        <p>Standard:
+                        <br>- No noise means / tidak ada data aneh
+                        <br>- Part variation is small / variasi part kecil
+                        <br>- No outlier reading / tidak ada kesalahan ukur</p>
+                        <p>Comment:          
+                        <br>{{ cross.cross_dbs }}</p>
                       </div>
-  
-                      <div class="card">
-                        <h5 class="card-header">Featured</h5>
-                        <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                          <img src="data:image/png;base64,{{ dba }}" alt="Admin"  width="95%", height="50%">
-                          <br><br><br>
-                          <p>Standard:
-                          <br>Mean line is straight line, ,means / arti garis lurus:
-                          <br>- No appraiser may have lower/higher reading than the other / tidak ada operattor punya pembacaan lebih tinggi/ lebih rendah</p>
-                          <p>Comment:          
-                            <br>{{ cross.cross_dba }}</p>
-                        </div>
+                    </div>
+                    <br><br>
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        {{divdba| safe}}
+                        <br><br><br>
+                        <p>Standard:
+                        <br>Mean line is straight line, ,means / arti garis lurus:
+                        <br>- No appraiser may have lower/higher reading than the other / tidak ada operattor punya pembacaan lebih tinggi/ lebih rendah</p>
+                        <p>Comment:          
+                          <br>{{ cross.cross_dba }}</p>
                       </div>
-                      <br><br><br>
-                      <div class="card">
-                        <h5 class="card-header">Featured</h5>
-                        <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                          <img src="data:image/png;base64,{{ aabp }}" alt="Admin"  width="95%", height="50%">
-                          <br><br><br>
-                          <p>Standard:
-                          <br>there is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</p>
-                          <p>Comment:          
-                            <br>{{ cross.cross_aabp }}</p>
-                        </div>
+                    </div>
+                    <br><br>
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        {{divaabp| safe}}
+                        <br><br><br>
+                        <p>Standard:
+                        <br>there is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</p>
+                        <p>Comment:          
+                          <br>{{ cross.cross_aabp }}</p>
                       </div>
-                      <div class="card">
-                        <h5 class="card-header">Featured</h5>
-                        <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                          <img src="data:image/png;base64,{{ xva }}" alt="Admin"  width="95%", height="50%">
-                          <br><br><br>
-                          <p>Standard:
-                          <br>There is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</p>
-                          <p>Comment:          
-                            <br>{{ cross.cross_xva }}</p>
-                        </div>
+                    </div>
+                    <br><br>
+                    <div class="card">
+                      <h5 class="card-header">Featured</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                        {{divxva| safe}}
+                        <br><br><br>
+                        <p>Standard:
+                        <br>There is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</p>
+                        <p>Comment:          
+                          <br>{{ cross.cross_xva }}</p>
                       </div>
-                      <br><br><br>
-                      <div class="card">
-                        <h5 class="card-header">Decision and Recommendation</h5>
-                        <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Decision</h6>
-                          <!-- {% if xbarr.xbarr_resume.0.1 < 10 %}
-                            <p>Measurement method is accepted / metoda pengukuran diterima</p>
-                          {% elif xbarr.xbarr_resume.0.1 < 30 %}
-                          <p>Measurement method need correction / metoda pengukuran perlu perbaikan</p>
-                          {% elif xbarr.xbarr_resume.0.1 >= 30 %}
-                          <p>Measurement method is rejected / metoda pengukuran tidak bisa dipakai</p>
-                          {% endif %} -->
-                          
-                            <br><br><h6 class="card-subtitle mb-2 text-muted">Recommendation</h6>
-                            <p>
-                          {% for ele in cross.cross_recommendation %} 
-                          <br>- {{ ele }}
-                          {% endfor %}
-                          </p>
-                        </div>
+                    </div>
+                    <br><br>
+                    <div class="card">
+                      <h5 class="card-header">Decision and Recommendation</h5>
+                      <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Decision</h6>
+                        <!-- {% if xbarr.xbarr_resume.0.1 < 10 %}
+                          <p>Measurement method is accepted / metoda pengukuran diterima</p>
+                        {% elif xbarr.xbarr_resume.0.1 < 30 %}
+                        <p>Measurement method need correction / metoda pengukuran perlu perbaikan</p>
+                        {% elif xbarr.xbarr_resume.0.1 >= 30 %}
+                        <p>Measurement method is rejected / metoda pengukuran tidak bisa dipakai</p>
+                        {% endif %} -->
+                        
+                          <br><br><h6 class="card-subtitle mb-2 text-muted">Recommendation</h6>
+                          <p>
+                        {% for ele in cross.cross_recommendation %} 
+                        <br>- {{ ele }}
+                        {% endfor %}
+                        </p>
                       </div>
+                    </div>
 
-                      <br><br>
-                    
-                   
+                    <br><br>
 
         </div>
         
     </div>
 
 </body>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.2.min.js"></script>
+{{scriptdba| safe}}
+{{scriptdbs| safe}}
+{{scriptrva| safe}}
+{{scriptresume| safe}}
+{{scriptaabp| safe}}
+{{scriptxva| safe}}
 </html>
 
