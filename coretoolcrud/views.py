@@ -5742,6 +5742,13 @@ def viewCommentLinearity(request, pk):
         tabs = abs(abs(a) / (s / (sumxoxbar ** 0.5)))
         tb =  abs(b) / (sgm + avemaster ** 2 / sumxoxbar2) ** 0.5 / s
 
+        remarks = []
+        for i in pvalue:
+            if i <= (1 - linearity.linearity_confidence):
+                remarks.append("Bias Significant")
+            else:
+                remarks.append("Bias Not Significant")
+
         p = figure(title="Linearity", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Bias', x_axis_label='Reference Value')
         for i in range(int(linearity.linearity_nmeasurement)):
             p.scatter(x[i], y[i], marker="circle")
@@ -5762,7 +5769,7 @@ def viewCommentLinearity(request, pk):
         gabung = zip(linearity.linearity_all, range(1, int(linearity.linearity_npart)+1))
         gabung2 = zip(bias, range(1, int(linearity.linearity_npart)+1))
         gabung3 = zip(xbar, averagebias, range(1, int(linearity.linearity_npart)+1))
-        gabung4 = zip(linearity.linearity_master, averagebias, pvalue, range(1, int(linearity.linearity_npart)+1))
+        gabung4 = zip(linearity.linearity_master, averagebias, pvalue, remarks)
         
 
         return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3, 'gabung4':gabung4, 'scriptbiasref':scriptbiasref, 'divbiasref':divbiasref})
@@ -5821,7 +5828,7 @@ def viewFinalLinearity(request, pk):
             averagebias.append(sum(temp) / len(temp))
             temp = []
 
-        averagebiasall = sum(averagebias) / len(averagebias)
+        avebiasall = sum(averagebias) / len(averagebias)
 
         x = []
         temp = []
@@ -5953,6 +5960,17 @@ def viewFinalLinearity(request, pk):
         tabs = abs(abs(a) / (s / (sumxoxbar ** 0.5)))
         tb =  abs(b) / (sgm + avemaster ** 2 / sumxoxbar2) ** 0.5 / s
 
+        remarks = []
+        for i in pvalue:
+            if i <= (1 - linearity.linearity_confidence):
+                remarks.append("Bias Significant")
+            else:
+                remarks.append("Bias Not Significant")
+        
+        aven1 = sum(n1) / len(n1)
+        avep = stats.t.sf(aven1, df=int(linearity.linearity_nmeasurement)-1) * 2
+        conf1 = 1 - linearity.linearity_confidence
+
         p = figure(title="Linearity", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Bias', x_axis_label='Reference Value')
         for i in range(int(linearity.linearity_nmeasurement)):
             p.scatter(x[i], y[i], marker="circle")
@@ -5973,10 +5991,10 @@ def viewFinalLinearity(request, pk):
         gabung = zip(linearity.linearity_all, range(1, int(linearity.linearity_npart)+1))
         gabung2 = zip(bias, range(1, int(linearity.linearity_npart)+1))
         gabung3 = zip(xbar, averagebias, range(1, int(linearity.linearity_npart)+1))
-        gabung4 = zip(linearity.linearity_master, averagebias, pvalue, range(1, int(linearity.linearity_npart)+1))
+        gabung4 = zip(linearity.linearity_master, averagebias, pvalue, remarks)
         
 
-        return render(request,'linearity/collection_linearity.html', {'linearity':linearity, 'survey':survey, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3, 'gabung4':gabung4, 'scriptbiasref':scriptbiasref, 'divbiasref':divbiasref})
+        return render(request,'linearity/collection_linearity.html', {'aven1':aven1, 'avep':avep, 'conf1':conf1, 'avebiasall':avebiasall, 'linearity':linearity, 'survey':survey, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3, 'gabung4':gabung4, 'scriptbiasref':scriptbiasref, 'divbiasref':divbiasref})
     else:
         return redirect('/logout')
 
@@ -6151,6 +6169,13 @@ def viewPrintLinearity(request, pk):
         tabs = abs(abs(a) / (s / (sumxoxbar ** 0.5)))
         tb =  abs(b) / (sgm + avemaster ** 2 / sumxoxbar2) ** 0.5 / s
 
+        remarks = []
+        for i in pvalue:
+            if i <= (1 - linearity.linearity_confidence):
+                remarks.append("Bias Significant")
+            else:
+                remarks.append("Bias Not Significant")
+
         p = figure(title="Linearity", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Bias', x_axis_label='Reference Value')
         for i in range(int(linearity.linearity_nmeasurement)):
             p.scatter(x[i], y[i], marker="circle")
@@ -6159,7 +6184,10 @@ def viewPrintLinearity(request, pk):
         p.line(linearity.linearity_master, upper, color="green", legend_label='Upper', line_width=2)
         p.scatter(linearity.linearity_master, lower, color="red")
         p.line(linearity.linearity_master, lower, color="red", legend_label='Lower', line_width=2)
-        
+        p.scatter(linearity.linearity_master, averagebias, color="orange")
+        p.line(linearity.linearity_master, averagebias, color="orange", legend_label='Average Bias', line_width=2)
+
+
         scriptbiasref, divbiasref = components(p)
 
         survey = Survey.objects.get(id = linearity.linearity_survey_id)
@@ -6169,9 +6197,9 @@ def viewPrintLinearity(request, pk):
         gabung = zip(linearity.linearity_all, range(1, int(linearity.linearity_npart)+1))
         gabung2 = zip(bias, range(1, int(linearity.linearity_npart)+1))
         gabung3 = zip(xbar, averagebias, range(1, int(linearity.linearity_npart)+1))
-        
+        gabung4 = zip(linearity.linearity_master, averagebias, pvalue, remarks)
 
-        return render(request,'linearity/print_linearity.html', {'linearity':linearity, 'survey':survey, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3, 'scriptbiasref':scriptbiasref, 'divbiasref':divbiasref})
+        return render(request,'linearity/print_linearity.html', {'linearity':linearity, 'survey':survey, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3, 'gabung4':gabung4, 'scriptbiasref':scriptbiasref, 'divbiasref':divbiasref})
     else:
         return redirect('/logout')
 

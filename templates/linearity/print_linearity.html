@@ -229,11 +229,33 @@
                     </tbody>
                   </table>
 
+                  <h6>Gage Bias</h6>
+                  <table class="table table-hover table-bordered results">
+                    <thead>
+                      <tr>
+                          <td scope="col">Reference Average</td>
+                          <td scope="col">Bias</td>
+                          <td scope="col">P</td>
+                          <td scope="col">Remarks</td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for i, j, k, l in gabung4 %} 
+                      <tr>
+                        <td>{{i|floatformat:2 }}</td>
+                        <td>{{j|floatformat:2 }}</td>
+                        <td>{{k|floatformat:2 }}</td>
+                        <td>{{l}}</td>
+                      </tr>
+                     
+                      {% endfor %}
+                    </tbody>
+                  </table>
+
                    
                     <div class="card">
-                      <h5 class="card-header">Featured</h5>
+                      <h5 class="card-header">Linearity Graph</h5>
                       <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
                         {{divbiasref| safe}}
                         <br><br><br>
                         <p>Bias in Gauge is unacceptable since the bias = 0 line does not fall within the confidence bounds
