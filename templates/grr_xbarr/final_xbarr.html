@@ -11,8 +11,8 @@
     .invoice-title h2, .invoice-title h3 {
     display: inline-block;
     }
-    p {
-    font-size: 11px;
+    h6 {
+    color: red;
     }
     .card {
       display:inline-block;
@@ -92,15 +92,15 @@
 
 
                       <div class="card">
-                        <h5 class="card-header">Featured</h5>
+                        
                         <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                          
                           <img src="data:image/png;base64,{{ psvc }}" alt="Admin"  width="95%", height="50%">
                           <br><br><br>
-                          <p>GRR &lt; 10% or  10 &lt;= GRR &lt;=30
-                          <br>NDC &gt; 5 Need Correction</p>
-                          <p>Comment:          
-                          <br>{{ xbarr.xbarr_psvc }}</p>
+                          <h7>GRR &lt; 10% or  10 &lt;= GRR &lt;=30
+                          <br>NDC &gt; 5 Need Correction</h7>
+                          <br><h6>Comment:          
+                          <br>{{ xbarr.xbarr_psvc }}</h6>
                         </div>
                       </div>
   
@@ -111,19 +111,19 @@
                         <div class="card-body">
                           <h6 class="card-subtitle mb-2 text-muted">Decision</h6>
                           {% if xbarr.xbarr_resume.0.1 < 10 %}
-                            <p>Measurement method is accepted / metoda pengukuran diterima</p>
+                            <h7>Measurement method is accepted / metoda pengukuran diterima</h7>
                           {% elif xbarr.xbarr_resume.0.1 < 30 %}
-                          <p>Measurement method need correction / metoda pengukuran perlu perbaikan</p>
+                          <h7>Measurement method need correction / metoda pengukuran perlu perbaikan</h7>
                           {% elif xbarr.xbarr_resume.0.1 >= 30 %}
-                          <p>Measurement method is rejected / metoda pengukuran tidak bisa dipakai</p>
+                          <h7>Measurement method is rejected / metoda pengukuran tidak bisa dipakai</h7>
                           {% endif %}
                           
                             <br><br><h6 class="card-subtitle mb-2 text-muted">Recommendation</h6>
-                            <p>
+                            <h7>
                           {% for ele in xbarr.xbarr_recommendation %} 
                           <br>- {{ ele }}
                           {% endfor %}
-                          </p>
+                          </h7>
                         </div>
                       </div>
 

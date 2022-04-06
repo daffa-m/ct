@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Corrective Action Report</title>
+    <title>Survey</title>
     <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -47,7 +47,7 @@
               {% if messages %}
               {% for message in messages %}
               <div class="alert alert-{{ message.tags }}" role="alert">
-                  <p>{{ message }}</p>
+                  <h7>{{ message }}</h7>
               </div>
               {% endfor %}
               {% endif %}
@@ -100,7 +100,7 @@
           <td>{{ survey_list.survey_category }}</td>
           <td>{{ survey_list.survey_process_name }}</td>
           <td><a href="{% url 'coretoolcrud:viewDetailSurvey' survey_list.id %}" class="btn btn-info">Detail</a></td>
-          <td><a href="{% url 'coretoolcrud:deleteSurvey' survey_list.id %}" class="btn btn-info" onclick="return confirm('Are you sure?')">Delete</a></td>
+          <td><a href="{% url 'coretoolcrud:deleteSurvey' survey_list.id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a></td>
         </tr>
         {% endfor %}
         

@@ -71,11 +71,11 @@
               {% for message in messages %}
               {% if message.tags == 'error' %}
               <div class="alert alert-danger" role="alert">
-                <p>{{ message }}</p>
+                <h7>{{ message }}</h7>
               </div>
               {% else %}
               <div class="alert alert-{{ message.tags }}" role="alert">
-                  <p>{{ message }}</p>
+                  <h7>{{ message }}</h7>
               </div>
               {% endif %}
               {% endfor %}
@@ -305,7 +305,7 @@
                 <div class="card border-primary">
                     <div class="card-body">
                         <h3 class="card-title">6. Confirm</h3><hr>
-                        <p class="card-text">Check your input carefully before you commit save data</p>
+                        <p class="card-text">Check your input carefully before you commit save data</h7>
                         <button type="submit" class="btn btn-outline-secondary">Save</button>
                     </div>
                 </div>

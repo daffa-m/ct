@@ -54,11 +54,11 @@
                     {% for message in messages %}
                     {% if message.tags == 'error' %}
                     <div class="alert alert-danger" role="alert">
-                      <p>{{ message }}</p>
+                      <h7>{{ message }}</h7>
                     </div>
                     {% else %}
                     <div class="alert alert-{{ message.tags }}" role="alert">
-                        <p>{{ message }}</p>
+                        <h7>{{ message }}</h7>
                     </div>
                     {% endif %}
                     {% endfor %}

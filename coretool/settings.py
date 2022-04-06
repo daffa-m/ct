@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://manitoba-dee-contributions-volunteer.trycloudflare.com']
+CSRF_TRUSTED_ORIGINS = ['https://nominated-texts-morgan-promising.trycloudflare.com']
 
 
 # Application definition

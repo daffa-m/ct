@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>GRR Xbar R</title>
+	<title>Linearity</title>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
@@ -14,8 +14,8 @@
     .invoice-title h2, .invoice-title h3, .invoice-title a {
     display: inline-block;
     }
-    p {
-    font-size: 11px;
+    h6 {
+    color: red;
     }
     .card {
       display:inline-block;
@@ -127,16 +127,16 @@
                     <tr>
                       <th scope="col">Measured By: {{linearity.linearity_measured}}</th>
                       <th scope="col">Reviewed By: {{linearity.linearity_reviewed}}</th>
+                      <th scope="col">|t|: {{tabs|floatformat:2}} tb: {{tb|floatformat:2}}</th>
                       <th scope="col">a: {{a|floatformat:2}}</th>
-                      <th scope="col">b: {{b|floatformat:2}}</th>
                       <th scope="col">S: {{s|floatformat:2}}</th>
                     </tr>
                     <tr>
                       <th scope="col">Master Measured By: {{linearity.linearity_ave_measured}}</th>
-                      <th scope="col">Master Reviewed By: {{linearity.linearity_ave_reviewed}}</th>
                       <th scope="col">Serial Number Gauge: {{linearity.linearity_ave_sn}}</th>
                       <th scope="col">Resolution: {{linearity.linearity_ave_res}}</th>
-                      <th scope="col">t abs: {{tabs|floatformat:2}}</th>
+                      <th scope="col">b: {{b|floatformat:2}}</th>
+                      <th scope="col">t: {{t|floatformat:2}}</th>
                     </tr>
                     
                     
@@ -233,13 +233,24 @@
                   <table class="table table-hover table-bordered results">
                     <thead>
                       <tr>
-                          <td scope="col">Reference Average</td>
+                          <td scope="col">Reference</td>
                           <td scope="col">Bias</td>
                           <td scope="col">P</td>
                           <td scope="col">Remarks</td>
                       </tr>
                     </thead>
                     <tbody>
+                      <tr>
+                        <td>Average</td>
+                        <td>{{avebiasall|floatformat:2}}</td>
+                        <td>{{avep|floatformat:2}}</td>
+                        {% if avep <= conf1 %}
+                        <td>Bias Significant</td>
+                        {% else %}
+                        <td>Bias Not Significant</td>
+                        {% endif %}
+                        
+                      </tr>
                       {% for i, j, k, l in gabung4 %} 
                       <tr>
                         <td>{{i|floatformat:2 }}</td>
@@ -258,32 +269,26 @@
                       <div class="card-body">
                         {{divbiasref| safe}}
                         <br><br><br>
-                        <p>Bias in Gauge is unacceptable since the bias = 0 line does not fall within the confidence bounds
-                        <br>Numerically this can be analyzed by looking at the slope and intercept</P>          
+                        <h7>Bias in Gauge is unacceptable since the bias = 0 line does not fall within the confidence bounds
+                        <br>Numerically this can be analyzed by looking at the slope and intercept</h7>          
                         
                       </div>
                     </div>
                     <br><br>
                     <div class="card">
-                        <h5 class="card-header">Decision and Recommendation</h5>
-                        <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Decision</h6>
-                          {% if tabs > t or tb > t %}
-                            <p>Bias is significant</p>
-                          {% else %}
-                          <p>Bias is not sifnificant</p>
-                          
-                          {% endif %}
-                          
-                            <br><br><h6 class="card-subtitle mb-2 text-muted">Recommendation</h6>
-                            <p>
-                         
-                          <br>{{ linearity.linearity_recommendation }}
-                          
-                          </p>
-                        </div>
-                      </div>
-
+                      <h5 class="card-header">Decision and Recommendation</h5>
+                      <div class="card-body">
+                        <h6>Decision</h6>
+                        {% if tabs > t or tb > t %}
+                          <h7>|t| value is higher than t value, indicated Bias is significant / there is a Linearity problem</h7>
+                        {% else %}
+                        <h7>|t| value is lower than t value, indicated Bias is insignificant / there is no Linearity problem</h7>
+                        
+                        {% endif %}
+                        
+                          <br><br><h6>Recommendation</h6>
+                          <h7>{{ linearity.linearity_recommendation }}
+                          </h7>
                       </div>
                     </div>
                    

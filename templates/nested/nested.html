@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Corrective Action Report</title>
+    <title>GRR Nested</title>
     <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -97,11 +97,11 @@
           {% for message in messages %}
           {% if message.tags == 'error' %}
           <div class="alert alert-danger" role="alert">
-            <p>{{ message }}</p>
+            <h7>{{ message }}</h7>
           </div>
           {% else %}
           <div class="alert alert-{{ message.tags }}" role="alert">
-              <p>{{ message }}</p>
+              <h7>{{ message }}</h7>
           </div>
           {% endif %}
           {% endfor %}

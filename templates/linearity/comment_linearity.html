@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>GRR Xbar R</title>
+	<title>Linearity</title>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
@@ -36,8 +36,8 @@
     .invoice-title h2, .invoice-title h3 {
     display: inline-block;
     }
-    p {
-    font-size: 11px;
+    h6 {
+    color: red;
     }
     .card {
       display:inline-block;
@@ -78,11 +78,11 @@
         {% for message in messages %}
         {% if message.tags == 'error' %}
         <div class="alert alert-danger" role="alert">
-          <p>{{ message }}</p>
+          <h7>{{ message }}</h7>
         </div>
         {% else %}
         <div class="alert alert-{{ message.tags }}" role="alert">
-            <p>{{ message }}</p>
+            <h7>{{ message }}</h7>
         </div>
         {% endif %}
         {% endfor %}
@@ -169,14 +169,14 @@
                         <th scope="col">Measured By: {{linearity.linearity_measured}}</th>
                         <th scope="col">Reviewed By: {{linearity.linearity_reviewed}}</th>
                         <th scope="col">|t|: {{tabs|floatformat:2}} tb: {{tb|floatformat:2}}</th>
-                        <th scope="col">a: {{a|floatformat:2}} b: {{b|floatformat:2}}</th>
+                        <th scope="col">a: {{a|floatformat:2}}</th>
                         <th scope="col">S: {{s|floatformat:2}}</th>
                       </tr>
                       <tr>
                         <th scope="col">Master Measured By: {{linearity.linearity_ave_measured}}</th>
-                        <th scope="col">Master Reviewed By: {{linearity.linearity_ave_reviewed}}</th>
                         <th scope="col">Serial Number Gauge: {{linearity.linearity_ave_sn}}</th>
                         <th scope="col">Resolution: {{linearity.linearity_ave_res}}</th>
+                        <th scope="col">b: {{b|floatformat:2}}</th>
                         <th scope="col">t: {{t|floatformat:2}}</th>
                       </tr>
                       
@@ -268,13 +268,23 @@
                     <table class="table table-hover table-bordered results">
                       <thead>
                         <tr>
-                            <td scope="col">Reference Average</td>
+                            <td scope="col">Reference</td>
                             <td scope="col">Bias</td>
                             <td scope="col">P</td>
                             <td scope="col">Remarks</td>
                         </tr>
                       </thead>
                       <tbody>
+                        <tr>
+                          <td>Average</td>
+                          <td>{{avebiasall|floatformat:2}}</td>
+                          <td>{{avep|floatformat:2}}</td>
+                          {% if avep <= conf1 %}
+                          <td>Bias Significant</td>
+                          {% else %}
+                          <td>Bias Not Significant</td>
+                          {% endif %}
+                        </tr>
                         {% for i, j, k, l in gabung4 %} 
                         <tr>
                           <td>{{i|floatformat:2 }}</td>
@@ -293,8 +303,8 @@
                           
                           {{divbiasref| safe}}
                           <br><br><br>
-                          <p>Bias in Gauge is unacceptable since the bias = 0 line does not fall within the confidence bounds
-                          <br>Numerically this can be analyzed by looking at the slope and intercept</P>          
+                          <h7>Bias in Gauge is unacceptable since the bias = 0 line does not fall within the confidence bounds
+                          <br>Numerically this can be analyzed by looking at the slope and intercept</h7>          
                           
                         </div>
                       </div>
@@ -305,18 +315,14 @@
                     <div class="card">
                       <h5 class="card-header">Recommendation</h5>
                       <div class="card-body">
-                        
-                        <div class="container1">
-                          <div class="form-check form-check-inline">
+                          <div class="form-check">
                             <input class="form-check-input" type="radio" name="linearity_recommendation" value="Repair / needs to be recalibrated to achieve zero bias through the modification of the hardware, software or both.">
                             <label class="form-check-label" for="inlineRadio1">Repair / needs to be recalibrated to achieve zero bias through the modification of the hardware, software or both.</label>
-                        </div><br>
-                        <div class="form-check form-check-inline">
+                        </div>
+                        <div class="form-check">
                         <input class="form-check-input" type="radio" name="linearity_recommendation" value="Gauge / Measurement can be used on range ...">
                         <label class="form-check-label" for="inlineRadio2">Gauge / Measurement can be used on range ...</label>
                       </div>
-                      </div>
-
                       </div>
                     </div>
                     <br><br><br>

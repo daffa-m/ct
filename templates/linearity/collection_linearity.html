@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>GRR Xbar R</title>
+	<title>Linearity</title>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
@@ -36,17 +36,13 @@
     .invoice-title h2, .invoice-title h3 {
     display: inline-block;
     }
-    p {
-    font-size: 11px;
+    h6 {
+    color: red;
     }
     .card {
       display:inline-block;
       width:100%;
       } 
-    .btn{
-      margin-right: 1%;
-      margin-left: 1%;
-    }    
     input{
       margin-top: 1%;
       margin-bottom: 1%;
@@ -78,11 +74,11 @@
         {% for message in messages %}
         {% if message.tags == 'error' %}
         <div class="alert alert-danger" role="alert">
-          <p>{{ message }}</p>
+          <h7>{{ message }}</h7>
         </div>
         {% else %}
         <div class="alert alert-{{ message.tags }}" role="alert">
-            <p>{{ message }}</p>
+            <h7>{{ message }}</h7>
         </div>
         {% endif %}
         {% endfor %}
@@ -168,14 +164,14 @@
                       <th scope="col">Measured By: {{linearity.linearity_measured}}</th>
                       <th scope="col">Reviewed By: {{linearity.linearity_reviewed}}</th>
                       <th scope="col">|t|: {{tabs|floatformat:2}} tb: {{tb|floatformat:2}}</th>
-                      <th scope="col">a: {{a|floatformat:2}} b: {{b|floatformat:2}}</th>
+                      <th scope="col">a: {{a|floatformat:2}}</th>
                       <th scope="col">S: {{s|floatformat:2}}</th>
                     </tr>
                     <tr>
                       <th scope="col">Master Measured By: {{linearity.linearity_ave_measured}}</th>
-                      <th scope="col">Master Reviewed By: {{linearity.linearity_ave_reviewed}}</th>
                       <th scope="col">Serial Number Gauge: {{linearity.linearity_ave_sn}}</th>
                       <th scope="col">Resolution: {{linearity.linearity_ave_res}}</th>
+                      <th scope="col">b: {{b|floatformat:2}}</th>
                       <th scope="col">t: {{t|floatformat:2}}</th>
                     </tr>
                     
@@ -299,7 +295,7 @@
 
                    
                     <div class="card">
-                      <h5 class="card-header">Linearity Graph</h5>
+                      
                       <div class="card-body">
                         {{divbiasref| safe}}
                         <br><br><br>
@@ -314,15 +310,15 @@
                         <div class="card-body">
                           <h6>Decision</h6>
                           {% if tabs > t or tb > t %}
-                            <h7>|t| value is higher than t value, indicated Bias is significant / there is a Linearity problem</h7>
+                            <h6>|t| value is higher than t value, indicated Bias is significant / there is a Linearity problem</h6>
                           {% else %}
-                          <h7>|t| value is lower than t value, indicated Bias is insignificant / there is no Linearity problem</h7>
+                          <h6>|t| value is lower than t value, indicated Bias is insignificant / there is no Linearity problem</h6>
                           
                           {% endif %}
                           
                             <br><br><h6>Recommendation</h6>
-                            <h7>{{ linearity.linearity_recommendation }}
-                            </h7>
+                            <h6>{{ linearity.linearity_recommendation }}
+                            </h6>
                         </div>
                       </div>
 

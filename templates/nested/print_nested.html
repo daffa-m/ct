@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>GRR Xbar R</title>
+	<title>GRR Nested</title>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
@@ -13,8 +13,8 @@
     .invoice-title h2, .invoice-title h3, .invoice-title a {
     display: inline-block;
     }
-    p {
-    font-size: 11px;
+    h6 {
+    color: red;
     }
     .card {
       display:inline-block;
@@ -228,115 +228,100 @@
                     </table>
 
                     <div class="card">
-                        <h5 class="card-header">Featured</h5>
+                        
                         <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                          
                           <img src="data:image/png;base64,{{ psvc }}" alt="Admin"  width="95%", height="50%">
                           <br><br><br>
-                          <p>GRR &lt; 10% or  10 &lt;= GRR &lt;=30
-                          <br>NDC &gt; 5 Need Correction</p>
-                          <p>Comment:          
-                          <br>{{ nested.nested_psvc }}</p>
+                          <h7>GRR &lt; 10% or  10 &lt;= GRR &lt;=30
+                          <br>NDC &gt; 5 Need Correction</h7>
+                          <br><h6>Comment:          
+                          <br>{{ nested.nested_psvc }}</h6>
                         </div>
                       </div>
                       <br><br>
                       <div class="card">
-                        <h5 class="card-header">Featured</h5>
+                        
                         <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                          
                           {{divrva| safe}}
                           <br><br><br>
-                          <p>Range value is within UCL/LCL range
+                          <h7>Range value is within UCL/LCL range
                           <br>Nilai R berada di dalam UCL/LCL, yang berarti:
                           <br>- No special cause / Tidak ada special cause
                           <br>- Same method / Metoda ukur sama
-                          <br>- Consistency of measurement (repeatability) / pengulangan konsisten</p>
-                          <p>Comment:                                    
-                          <br>{{ nested.nested_rva }}</p>
+                          <br>- Consistency of measurement (repeatability) / pengulangan konsisten</h7>
+                          <br><h6>Comment:                                    
+                          <br>{{ nested.nested_rva }}</h6>
                         </div>
                       </div>
                       <br><br>
                       <div class="card">
-                        <h5 class="card-header">Featured</h5>
+                        
                         <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                          
                           {{divdbs| safe}}
                           <br><br><br>
-                          <p>Standard:
+                          <h7>Standard:
                           <br>- No noise means / tidak ada data aneh
                           <br>- Part variation is small / variasi part kecil
-                          <br>- No outlier reading / tidak ada kesalahan ukur</p>
-                          <p>Comment:          
-                          <br>{{ nested.nested_dbs }}</p>
+                          <br>- No outlier reading / tidak ada kesalahan ukur</h7>
+                          <br><h6>Comment:          
+                          <br>{{ nested.nested_dbs }}</h6>
                         </div>
                       </div>
                       <br><br>
                       <div class="card">
-                        <h5 class="card-header">Featured</h5>
+                        
                         <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                          
                           {{divdba| safe}}
                           <br><br><br>
-                          <p>Standard:
+                          <h7>Standard:
                           <br>Mean line is straight line, ,means / arti garis lurus:
-                          <br>- No appraiser may have lower/higher reading than the other / tidak ada operattor punya pembacaan lebih tinggi/ lebih rendah</p>
-                          <p>Comment:          
-                            <br>{{ nested.nested_dba }}</p>
+                          <br>- No appraiser may have lower/higher reading than the other / tidak ada operattor punya pembacaan lebih tinggi/ lebih rendah</h7>
+                          <br><h6>Comment:          
+                            <br>{{ nested.nested_dba }}</h6>
                         </div>
                       </div>
                       <br><br>
                       <div class="card">
-                        <h5 class="card-header">Featured</h5>
+                        
                         <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                          
                           {{divaabp| safe}}
                           <br><br><br>
-                          <p>Standard:
-                          <br>There is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</p>
-                          <p>Comment:          
-                            <br>{{ nested.nested_aabp }}</p>
+                          <h7>Standard:
+                          <br>There is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</h7>
+                          <br><h6>Comment:          
+                            <br>{{ nested.nested_aabp }}</h6>
                         </div>
                       </div>
                       <br><br>
                       <div class="card">
-                        <h5 class="card-header">Featured</h5>
+                        
                         <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                          {{divxva| safe}}
-                          <br><br><br>
-                          <p>Standard:
-                            <br>Minimal 50% Xbar fall outside the control (adequate to detect part to part variation / Sufficient Discrimination & controlling the process sample represent the expected process Variation)
-                            <br>Minimal 50% Xbarr berada di luar control limit, ini menunjukkan pengukuran dapat mendeteksi variasi (resolusi mencukupi)</p>
-                          <p>Comment:          
-                            <br>{{ nested.nested_xva }}</p>
-                        </div>
-                      </div>
-                      <br><br>
-                      <div class="card">
-                        <h5 class="card-header">Decision and Recommendation</h5>
-                        <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">Decision</h6>
-                          <!-- {% if xbarr.xbarr_resume.0.1 < 10 %}
-                            <p>Measurement method is accepted / metoda pengukuran diterima</p>
-                          {% elif xbarr.xbarr_resume.0.1 < 30 %}
-                          <p>Measurement method need correction / metoda pengukuran perlu perbaikan</p>
-                          {% elif xbarr.xbarr_resume.0.1 >= 30 %}
-                          <p>Measurement method is rejected / metoda pengukuran tidak bisa dipakai</p>
-                          {% endif %} -->
+                          <h6>Decision</h6>
+                          {% if decision < 10 %}
+                          <h6>Measurement method is accepted / metoda pengukuran diterima</h6>
+                          {% elif decision < 30 %}
+                          <h6>Measurement method need correction / metoda pengukuran perlu perbaikan</h6>
+                          {% elif decision >= 30 %}
+                          <h6>Measurement method is rejected / metoda pengukuran tidak bisa dipakai</h6>
+                          {% endif %}
                           
-                            <br><br><h6 class="card-subtitle mb-2 text-muted">Recommendation</h6>
-                            <p>
+                            <br><h6>Recommendation</h6>
+                            
                           {% for ele in nested.nested_recommendation %} 
-                          <br>- {{ ele }}
+                          <h6>- {{ ele }}</h6>
                           {% endfor %}
-                          </p>
+                          
                         </div>
                       </div>
 
                       <br><br>
                     
-                      <a href="{% url 'coretoolcrud:deleteNested' nested.nested_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                      <br><br>
+                     
 
         </div>
         
