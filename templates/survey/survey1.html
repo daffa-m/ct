@@ -221,11 +221,11 @@
                     <div class="card-body">
                         <h3 class="card-title">5. Type Of Data</h3><hr><br>
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="survey_data" value="att">
+                            <input class="form-check-input" type="radio" name="survey_data" value="att" id="att_main" onchange="check()">
                             <label class="form-check-label" for="inlineRadio1">Attribute / Uncontinous Data</label>
                         </div>
                         <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="survey_data" value="var">
+                        <input class="form-check-input" type="radio" name="survey_data" value="var" id="var_main" onchange="check()">
                         <label class="form-check-label" for="inlineRadio2">Variable / Continous Data</label>
                       </div>
                     </div>
@@ -349,6 +349,12 @@
                 </div>
             </div>
             <div class="col-sm-3 col-md-4 py-3">
+                
+            </div>
+            <div class="col-sm-3 col-md-4 py-3">
+                
+            </div>
+            <div class="col-sm-3 col-md-4 py-3">
                 <div class="card border-primary">
                     <div class="card-body">
                         <h3 class="card-title">7. Confirm</h3><hr>
@@ -372,7 +378,69 @@
             });
         });
 
-        
+        function check() {
+          if (document.getElementById('att_main').checked) {
+              document.getElementById('att_pu0').disabled = false;
+              document.getElementById('att_pu1').disabled = false;
+              document.getElementById('att_qty0').disabled = false;
+              document.getElementById('att_qty1').disabled = false;
+              document.getElementById('att_cat0').disabled = false;
+              document.getElementById('att_cat1').disabled = false;
+              document.getElementById('var_wb0').disabled = true;
+              document.getElementById('var_wb1').disabled = true;
+              document.getElementById('var_bo0').disabled = true;
+              document.getElementById('var_bo1').disabled = true;
+              document.getElementById('var_var0').disabled = true;
+              document.getElementById('var_var1').disabled = true;
+              document.getElementById('var_ps0').disabled = true;
+              document.getElementById('var_ps1').disabled = true;
+              document.getElementById('var_h0').disabled = true;
+              document.getElementById('var_h1').disabled = true;
+              document.getElementById('var_subgroup0').disabled = true;
+              document.getElementById('var_subgroup1').disabled = true;
+          }
+          else if (document.getElementById('var_main').checked) {
+            document.getElementById('att_pu0').disabled = true;
+              document.getElementById('att_pu1').disabled = true;
+              document.getElementById('att_qty0').disabled = true;
+              document.getElementById('att_qty1').disabled = true;
+              document.getElementById('att_cat0').disabled = true;
+              document.getElementById('att_cat1').disabled = true;
+              document.getElementById('var_wb0').disabled = false;
+              document.getElementById('var_wb1').disabled = false;
+              document.getElementById('var_bo0').disabled = false;
+              document.getElementById('var_bo1').disabled = false;
+              document.getElementById('var_var0').disabled = false;
+              document.getElementById('var_var1').disabled = false;
+              if (document.getElementById('var_var0').checked) {
+                document.getElementById('var_ps0').disabled = false;
+                document.getElementById('var_ps1').disabled = false;
+              }
+              if (document.getElementById('var_var1').checked) {
+                document.getElementById('var_ps0').disabled = true;
+                document.getElementById('var_ps1').disabled = true;
+              }
+              document.getElementById('var_h0').disabled = false;
+              document.getElementById('var_h1').disabled = false;
+              if (document.getElementById('var_h0').checked) {
+                document.getElementById('var_subgroup0').disabled = true;
+                document.getElementById('var_subgroup1').disabled = true;
+              }
+              if (document.getElementById('var_h1').checked) {
+                document.getElementById('var_subgroup0').disabled = false;
+                document.getElementById('var_subgroup1').disabled = false;
+              }
+              if (document.getElementById('var_ps0').checked) {
+                document.getElementById('var_rev0').disabled = false;
+                document.getElementById('var_rev1').disabled = false;
+              }
+              if (document.getElementById('var_ps1').checked) {
+                document.getElementById('var_rev0').disabled = true;
+                document.getElementById('var_rev1').disabled = true;
+              }
+
+          }
+      }
     </script>
 </body>
 </html>

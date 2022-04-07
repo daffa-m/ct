@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-      <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.6.4/jquery.min.js" integrity="sha512-SW0bB7zYONzOFdTogLM8mF+lpvSaPH55g+RyyV8+dRZkiW5n/c1gNgGk5i2xfzDLTmPHvSCqsaiEoZJDiToTWg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <!-- <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script> -->
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
       <style>
         ul.breadcrumb {
@@ -192,21 +193,6 @@
             <div class="col-sm-3 col-md-4 py-3">
                 <div class="card border-primary">
                     <div class="card-body">
-                        <h3 class="card-title">5. Type Of Data</h3><hr><br>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="survey_data" id="att_main" value="att" onchange="check()" {% if survey.survey_data == "att" %}checked="checked"{% endif %}>
-                            <label class="form-check-label" for="inlineRadio1">Attribute / Uncontinous Data</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="survey_data" id="var_main" value="var" onchange="check()" {% if survey.survey_data == "var" %}checked="checked"{% endif %}>
-                        <label class="form-check-label" for="inlineRadio2">Variable / Continous Data</label>
-                      </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-3 col-md-4 py-3">
-                <div class="card border-primary">
-                    <div class="card-body">
                         <h3 class="card-title">4. Statistical Study</h3><hr>
                         <div class="form-group">
                             <label for="exampleInputEmail1">Plan Date</label>
@@ -232,6 +218,21 @@
                 </div>
             </div>
             <div class="col-sm-3 col-md-4 py-3">
+                <div class="card border-primary">
+                    <div class="card-body">
+                        <h3 class="card-title">5. Type Of Data</h3><hr><br>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="survey_data" id="att_main" value="att" onchange="check()" {% if survey.survey_data == "att" %}checked="checked"{% endif %}>
+                            <label class="form-check-label" for="inlineRadio1">Attribute / Uncontinous Data</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="survey_data" id="var_main" value="var" onchange="check()" {% if survey.survey_data == "var" %}checked="checked"{% endif %}>
+                        <label class="form-check-label" for="inlineRadio2">Variable / Continous Data</label>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div id="var" class="desc col-sm-3 col-md-4 py-3">
                 <div class="card border-primary">
                     <div class="card-body">
                         <h3 class="card-title">6. Variable</h3><hr>
@@ -312,7 +313,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-3 col-md-4 py-3">
+            <div id="att" class="desc col-sm-3 col-md-4 py-3">
                 <div class="card border-primary">
                     <div class="card-body">
                         <h3 class="card-title">6. Attribute</h3><hr>
@@ -349,11 +350,17 @@
                 </div>
             </div>
             <div class="col-sm-3 col-md-4 py-3">
+                
+            </div>
+            <div class="col-sm-3 col-md-4 py-3">
+                
+            </div>
+            <div class="col-sm-3 col-md-4 py-3">
                 <div class="card border-primary">
                     <div class="card-body">
                         <h3 class="card-title">7. Confirm</h3><hr>
                         <p class="card-text">Check your input carefully before you commit save data</h7>
-                        <button type="submit" class="btn btn-outline-secondary">Save</button>
+                        <br><button type="submit" class="btn btn-outline-secondary">Save</button>
                     </div>
                 </div>
             </div>
@@ -363,6 +370,15 @@
 
 
     <script>
+        $(document).ready(function() {
+            $("div.desc").hide();
+            $("input[name$='survey_data']").click(function() {
+                var test = $(this).val();
+                $("div.desc").hide();
+                $("#" + test).show();
+            });
+        });
+
         function check() {
             if (document.getElementById('att_main').checked) {
                 document.getElementById('att_pu0').disabled = false;
