@@ -86,7 +86,7 @@
           <hr>
     
         </div>
-        <form action="{% url 'coretoolcrud:storeManual' %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'coretoolcrud:storeEditManual' survey.id %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
         <div class="row" data-masonry='{"percentPosition": true }'>
             <div class="col-sm-3 col-md-4 py-3">
@@ -121,24 +121,46 @@
                     <div class="card-body">
                         <h3 class="card-title">2. Identifying Character</h3><hr>
                         <div class="form-group">
-                            <label for="exampleInputEmail1">Name</label>
-                            <input class="form-control" name="survey_name" id="demoFormHorizontalEmail" type="text" value={{survey.survey_name}} required />
+                            <label for="exampleInputEmail1">Character</label>
+                            <input class="form-control" name="survey_character" id="demoFormHorizontalEmail" type="text" value={{survey.survey_character}} required />
                         </div>
                         <div class="form-group"><br>
-                            <label for="exampleInputEmail1">Serial Number</label>
-                            <input class="form-control" name="survey_sn" id="demoFormHorizontalEmail" type="text" value={{survey.survey_sn}} required />
+                            <label for="exampleInputPassword1">Category</label>
+                            <select name="survey_category" id="demoSelectbox" class="form-control">
+                                <option value="" disabled hidden>Please Choose</option>
+                                <option {% if survey.survey_category == "Process" %} selected="selected" {% endif %}>Process</option>
+                                <option {% if survey.survey_category == "Product" %} selected="selected" {% endif %}>Product</option>
+                            </select>
                         </div>
                         <div class="form-group"><br>
-                            <label for="exampleInputEmail1">Resolution</label>
-                            <input class="form-control" name="survey_resolution" id="demoFormHorizontalEmail" type="text" value={{survey.survey_resolution}} required />
+                            <label for="exampleInputEmail1">Process Name</label>
+                            <input class="form-control" name="survey_process_name" id="demoFormHorizontalEmail" type="text" value={{survey.survey_process_name}} required />
                         </div>
                         <div class="form-group"><br>
-                            <label for="exampleInputEmail1">Unit</label>
-                            <input class="form-control" name="survey_unit" id="demoFormHorizontalEmail" type="text" value={{survey.survey_unit}} required />
+                            <label for="exampleInputEmail1">Symbol</label>
+                            <input class="form-control" name="survey_symbol" id="demoFormHorizontalEmail" type="text" value={{survey.survey_symbol}} required />
                         </div>
                         <div class="form-group"><br>
-                            <label for="exampleInputEmail1">Next Calibration Date</label>
-                            <input class="form-control" name="survey_next_cal" id="demoFormHorizontalEmail" type="date" value={{survey.survey_next_cal|date:'Y-m-d'}} required />
+                            <label for="exampleInputEmail1">Reference</label>
+                            <input class="form-control" name="survey_ref" id="demoFormHorizontalEmail" type="text" value={{survey.survey_ref}} required />
+                        </div>
+                        <div class="row">
+                            <div class="col"><br>
+                                <label for="inputEmail4">Max Range Spec</label>
+                                <input type="text" class="form-control" name="survey_range_max" id="inputEmail4" value={{survey.survey_range_max}} placeholder="Max">      
+                            </div>
+                            <div class="col"><br>
+                                <label for="inputEmail4">Min Range Spec</label>
+                                <input type="text" class="form-control" name="survey_range_min" id="inputPassword4" value={{survey.survey_range_min}} placeholder="Min">    
+                            </div>
+                          </div>
+                        <div class="form-group"><br>
+                            <label for="exampleInputEmail1">FMEA Number</label>
+                            <input class="form-control" name="survey_fmea" id="demoFormHorizontalEmail" type="text" value={{survey.survey_fmea}} required />
+                        </div>
+                        <div class="form-group"><br>
+                            <label for="exampleInputEmail1">Control Plan Number</label>
+                            <input class="form-control" name="survey_control_plan" id="demoFormHorizontalEmail" type="text" value={{survey.survey_control_plan}} required />
                         </div>
                     </div>
                 </div>
@@ -306,7 +328,7 @@
                     <div class="card-body">
                         <h3 class="card-title">6. Confirm</h3><hr>
                         <p class="card-text">Check your input carefully before you commit save data</h7>
-                        <button type="submit" class="btn btn-outline-secondary">Save</button>
+                        <br><br><button type="submit" class="btn btn-outline-secondary">Save</button>
                     </div>
                 </div>
             </div>

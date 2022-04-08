@@ -200,8 +200,6 @@ def storeEditManual(request, pk):
         survey.survey_study = request.POST.getlist('survey_study')
 
         survey.save()
-        survey = Survey.objects.latest('id')
-        print(type(survey.survey_plan))
         messages.success(request, "Data Survey Berhasil Disimpan")
         return redirect('coretoolcrud:viewDetailSurvey',survey.id )
     else:
@@ -426,13 +424,9 @@ def storeEditSurvey(request, pk):
                 elif survey.survey_var_subgroup == "more or equal than 10":
                     study.append("Xbar-S")
             
-            print(survey.survey_var_variation, survey.survey_var_part_sample, survey.survey_var_review)
-
 
         survey.survey_study = study
         survey.save()
-        survey = Survey.objects.latest('id')
-        print(type(survey.survey_plan))
         messages.success(request, "Data Survey Berhasil Disimpan")
         # return render(request,'survey/survey_result.html',{'survey':survey})
         return redirect('coretoolcrud:viewDetailSurvey',survey.id )

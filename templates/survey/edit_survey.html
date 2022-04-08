@@ -87,7 +87,7 @@
           <hr>
     
         </div>
-        <form action="{% url 'coretoolcrud:storeSurvey' %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'coretoolcrud:storeEditSurvey' survey.id %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
         <div class="row" data-masonry='{"percentPosition": true }'>
             <div class="col-sm-3 col-md-4 py-3">
@@ -360,7 +360,7 @@
                     <div class="card-body">
                         <h3 class="card-title">7. Confirm</h3><hr>
                         <p class="card-text">Check your input carefully before you commit save data</h7>
-                        <br><button type="submit" class="btn btn-outline-secondary">Save</button>
+                        <br><br><button type="submit" class="btn btn-outline-secondary">Save</button>
                     </div>
                 </div>
             </div>

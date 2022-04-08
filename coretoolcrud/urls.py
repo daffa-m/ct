@@ -24,8 +24,8 @@ urlpatterns = [
     path('viewEditManual/<int:pk>',viewEditManual,name='viewEditManual'),
     path('storeManual',storeManual,name='storeManual'),
     path('storeSurvey',storeSurvey,name='storeSurvey'),
-    path('storeEditManual',storeEditManual,name='storeEditManual'),
-    path('storeEditSurvey',storeEditSurvey,name='storeEditSurvey'),
+    path('storeEditManual/<int:pk>',storeEditManual,name='storeEditManual'),
+    path('storeEditSurvey/<int:pk>',storeEditSurvey,name='storeEditSurvey'),
     path('deleteSurvey/<int:pk>',deleteSurvey,name='deleteSurvey'),
 
     
