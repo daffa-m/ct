@@ -36,6 +36,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
+def custom_page_not_found_view(request, exception=None):
+    return render(request, 'errors/404.html')
+
 # Login
 
 def viewLogin(request):
