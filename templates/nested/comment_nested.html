@@ -211,6 +211,20 @@
                       
                       <div class="card-body">
                         
+                        {{divdbs| safe}}
+                        <br><br><br>
+                        <h7>Standard:
+                        <br>- No noise means / tidak ada data aneh
+                        <br>- Part variation is small / variasi part kecil
+                        <br>- No outlier reading / tidak ada kesalahan ukur</h7>
+                        <br><br><h6>Comment :</h6> <textarea class="form-control" name="nested_dbs" id="textAreaExample" rows="4">{{ nested.nested_dbs }}</textarea>
+                      </div>
+                    </div>
+                    <br><br>
+                    <div class="card">
+                      
+                      <div class="card-body">
+                        
                         {{divrva| safe}}
                         <br><br><br>
                         <h7>Range value is within UCL/LCL range
@@ -222,20 +236,7 @@
                       </div>
                     </div>
                     <br><br>
-                    <div class="card">
-                      
-                      <div class="card-body">
-                        
-                        {{divdbs| safe}}
-                        <br><br><br>
-                        <h7>Standard:
-                        <br>- No noise means / tidak ada data aneh
-                        <br>- Part variation is small / variasi part kecil
-                        <br>- No outlier reading / tidak ada kesalahan ukur</h7>
-                        <br><br><h6>Comment :</h6> <textarea class="form-control" name="nested_dbs" id="textAreaExample" rows="4">{{ nested.nested_dbs }}</textarea>
-                      </div>
-                    </div>
-                    <br><br>
+                    
                     <div class="card">
                       
                       <div class="card-body">
@@ -253,18 +254,6 @@
                       
                       <div class="card-body">
                         
-                        {{divaabp| safe}}
-                        <br><br><br>
-                        <h7>Standard:
-                        <br>There is no tendency for measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</h7>
-                        <br><br><h6>Comment :</h6> <textarea class="form-control" name="nested_aabp" id="textAreaExample" rows="4">{{ nested.nested_aabp }}</textarea>
-                      </div>
-                    </div>
-                    <br><br>
-                    <div class="card">
-                      
-                      <div class="card-body">
-                        
                         {{divxva| safe}}
                         <br><br><br>
                         <h7>Standard:
@@ -274,6 +263,19 @@
                       </div>
                     </div>
                     <br><br>
+                    <div class="card">
+                      
+                      <div class="card-body">
+                        
+                        {{divaabp| safe}}
+                        <br><br><br>
+                        <h7>Standard:
+                        <br>There is no tendency for measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</h7>
+                        <br><br><h6>Comment :</h6> <textarea class="form-control" name="nested_aabp" id="textAreaExample" rows="4">{{ nested.nested_aabp }}</textarea>
+                      </div>
+                    </div>
+                    <br><br>
+                    
                     <div class="card">
                       <h5 class="card-header">Recommendation</h5>
                       <div class="card-body">

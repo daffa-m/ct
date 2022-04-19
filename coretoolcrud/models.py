@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.postgres.fields import JSONField
+from datetime import date
+
+
 
 # Create your models here.
 
@@ -126,3 +129,6 @@ class Survey(models.Model):
     survey_var_subgroup = models.TextField(null=True)
     survey_var_ave = models.TextField(null=True)
     survey_study = models.JSONField(null=True)
+    @property
+    def is_past_due(self):
+        return date.today() > self.survey_next_cal

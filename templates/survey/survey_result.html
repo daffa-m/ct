@@ -53,7 +53,12 @@
       </style>
     
     </head>
-<body>
+{% if survey.is_past_due %}
+  <body onload="calWarning()">  
+{% else %}
+  <body>
+{% endif %}
+
     
 
     
@@ -178,7 +183,11 @@
         {% endif %}
     </div>
 
-
+    <script>
+      function calWarning() {
+        alert("Calibration date is overdue!");
+      }
+      </script>
     
 </body>
 </html>

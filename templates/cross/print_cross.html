@@ -162,7 +162,15 @@
                         <tr>
                           <td>{{ l }}</td>
                           {% for i in j %}
+                          {% if cross.cross_stdevmin == 0 and cross.cross_stdevmax == 0 %}
                           <td>{{i}}</td>
+                          {% else %}
+                          {% if i < cross.cross_stdevmin or i > cross.cross_stdevmax %}
+                          <td style="color:red">{{i}}</td>
+                          {% else %}
+                          <td>{{i}}</td>
+                          {% endif %}
+                          {% endif %}
                           {% endfor %}
                         </tr>
                         {% endfor %}
@@ -240,6 +248,21 @@
                     </div>
                     <br><br>
                     <div class="card">
+                        
+                      <div class="card-body">
+                        
+                        {{divdbs| safe}}
+                        <br><br><br>
+                        <h7>Standard:
+                        <br>- No noise means / tidak ada data aneh
+                        <br>- Part variation is small / variasi part kecil
+                        <br>- No outlier reading / tidak ada kesalahan ukur</h7>
+                        <br><h6>Comment:          
+                        <br>{{ cross.cross_dbs }}</h6>
+                      </div>
+                    </div>
+                    <br><br>
+                    <div class="card">
                       
                       <div class="card-body">
                         
@@ -255,21 +278,7 @@
                       </div>
                     </div>
                     <br><br>
-                    <div class="card">
-                      
-                      <div class="card-body">
-                        
-                        {{divdbs| safe}}
-                        <br><br><br>
-                        <h7>Standard:
-                        <br>- No noise means / tidak ada data aneh
-                        <br>- Part variation is small / variasi part kecil
-                        <br>- No outlier reading / tidak ada kesalahan ukur</h7>
-                        <br><h6>Comment:          
-                        <br>{{ cross.cross_dbs }}</h6>
-                      </div>
-                    </div>
-                    <br><br>
+                    
                     <div class="card">
                       
                       <div class="card-body">
@@ -288,12 +297,12 @@
                       
                       <div class="card-body">
                         
-                        {{divaabp| safe}}
+                        {{divxva| safe}}
                         <br><br><br>
                         <h7>Standard:
-                        <br>there is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</h7>
+                        <br>There is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</h7>
                         <br><h6>Comment:          
-                          <br>{{ cross.cross_aabp }}</h6>
+                          <br>{{ cross.cross_xva }}</h6>
                       </div>
                     </div>
                     <br><br>
@@ -301,12 +310,12 @@
                       
                       <div class="card-body">
                         
-                        {{divxva| safe}}
+                        {{divaabp| safe}}
                         <br><br><br>
                         <h7>Standard:
-                        <br>There is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</h7>
+                        <br>there is no tendency fo measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</h7>
                         <br><h6>Comment:          
-                          <br>{{ cross.cross_xva }}</h6>
+                          <br>{{ cross.cross_aabp }}</h6>
                       </div>
                     </div>
                     <br><br>

@@ -26,11 +26,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'django-insecure-g6$6@ufzo5(6we=zjcw%!h05^*m#ib837#j&%-3%5^nw-@n8h+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://katie-gives-evaluated-december.trycloudflare.com']
+CSRF_TRUSTED_ORIGINS = ['https://again-prospective-vintage-nasdaq.trycloudflare.com']
 
 
 # Application definition

@@ -819,7 +819,7 @@ def viewCommentGrrXbarr(request, pk):
 
         ####bokeh#######
 
-        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = bot, y_axis_label='Measurement', x_axis_label='Appraiser-Trial')
+        p = figure(title="R Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Range', x_axis_label='No Sample')
         p.line(bot, flat, legend_label="Range", line_width=2)
         p.line(bot, listulcr, legend_label="UCLRbar", color="green", line_width=2)
         p.line(bot, listlclr, legend_label="LCLRbar", color="red", line_width=2)
@@ -878,7 +878,7 @@ def viewCommentGrrXbarr(request, pk):
 
         ####bokeh#######
 
-        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="Data by No Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='No Sample')
         p.line(urutline, avepertrial, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_nkaryawan) * int(xbarr.xbarr_ntrial)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
@@ -905,7 +905,7 @@ def viewCommentGrrXbarr(request, pk):
        
         ######bokeh######
 
-        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = xbarr.xbarr_karyawan, x_axis_label='Appraiser', y_axis_label='Measurement')
+        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = xbarr.xbarr_karyawan, x_axis_label='Appraisal', y_axis_label='Measurement')
         p.line(xbarr.xbarr_karyawan, aveperkaryawan, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_npart) * int(xbarr.xbarr_ntrial)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
@@ -954,7 +954,7 @@ def viewCommentGrrXbarr(request, pk):
 
         ####bokeh#######
 
-        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = bot, y_axis_label='Measurement', x_axis_label='Appraiser-Trial')
+        p = figure(title="Xbar Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Mean', x_axis_label='No Sample')
         p.line(bot, flat, legend_label="Xbar", line_width=2)
         p.line(bot, listuclx, legend_label="UCLXbar2", color="green", line_width=2)
         p.line(bot, listlclx, legend_label="LCLXbar2", color="red", line_width=2)
@@ -966,7 +966,7 @@ def viewCommentGrrXbarr(request, pk):
 
         gabung = zip(xbarr.xbarr_karyawan, range(1, int(xbarr.xbarr_nkaryawan)+1))
         survey = Survey.objects.get(id = xbarr.xbarr_survey_id)
-        return render(request,'grr_xbarr/comment_xbarr.html',{'psvc':psvc, 'scriptdbs':scriptdbs, 'divdbs':divdbs, 'scriptdba':scriptdba, 'divdba':divdba, 'scriptrva':scriptrva, 'divrva':divrva, 'scriptresume':scriptresume, 'divresume':divresume, 'scriptaabp':scriptaabp, 'divaabp':divaabp, 'scriptxva':scriptxva, 'divxva':divxva, 'xbarr':xbarr, 'survey':survey, 'gabung':gabung})
+        return render(request,'grr_xbarr/comment_xbarr.html',{'ev':ev, 'av':av, 'psvc':psvc, 'scriptdbs':scriptdbs, 'divdbs':divdbs, 'scriptdba':scriptdba, 'divdba':divdba, 'scriptrva':scriptrva, 'divrva':divrva, 'scriptresume':scriptresume, 'divresume':divresume, 'scriptaabp':scriptaabp, 'divaabp':divaabp, 'scriptxva':scriptxva, 'divxva':divxva, 'xbarr':xbarr, 'survey':survey, 'gabung':gabung})
         # return render(request,'xbarr/result_xbarr.html',{'resumes':resumes})
     else:
         return redirect('/logout')
@@ -1287,7 +1287,7 @@ def viewFinalGrrXbarr(request, pk):
 
         ####bokeh#######
 
-        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = bot, y_axis_label='Measurement', x_axis_label='Appraiser-Trial')
+        p = figure(title="R Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Range', x_axis_label='No Sample')
         p.line(bot, flat, legend_label="Range", line_width=2)
         p.line(bot, listulcr, legend_label="UCLRbar", color="green", line_width=2)
         p.line(bot, listlclr, legend_label="LCLRbar", color="red", line_width=2)
@@ -1346,7 +1346,7 @@ def viewFinalGrrXbarr(request, pk):
 
         ####bokeh#######
 
-        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="Data by No Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='No Sample')
         p.line(urutline, avepertrial, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_nkaryawan) * int(xbarr.xbarr_ntrial)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
@@ -1373,7 +1373,7 @@ def viewFinalGrrXbarr(request, pk):
        
         ######bokeh######
 
-        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = xbarr.xbarr_karyawan, x_axis_label='Appraiser', y_axis_label='Measurement')
+        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = xbarr.xbarr_karyawan, x_axis_label='Appraisal', y_axis_label='Measurement')
         p.line(xbarr.xbarr_karyawan, aveperkaryawan, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_npart) * int(xbarr.xbarr_ntrial)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
@@ -1422,7 +1422,7 @@ def viewFinalGrrXbarr(request, pk):
 
         ####bokeh#######
 
-        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = bot, y_axis_label='Measurement', x_axis_label='Appraiser-Trial')
+        p = figure(title="Xbar Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Mean', x_axis_label='No Sample')
         p.line(bot, flat, legend_label="Xbar", line_width=2)
         p.line(bot, listuclx, legend_label="UCLXbar2", color="green", line_width=2)
         p.line(bot, listlclx, legend_label="LCLXbar2", color="red", line_width=2)
@@ -1750,7 +1750,7 @@ def viewPrintGrrXbarr(request, pk):
 
         ####bokeh#######
 
-        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = bot, y_axis_label='Measurement', x_axis_label='Appraiser-Trial')
+        p = figure(title="R Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Range', x_axis_label='No Sample')
         p.line(bot, flat, legend_label="Range", line_width=2)
         p.line(bot, listulcr, legend_label="UCLRbar", color="green", line_width=2)
         p.line(bot, listlclr, legend_label="LCLRbar", color="red", line_width=2)
@@ -1809,7 +1809,7 @@ def viewPrintGrrXbarr(request, pk):
 
         ####bokeh#######
 
-        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="Data by No Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='No Sample')
         p.line(urutline, avepertrial, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_nkaryawan) * int(xbarr.xbarr_ntrial)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
@@ -1836,7 +1836,7 @@ def viewPrintGrrXbarr(request, pk):
        
         ######bokeh######
 
-        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = xbarr.xbarr_karyawan, x_axis_label='Appraiser', y_axis_label='Measurement')
+        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = xbarr.xbarr_karyawan, x_axis_label='Appraisal', y_axis_label='Measurement')
         p.line(xbarr.xbarr_karyawan, aveperkaryawan, legend_label="Average", line_width=2)
         for i in range(int(xbarr.xbarr_npart) * int(xbarr.xbarr_ntrial)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
@@ -1885,7 +1885,7 @@ def viewPrintGrrXbarr(request, pk):
 
         ####bokeh#######
 
-        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range = bot, y_axis_label='Measurement', x_axis_label='Appraiser-Trial')
+        p = figure(title="Xbar Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Mean', x_axis_label='No Sample')
         p.line(bot, flat, legend_label="Xbar", line_width=2)
         p.line(bot, listuclx, legend_label="UCLXbar2", color="green", line_width=2)
         p.line(bot, listlclx, legend_label="LCLXbar2", color="red", line_width=2)
@@ -2406,7 +2406,7 @@ def viewCommentCross(request, pk):
         ###########graf
 
         plt.figure()
-        dfdisplay.plot(kind='bar', x='Source', rot=0, ylabel='Value', title='Resume', figsize=(6, 4))
+        dfdisplay.plot(kind='bar', x='Source', rot=0, ylabel='Value', title='Components of Variation', figsize=(6, 4))
         plt.legend(bbox_to_anchor=(0.5, -0.05), loc='upper center', ncol=5)
 
         fig = plt.gcf()
@@ -2424,16 +2424,19 @@ def viewCommentCross(request, pk):
             for j in range(int(cross.cross_npart)):
                 bot.append(cross.cross_karyawan[i] + "-" + str(j+1))
 
-        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
-        p.scatter(bot, rpartflat, legend_label="R", marker="circle")
-        p.scatter(bot, ulcrflat, color="green", legend_label="UCLRbar", marker="circle")
-        p.scatter(bot, lclrflat, color="red", legend_label="LCLRbar", marker="circle")
+        p = figure(title="R Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p.scatter(bot, rpartflat, marker="circle")
+        p.scatter(bot, ulcrflat, color="green", marker="circle")
+        p.scatter(bot, lclrflat, color="red", marker="circle")
+        p.line(bot, rpartflat, legend_label="R", line_width=2)
+        p.line(bot, ulcrflat, color="green", legend_label="UCLRbar", line_width=2)
+        p.line(bot, lclrflat, color="red", legend_label="LCLRbar", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptrva, divrva = components(p)
 
         ####################################
 
-        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p = figure(title="Xbar Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Mean', x_axis_label='No Sample')
         p.line(bot, avepartflat, legend_label="Xbar", line_width=2)
         p.line(bot, uclxflat, legend_label="UCLXbar2", color="green", line_width=2)
         p.line(bot, lclxflat, legend_label="LCLXbar2", color="red", line_width=2)
@@ -2443,7 +2446,7 @@ def viewCommentCross(request, pk):
 
         #####################################
 
-        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="Data by No Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='No Sample')
         for i in range(len(urutallpart)):
             p.scatter(urutallpart[i], pertrial[i], marker="circle")
         
@@ -2452,7 +2455,7 @@ def viewCommentCross(request, pk):
 
         #####################################
 
-        p = figure(title="Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=cross.cross_karyawan, y_axis_label='Measurement', x_axis_label='Appraiser')
+        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=cross.cross_karyawan, y_axis_label='Measurement', x_axis_label='Appraisal')
         for i in range(len(urutnama)):
             p.scatter(urutnama[i], perkaryawan[i], marker="circle")
         
@@ -2465,7 +2468,7 @@ def viewCommentCross(request, pk):
 
         colors = []
 
-        p = figure(title="Average Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="No Sample * Appraisal Interaction", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Average', x_axis_label='Sample')
         for i in range(int(cross.cross_nkaryawan)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutpart2[i], avepart[i], marker="circle")
@@ -2898,7 +2901,7 @@ def viewFinalCross(request, pk):
         ###########graf
 
         plt.figure()
-        dfdisplay.plot(kind='bar', x='Source', rot=0, ylabel='Value', title='Resume', figsize=(6, 4))
+        dfdisplay.plot(kind='bar', x='Source', rot=0, ylabel='Value', title='Components of Variation', figsize=(6, 4))
         plt.legend(loc='upper center', ncol=5)
 
         fig = plt.gcf()
@@ -2918,16 +2921,19 @@ def viewFinalCross(request, pk):
             for j in range(int(cross.cross_npart)):
                 bot.append(cross.cross_karyawan[i] + "-" + str(j+1))
 
-        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
-        p.scatter(bot, rpartflat, legend_label="R", marker="circle")
-        p.scatter(bot, ulcrflat, color="green", legend_label="UCLRbar", marker="circle")
-        p.scatter(bot, lclrflat, color="red", legend_label="LCLRbar", marker="circle")
+        p = figure(title="R Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Range', x_axis_label='No Sample')
+        p.scatter(bot, rpartflat, marker="circle")
+        p.scatter(bot, ulcrflat, color="green", marker="circle")
+        p.scatter(bot, lclrflat, color="red", marker="circle")
+        p.line(bot, rpartflat, legend_label="R", line_width=2)
+        p.line(bot, ulcrflat, color="green", legend_label="UCLRbar", line_width=2)
+        p.line(bot, lclrflat, color="red", legend_label="LCLRbar", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptrva, divrva = components(p)
 
         ####################################
 
-        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p = figure(title="Xbar Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Mean', x_axis_label='No Sample')
         p.line(bot, avepartflat, legend_label="Xbar", line_width=2)
         p.line(bot, uclxflat, legend_label="UCLXbar2", color="green", line_width=2)
         p.line(bot, lclxflat, legend_label="LCLXbar2", color="red", line_width=2)
@@ -2937,7 +2943,7 @@ def viewFinalCross(request, pk):
 
         #####################################
 
-        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="Data by No Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='No Sample')
         for i in range(len(urutallpart)):
             p.scatter(urutallpart[i], pertrial[i], marker="circle")
         
@@ -2946,7 +2952,7 @@ def viewFinalCross(request, pk):
 
         #####################################
 
-        p = figure(title="Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=cross.cross_karyawan, y_axis_label='Measurement', x_axis_label='Appraiser')
+        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=cross.cross_karyawan, y_axis_label='Measurement', x_axis_label='Appraisal')
         for i in range(len(urutnama)):
             p.scatter(urutnama[i], perkaryawan[i], marker="circle")
         
@@ -2959,7 +2965,7 @@ def viewFinalCross(request, pk):
 
         colors = []
 
-        p = figure(title="Average Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="No Sample * Appraisal Interaction", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Average', x_axis_label='Sample')
         for i in range(int(cross.cross_nkaryawan)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutpart2[i], avepart[i], marker="circle")
@@ -3380,7 +3386,7 @@ def viewPrintCross(request, pk):
         ###########graf
 
         plt.figure()
-        dfdisplay.plot(kind='bar', x='Source', rot=0, ylabel='Value', title='Resume', figsize=(6, 4))
+        dfdisplay.plot(kind='bar', x='Source', rot=0, ylabel='Value', title='Component of Variation', figsize=(6, 4))
         plt.legend(loc='upper center', ncol=5)
 
         fig = plt.gcf()
@@ -3400,16 +3406,19 @@ def viewPrintCross(request, pk):
             for j in range(int(cross.cross_npart)):
                 bot.append(cross.cross_karyawan[i] + "-" + str(j+1))
 
-        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
-        p.scatter(bot, rpartflat, legend_label="R", marker="circle")
-        p.scatter(bot, ulcrflat, color="green", legend_label="UCLRbar", marker="circle")
-        p.scatter(bot, lclrflat, color="red", legend_label="LCLRbar", marker="circle")
+        p = figure(title="R Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p.scatter(bot, rpartflat, marker="circle")
+        p.scatter(bot, ulcrflat, color="green", marker="circle")
+        p.scatter(bot, lclrflat, color="red", marker="circle")
+        p.line(bot, rpartflat, legend_label="R", line_width=2)
+        p.line(bot, ulcrflat, color="green", legend_label="UCLRbar", line_width=2)
+        p.line(bot, lclrflat, color="red", legend_label="LCLRbar", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptrva, divrva = components(p)
 
         ####################################
 
-        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p = figure(title="Xbar Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Mean', x_axis_label='No Sample')
         p.line(bot, avepartflat, legend_label="Xbar", line_width=2)
         p.line(bot, uclxflat, legend_label="UCLXbar2", color="green", line_width=2)
         p.line(bot, lclxflat, legend_label="LCLXbar2", color="red", line_width=2)
@@ -3419,7 +3428,7 @@ def viewPrintCross(request, pk):
 
         #####################################
 
-        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="Data by No Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='No Sample')
         for i in range(len(urutallpart)):
             p.scatter(urutallpart[i], pertrial[i], marker="circle")
         
@@ -3428,7 +3437,7 @@ def viewPrintCross(request, pk):
 
         #####################################
 
-        p = figure(title="Data by Appraiser", sizing_mode="stretch_width", x_range=cross.cross_karyawan, y_axis_label='Measurement', x_axis_label='Appraiser')
+        p = figure(title="Data by Appraisal", sizing_mode="stretch_width", x_range=cross.cross_karyawan, y_axis_label='Measurement', x_axis_label='Appraisal')
         for i in range(len(urutnama)):
             p.scatter(urutnama[i], perkaryawan[i], marker="circle")
         
@@ -3441,7 +3450,7 @@ def viewPrintCross(request, pk):
 
         colors = []
 
-        p = figure(title="Average Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="No Sample * Appraisal Interaction", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Average', x_axis_label='Sample')
         for i in range(int(cross.cross_nkaryawan)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutpart2[i], avepart[i], marker="circle")
@@ -4065,7 +4074,7 @@ def viewCommentNested(request, pk):
             for j in range(int(nested.nested_npart)):
                 bot.append(nested.nested_karyawan[i] + "-" + str(j+1))
 
-        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p = figure(title="R Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
         p.scatter(bot, rpartflat, legend_label="R", marker="circle")
         p.scatter(bot, ulcrflat, color="green", legend_label="UCLRbar", marker="circle")
         p.scatter(bot, lclrflat, color="red", legend_label="LCLRbar", marker="circle")
@@ -4074,7 +4083,7 @@ def viewCommentNested(request, pk):
 
         ####################################
 
-        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p = figure(title="Xbar Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Mean', x_axis_label='No Sample')
         p.line(bot, avepartflat, legend_label="Xbar", line_width=2)
         p.line(bot, uclxflat, legend_label="UCLXbar2", color="green", line_width=2)
         p.line(bot, lclxflat, legend_label="LCLXbar2", color="red", line_width=2)
@@ -4084,7 +4093,7 @@ def viewCommentNested(request, pk):
 
         #####################################
         colors = []
-        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="Data by No Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='No Sample')
         for i in range(len(urutallpart)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutallpart[i], pertrial[i], color=colors[i], marker="circle")
@@ -4094,7 +4103,7 @@ def viewCommentNested(request, pk):
 
         #####################################
         colors = []
-        p = figure(title="Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=nested.nested_karyawan, y_axis_label='Measurement', x_axis_label='Appraiser')
+        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=nested.nested_karyawan, y_axis_label='Measurement', x_axis_label='Appraisal')
         for i in range(len(urutnama)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutnama[i], perkaryawan[i], color=colors[i], marker="circle")
@@ -4107,7 +4116,7 @@ def viewCommentNested(request, pk):
 
         colors = []
 
-        p = figure(title="Average Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="No Sample * Appraisal Interaction", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Average', x_axis_label='Sample')
         for i in range(int(nested.nested_nkaryawan)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutpart2[i], avepart[i], color=colors[i], marker="circle")
@@ -4654,7 +4663,7 @@ def viewFinalNested(request, pk):
             for j in range(int(nested.nested_npart)):
                 bot.append(nested.nested_karyawan[i] + "-" + str(j+1))
 
-        p = figure(title="Range vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p = figure(title="R Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
         p.scatter(bot, rpartflat, legend_label="R", marker="circle")
         p.scatter(bot, ulcrflat, color="green", legend_label="UCLRbar", marker="circle")
         p.scatter(bot, lclrflat, color="red", legend_label="LCLRbar", marker="circle")
@@ -4663,7 +4672,7 @@ def viewFinalNested(request, pk):
 
         ####################################
 
-        p = figure(title="Xbar vs Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p = figure(title="Xbar Chart by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Mean', x_axis_label='No Sample')
         p.line(bot, avepartflat, legend_label="Xbar", line_width=2)
         p.line(bot, uclxflat, legend_label="UCLXbar2", color="green", line_width=2)
         p.line(bot, lclxflat, legend_label="LCLXbar2", color="red", line_width=2)
@@ -4674,7 +4683,7 @@ def viewFinalNested(request, pk):
         #####################################
 
         colors = []
-        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="Data by No Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='No Sample')
         for i in range(len(urutallpart)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutallpart[i], pertrial[i], color=colors[i], marker="circle")
@@ -4684,7 +4693,7 @@ def viewFinalNested(request, pk):
 
         #####################################
         colors = []
-        p = figure(title="Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=nested.nested_karyawan, y_axis_label='Measurement', x_axis_label='Appraiser')
+        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=nested.nested_karyawan, y_axis_label='Measurement', x_axis_label='Appraisal')
         for i in range(len(urutnama)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutnama[i], perkaryawan[i], color=colors[i], marker="circle")
@@ -4697,7 +4706,7 @@ def viewFinalNested(request, pk):
 
         colors = []
 
-        p = figure(title="Average Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="No Sample * Appraisal Interaction", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Average', x_axis_label='Sample')
         for i in range(int(nested.nested_nkaryawan)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutpart2[i], avepart[i], color=colors[i], marker="circle")
@@ -5210,7 +5219,7 @@ def viewPrintNested(request, pk):
             for j in range(int(nested.nested_npart)):
                 bot.append(nested.nested_karyawan[i] + "-" + str(j+1))
 
-        p = figure(title="Range vs Appraiser", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p = figure(title="R Chart by Appraisal", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
         p.scatter(bot, rpartflat, legend_label="R", marker="circle")
         p.scatter(bot, ulcrflat, color="green", legend_label="UCLRbar", marker="circle")
         p.scatter(bot, lclrflat, color="red", legend_label="LCLRbar", marker="circle")
@@ -5219,7 +5228,7 @@ def viewPrintNested(request, pk):
 
         ####################################
 
-        p = figure(title="Xbar vs Appraiser", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
+        p = figure(title="Xbar Chart by Appraisal", sizing_mode="stretch_width", x_range=bot, y_axis_label='Measurement', x_axis_label='Appraiser-Sample')
         p.line(bot, avepartflat, legend_label="Xbar", line_width=2)
         p.line(bot, uclxflat, legend_label="UCLXbar2", color="green", line_width=2)
         p.line(bot, lclxflat, legend_label="LCLXbar2", color="red", line_width=2)
@@ -5230,7 +5239,7 @@ def viewPrintNested(request, pk):
         #####################################
 
         colors = []
-        p = figure(title="Data by Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="Data by No Sample", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='No Sample')
         for i in range(len(urutallpart)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutallpart[i], pertrial[i], color=colors[i], marker="circle")
@@ -5240,7 +5249,7 @@ def viewPrintNested(request, pk):
 
         #####################################
         colors = []
-        p = figure(title="Data by Appraiser", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=nested.nested_karyawan, y_axis_label='Measurement', x_axis_label='Appraiser')
+        p = figure(title="Data by Appraisal", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=nested.nested_karyawan, y_axis_label='Measurement', x_axis_label='Appraisal')
         for i in range(len(urutnama)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutnama[i], perkaryawan[i], color=colors[i], marker="circle")
@@ -5253,7 +5262,7 @@ def viewPrintNested(request, pk):
 
         colors = []
 
-        p = figure(title="Average Data by Appraiser", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
+        p = figure(title="No Sample * Appraisal Interaction", sizing_mode="stretch_width", y_axis_label='Measurement', x_axis_label='Sample')
         for i in range(int(nested.nested_nkaryawan)):
             colors.append('#%06X' % randint(0, 0xFFFFFF))
             p.scatter(urutpart2[i], avepart[i], color=colors[i], marker="circle")

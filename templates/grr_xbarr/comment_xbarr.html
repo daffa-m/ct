@@ -228,7 +228,21 @@
                         <br><br><h6>Comment :</h6> <textarea class="form-control" name="xbarr_psvc" id="textAreaExample" rows="4">{{ xbarr.xbarr_psvc }}</textarea>
                       </div>
                     </div>
-
+                    <br><br>
+                    <div class="card">
+                      
+                      <div class="card-body">
+                        
+                        {{divdbs| safe}}
+                        <br><br><br>
+                        <h7>Standard:
+                        <br>- No noise means / tidak ada data aneh
+                        <br>- Part variation is small / variasi part kecil
+                        <br>- No outlier reading / tidak ada kesalahan ukur</h7>
+                        <br><br><h6>Comment :</h6> <textarea class="form-control" name="xbarr_dbs" id="textAreaExample" rows="4">{{ xbarr.xbarr_dbs }}</textarea>
+                      </div>
+                    </div>
+                    <br><br>
                     <div class="card">
                       
                       <div class="card-body">
@@ -243,21 +257,7 @@
                         <br><br><h6>Comment :</h6> <textarea class="form-control" name="xbarr_rva" id="textAreaExample" rows="4">{{ xbarr.xbarr_rva }}</textarea>
                       </div>
                     </div>
-                    <br><br><br>
-                    <div class="card">
-                      
-                      <div class="card-body">
-                        
-                        {{divdbs| safe}}
-                        <br><br><br>
-                        <h7>Standard:
-                        <br>- No noise means / tidak ada data aneh
-                        <br>- Part variation is small / variasi part kecil
-                        <br>- No outlier reading / tidak ada kesalahan ukur</h7>
-                        <br><br><h6>Comment :</h6> <textarea class="form-control" name="xbarr_dbs" id="textAreaExample" rows="4">{{ xbarr.xbarr_dbs }}</textarea>
-                      </div>
-                    </div>
-
+                    <br><br>
                     <div class="card">
                       
                       <div class="card-body">
@@ -270,19 +270,7 @@
                         <br><br><h6>Comment :</h6> <textarea class="form-control" name="xbarr_dba" id="textAreaExample" rows="4">{{ xbarr.xbarr_dba }}</textarea>
                       </div>
                     </div>
-                    <br><br><br>
-                    <div class="card">
-                      
-                      <div class="card-body">
-                        
-                        {{divaabp| safe}}
-                        <br><br><br>
-                        <h7>Standard:
-                        <br>There is no tendency for measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</h7>
-                        <br><br><h6>Comment :</h6> <textarea class="form-control" name="xbarr_aabp" id="textAreaExample" rows="4">{{ xbarr.xbarr_aabp }}</textarea>
-                      </div>
-                    </div>
-
+                    <br><br>
                     <div class="card">
                       
                       <div class="card-body">
@@ -295,19 +283,69 @@
                         <br><br><h6>Comment :</h6> <textarea class="form-control" name="xbarr_xva" id="textAreaExample" rows="4">{{ xbarr.xbarr_xva }}</textarea>
                       </div>
                     </div>
-                    <br><br><br>
+                    <br><br>
+                    <div class="card">
+                      
+                      <div class="card-body">
+                        
+                        {{divaabp| safe}}
+                        <br><br><br>
+                        <h7>Standard:
+                        <br>There is no tendency for measurement result, Average Position should be random / Tidak ada kecenderungan hasil pengukuran dilihat dari rata-rata pengukuran Part random / tidak ada pola</h7>
+                        <br><br><h6>Comment :</h6> <textarea class="form-control" name="xbarr_aabp" id="textAreaExample" rows="4">{{ xbarr.xbarr_aabp }}</textarea>
+                      </div>
+                    </div>
+                    <br><br>
+                    
                     <div class="card">
                       <h5 class="card-header">Recommendation</h5>
                       <div class="card-body">
-                        <div class="container1">
-                          <button class="add_form_field btn btn-primary">Add New Field &nbsp; 
-                            <span style="font-size:16px; font-weight:bold;">+ </span>
-                          </button>
-                          <div><input class="form-control" type="text" name="xbarr_recommendation"></div>
-                      </div>
+                        {% if ev > av %}
+                        <label for="exampleInputPassword1">Repeatability ({{ev}}) is larger than reproducibility ({{av}})</label>
+                           
+                        <br>
+                        <input class="form-check-input" name="xbarr_recommendation" type="checkbox" id="gridCheck1" value="Gage / instrument needs maintenance">
+                        <label class="form-check-label" for="gridCheck1">
+                          Gage / instrument needs maintenance
+                        </label><br>
+                        <input class="form-check-input" name="xbarr_recommendation" type="checkbox" id="gridCheck1" value="Gage to be redesigned to be more rigid">
+                        <label class="form-check-label" for="gridCheck1">
+                          Gage to be redesigned to be more rigid
+                        </label><br>
+                        <input class="form-check-input" name="xbarr_recommendation" type="checkbox" id="gridCheck1" value="Clampint / location for gaging needs to be improved">
+                        <label class="form-check-label" for="gridCheck1">
+                          Clampint / location for gaging needs to be improved
+                        </label><br>
+                        <input class="form-check-input" name="xbarr_recommendation" type="checkbox" id="gridCheck1" value="Change excessive within-part variation">
+                        <label class="form-check-label" for="gridCheck1">
+                          Change excessive within-part variation
+                        </label><br>
+                        <input class="form-check-input" id="gridCheck1" type="checkbox" onclick="if (this.checked){ document.getElementById('name2').disabled = false; document.getElementById('name2').focus();}else{document.getElementById('name2').disabled=true;}" />
+                        <label class="form-check-label" for="gridCheck1">
+                          Other
+                        </label><input class="form-control" type="text" id="name2" placeholder="Other" name="xbarr_recommendation" disabled="disabled"/>
+                        {% else %}
 
+                        <label for="exampleInputPassword1">Reproducibility ({{av}}) is larger than repeatability ({{ev}})</label>
+                           
+                        <br>
+                        <input class="form-check-input" name="xbarr_recommendation" type="checkbox" id="gridCheck1" value="Train appraiser how to use and read gage">
+                        <label class="form-check-label" for="gridCheck1">
+                          Train appraiser how to use and read gage
+                        </label><br>
+                        <input class="form-check-input" name="xbarr_recommendation" type="checkbox" id="gridCheck1" value="Calibration on gage dial need to be reviewed">
+                        <label class="form-check-label" for="gridCheck1">
+                          Calibration on gage dial need to be reviewed
+                        </label><br>
+                        <input class="form-check-input" id="gridCheck1" type="checkbox" onclick="if (this.checked){ document.getElementById('name2').disabled = false; document.getElementById('name2').focus();}else{document.getElementById('name2').disabled=true;}" />
+                        <label class="form-check-label" for="gridCheck1">
+                          Other
+                        </label><input class="form-control" type="text" id="name2" placeholder="Other" name="xbarr_recommendation" disabled="disabled"/>
+
+                        {% endif %}
                       </div>
                     </div>
+                    
                     <br><br><br>
                     <button type="submit" class="btn btn-primary">Submit</button>
                   </form>
@@ -320,30 +358,7 @@
 
 
 
-    <script>
-    $(document).ready(function() {
-    var max_fields = 10;
-    var wrapper = $(".container1");
-    var add_button = $(".add_form_field");
-
-    var x = 1;
-    $(add_button).click(function(e) {
-        e.preventDefault();
-        if (x < max_fields) {
-            x++;
-            $(wrapper).append('<div class="input-group"><input class="form-control" type="text" name="xbarr_recommendation"/> <a href="#" class="delete btn btn-danger">Delete</a></div>'); //add input box
-        } else {
-            alert('You Reached the limits')
-        }
-    });
-
-    $(wrapper).on("click", ".delete", function(e) {
-        e.preventDefault();
-        $(this).parent('div').remove();
-        x--;
-    })
-});
-    </script>
+   
 </body>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.2.min.js"></script>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
