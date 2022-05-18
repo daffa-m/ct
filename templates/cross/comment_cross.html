@@ -275,7 +275,56 @@
                       </div>
                     </div>
                     <br><br>
-                    
+                    <div class="card">
+                      <h5 class="card-header">Recommendation</h5>
+                      <div class="card-body">
+                        {% if ev > av %}
+                        <label for="exampleInputPassword1">Repeatability ({{ev}}) is larger than reproducibility ({{av}})</label>
+                           
+                        <br>
+                        <input class="form-check-input" name="cross_recommendation" type="checkbox" id="gridCheck1" value="Gage / instrument needs maintenance">
+                        <label class="form-check-label" for="gridCheck1">
+                          Gage / instrument needs maintenance
+                        </label><br>
+                        <input class="form-check-input" name="cross_recommendation" type="checkbox" id="gridCheck1" value="Gage to be redesigned to be more rigid">
+                        <label class="form-check-label" for="gridCheck1">
+                          Gage to be redesigned to be more rigid
+                        </label><br>
+                        <input class="form-check-input" name="cross_recommendation" type="checkbox" id="gridCheck1" value="Clampint / location for gaging needs to be improved">
+                        <label class="form-check-label" for="gridCheck1">
+                          Clampint / location for gaging needs to be improved
+                        </label><br>
+                        <input class="form-check-input" name="cross_recommendation" type="checkbox" id="gridCheck1" value="Change excessive within-part variation">
+                        <label class="form-check-label" for="gridCheck1">
+                          Change excessive within-part variation
+                        </label><br>
+                        <input class="form-check-input" id="gridCheck1" type="checkbox" onclick="if (this.checked){ document.getElementById('name2').disabled = false; document.getElementById('name2').focus();}else{document.getElementById('name2').disabled=true;}" />
+                        <label class="form-check-label" for="gridCheck1">
+                          Other
+                        </label><input class="form-control" type="text" id="name2" placeholder="Other" name="cross_recommendation" disabled="disabled"/>
+                        {% else %}
+
+                        <label for="exampleInputPassword1">Reproducibility ({{av}}) is larger than repeatability ({{ev}})</label>
+                           
+                        <br>
+                        <input class="form-check-input" name="cross_recommendation" type="checkbox" id="gridCheck1" value="Train appraiser how to use and read gage">
+                        <label class="form-check-label" for="gridCheck1">
+                          Train appraiser how to use and read gage
+                        </label><br>
+                        <input class="form-check-input" name="cross_recommendation" type="checkbox" id="gridCheck1" value="Calibration on gage dial need to be reviewed">
+                        <label class="form-check-label" for="gridCheck1">
+                          Calibration on gage dial need to be reviewed
+                        </label><br>
+                        <input class="form-check-input" id="gridCheck1" type="checkbox" onclick="if (this.checked){ document.getElementById('name2').disabled = false; document.getElementById('name2').focus();}else{document.getElementById('name2').disabled=true;}" />
+                        <label class="form-check-label" for="gridCheck1">
+                          Other
+                        </label><input class="form-control" type="text" id="name2" placeholder="Other" name="cross_recommendation" disabled="disabled"/>
+
+                        {% endif %}
+                      </div>
+
+                    </div>
+                    <br><br>
                     <div class="card">
                       <h5 class="card-header">Recommendation</h5>
                       <div class="card-body">

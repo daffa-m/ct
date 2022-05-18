@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Xbarr, Cross, Nested, Linearity, Survey, User
+from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Survey, User
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -27,6 +27,8 @@ import urllib, base64
 from bokeh.plotting import figure, show
 from bokeh.embed import components
 from bokeh.models import LinearAxis
+from calendar import monthrange
+import statistics
 
 from random import randint
 
@@ -6107,5 +6109,186 @@ def deleteLinearity(request, pk):
         linearity.delete()
         messages.success(request, "Linearity berhasil dihapus")
         return redirect('coretoolcrud:viewDetailSurvey', pk)
+    else:
+        return redirect('/logout')
+
+# Xbarr
+
+def viewVxbarr(request, pk):
+    if 'user' in request.session:
+        try:
+            vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
+            if vxbarr.vxbarr_all:
+                return redirect('coretoolcrud:viewFinalVxbarr', pk)
+            else:
+                survey = Survey.objects.get(id = pk)
+                month = survey.survey_plan.month
+                year = survey.survey_plan.year
+                days = range(monthrange(year, month)[1])
+                subs = range(int(vxbarr.vxbarr_subgroup))
+                plan = survey.survey_plan
+                return render(request,'xbarr/all_xbarr.html',{'days':days, 'subs':subs, 'plan':plan, 'vxbarr':vxbarr})
+            
+        except Vxbarr.DoesNotExist:
+            return render(request,'xbarr/xbarr.html',{'pk':pk})
+    else:
+        return redirect('/logout')
+
+def storeVxbarr(request, pk):
+    if 'user' in request.session:
+        try:
+            vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
+            vxbarr.delete()
+        except Vxbarr.DoesNotExist:
+            pass
+
+        vxbarr = Vxbarr()
+        vxbarr.vxbarr_survey_id = pk
+        vxbarr.vxbarr_usl = request.POST.get('vxbarr_usl')
+        vxbarr.vxbarr_lsl = request.POST.get('vxbarr_lsl')
+        vxbarr.vxbarr_unit = request.POST.get('vxbarr_unit')
+        vxbarr.vxbarr_subgroup = request.POST.get('vxbarr_subgroup')
+        vxbarr.save()
+
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = range(monthrange(year, month)[1])
+        subs = range(int(vxbarr.vxbarr_subgroup))
+        plan = survey.survey_plan
+        return render(request,'xbarr/all_xbarr.html',{'days':days, 'subs':subs, 'plan':plan, 'vxbarr':vxbarr})
+    else:
+        return redirect('/logout')
+
+def storeAllVxbarr(request, pk):
+    if 'user' in request.session:
+        vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        print("days", days)
+        temppart = []
+        temptrial = []
+        iter = 1
+
+        vxbarr.vxbarr_all = request.POST.getlist('vxbarr_all')
+        for i in range(int(days) * int(vxbarr.vxbarr_subgroup)):
+            if iter % days != 0:
+                temppart.append(vxbarr.vxbarr_all[i])
+                iter = iter + 1
+            else:
+                temppart.append(vxbarr.vxbarr_all[i])
+                temptrial.append(temppart)
+                temppart = []
+                iter = iter + 1
+        
+        vxbarr.vxbarr_all = temptrial
+        vxbarr.save()
+        return redirect('coretoolcrud:viewFinalVxbarr', pk)    
+    else:
+        return redirect('/logout')        
+
+def deleteVxbarr(request, pk):
+    if 'user' in request.session:
+        vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
+        vxbarr.delete()
+        messages.success(request, "Xbar R berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pk)
+    else:
+        return redirect('/logout')
+
+def viewFinalVxbarr(request, pk):
+    if 'user' in request.session:
+        vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        ##############################
+
+        r = []
+        temp = []
+        xbar = []
+        for i in range(days):
+            for j in range(vxbarr.vxbarr_subgroup):
+                temp.append(vxbarr.vxbarr_all[j][i])
+            r.append(max(temp) - min(temp))
+            xbar.append(sum(temp) / vxbarr.vxbarr_subgroup)
+            temp = []
+
+        allflat = []
+        for ele in vxbarr.vxbarr_all:
+            for e in ele:
+                allflat.append(e)
+
+        xbar2 = sum(xbar) / days
+        rbar = sum(r) / days
+        sigma = statistics.stdev(allflat)
+
+        subgroup = [[2, 3.268, 1.88, 1.128, 0], [3, 2.574, 1.023, 1.693, 0], [4, 2.282, 0.729, 2.059, 0], [5, 2.114, 0.577, 2.326, 0]]
+
+        for ele in subgroup:
+            if ele[0] == vxbarr.vxbarr_subgroup:
+                d2 = ele[3]
+                d4 = ele[1]
+                a2 = ele[2]
+                d3 = ele[4]
+
+        usllsl = []
+        usllsl.append(vxbarr.vxbarr_usl - xbar2)
+        usllsl.append(xbar2 - vxbarr.vxbarr_lsl)
+
+        xbar2m = xbar2 - a2 * rbar 
+        xbar2p = xbar2 + a2 * rbar 
+        rbard4 = rbar * d4
+        rbard3 = rbar * d3
+
+        cp = (vxbarr.vxbarr_usl - vxbarr.vxbarr_lsl) / (6 * rbar / d2)
+        cpk = min(usllsl) / (3 * rbar / d2)
+        pp = (vxbarr.vxbarr_usl - vxbarr.vxbarr_lsl) / (6 * sigma)
+        ppk = min(usllsl) / (3 * sigma)
+
+        ###############################
+
+        bot = []
+        xbar2list = []
+        usllist = []
+        lsllist = []
+        xbar2mlist = []
+        xbar2plist = []
+        rbard4list = []
+        rbard3list = []
+
+
+        for i in range(days):
+            bot.append("T"+str(i+1))
+            xbar2list.append(xbar2)
+            usllist.append(vxbarr.vxbarr_usl)
+            lsllist.append(vxbarr.vxbarr_lsl)
+            xbar2mlist.append(xbar2m)
+            xbar2plist.append(xbar2p)
+            rbard4list.append(rbard4)
+            rbard3list.append(rbard3)
+
+        allt = np.array(vxbarr.vxbarr_all).T.tolist()
+
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Mean', x_axis_label='No Sample')
+        p.line(bot, usllist, legend_label="USL", line_width=2)
+        p.line(bot, lsllist, legend_label="LSL", color="green", line_width=2)
+        p.line(bot, xbar2plist, legend_label="Xbar2 + a2 * Rbar", color="red", line_width=2)
+        p.line(bot, xbar2mlist, legend_label="Xbar2 - a2 * Rbar", color="yellow", line_width=2)
+        p.line(bot, xbar2list, legend_label="Xbar2", color="black", line_width=2)
+        p.line(bot, xbar, legend_label="Xbar", color="magenta", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxbar, divxbar = components(p)
+
+        #####################################
+
+        
+        gabung = zip(bot, allt)
+        subs = range(1, int(vxbarr.vxbarr_subgroup)+1)
+
+        return render(request,'xbarr/collection_xbarr.html', {'vxbarr':vxbarr, 'survey':survey, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar})
     else:
         return redirect('/logout')

@@ -91,7 +91,15 @@ class Linearity(models.Model):
     linearity_reviewed = models.TextField()
     linearity_measured = models.TextField()
 
-    
+class Vxbarr(models.Model):
+    vxbarr_survey_id = models.IntegerField()
+    vxbarr_lsl = models.IntegerField()
+    vxbarr_usl = models.IntegerField()
+    vxbarr_subgroup = models.IntegerField()
+    vxbarr_unit = models.TextField()
+    vxbarr_all = models.JSONField(null=True)
+    vxbarr_measured = models.TextField()
+    vxbarr_reviewed = models.TextField()
 
 class Survey(models.Model):
     survey_user_id = models.IntegerField()
