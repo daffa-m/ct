@@ -227,7 +227,8 @@
                         </div>
                       </div>
                       <br><br>
-                     
+                      <form action="{% url 'coretoolcrud:storeCommentVxbarr' vxbarr.id %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
                       <div class="card">
                         <h5 class="card-header">Recommendation</h5>
                         <div class="card-body">
@@ -236,12 +237,30 @@
                           <label for="exampleInputPassword1">Resume Stability of Process</label>
                              
                           <br>
-                          <h6>{{vxbarr.vxbarr_stability}}</h6><br><br>
+                          <input class="form-check-input" name="vxbarr_stability" type="checkbox" id="gridCheck1" value="Process Stable">
+                          <label class="form-check-label" for="gridCheck1">
+                            Process Stable
+                          </label><br>
+                          <input class="form-check-input" name="vxbarr_stability" type="checkbox" id="gridCheck1" value="Process Not Stable">
+                          <label class="form-check-label" for="gridCheck1">
+                            Process Not Stable
+                          </label><br><br>
 
                           <label for="exampleInputPassword1">Resume Capability of Process</label>
                              
                           <br>
-                          <h6>{{vxbarr.vxbarr_capability}}</h6><br>
+                          <input class="form-check-input" name="vxbarr_capability" type="checkbox" id="gridCheck1" value="Capable">
+                          <label class="form-check-label" for="gridCheck1">
+                            Capable
+                          </label><br>
+                          <input class="form-check-input" name="vxbarr_capability" type="checkbox" id="gridCheck1" value="Not Capable">
+                          <label class="form-check-label" for="gridCheck1">
+                            Not Capable
+                          </label><br>
+                          <input class="form-check-input" name="vxbarr_capability" type="checkbox" id="gridCheck1" value="Capable But Need Adjustment">
+                          <label class="form-check-label" for="gridCheck1">
+                            Capable But Need Adjustment
+                          </label><br>
                           
   
                         </div>
@@ -249,8 +268,7 @@
                       </div>
                       <br><br>
                     
-                      <a href="{% url 'coretoolcrud:deleteVxbarr' vxbarr.vxbarr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                    <a href="{% url 'coretoolcrud:viewPrintVxbarr' vxbarr.vxbarr_survey_id %}" class="btn btn-info">Print</a>
+                      <button type="submit" class="btn btn-primary">Submit</button>
                       <br><br>
 
         </div>

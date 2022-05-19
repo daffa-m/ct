@@ -6148,6 +6148,8 @@ def storeVxbarr(request, pk):
         vxbarr.vxbarr_lsl = request.POST.get('vxbarr_lsl')
         vxbarr.vxbarr_unit = request.POST.get('vxbarr_unit')
         vxbarr.vxbarr_subgroup = request.POST.get('vxbarr_subgroup')
+        vxbarr.vxbarr_measured = request.POST.get('vxbarr_measured')
+        vxbarr.vxbarr_reviewed = request.POST.get('vxbarr_reviewed')
         vxbarr.save()
 
         survey = Survey.objects.get(id = pk)
@@ -6198,7 +6200,7 @@ def deleteVxbarr(request, pk):
     else:
         return redirect('/logout')
 
-def viewFinalVxbarr(request, pk):
+def viewCommentVxbarr(request, pk):
     if 'user' in request.session:
         vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
         survey = Survey.objects.get(id = pk)
@@ -6212,7 +6214,7 @@ def viewFinalVxbarr(request, pk):
         xbar = []
         for i in range(days):
             for j in range(vxbarr.vxbarr_subgroup):
-                temp.append(vxbarr.vxbarr_all[j][i])
+                temp.append(float(vxbarr.vxbarr_all[j][i]))
             r.append(max(temp) - min(temp))
             xbar.append(sum(temp) / vxbarr.vxbarr_subgroup)
             temp = []
@@ -6220,7 +6222,7 @@ def viewFinalVxbarr(request, pk):
         allflat = []
         for ele in vxbarr.vxbarr_all:
             for e in ele:
-                allflat.append(e)
+                allflat.append(float(e))
 
         xbar2 = sum(xbar) / days
         rbar = sum(r) / days
@@ -6273,7 +6275,7 @@ def viewFinalVxbarr(request, pk):
 
         allt = np.array(vxbarr.vxbarr_all).T.tolist()
 
-        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Sample Mean', x_axis_label='No Sample')
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
         p.line(bot, usllist, legend_label="USL", line_width=2)
         p.line(bot, lsllist, legend_label="LSL", color="green", line_width=2)
         p.line(bot, xbar2plist, legend_label="Xbar2 + a2 * Rbar", color="red", line_width=2)
@@ -6285,10 +6287,237 @@ def viewFinalVxbarr(request, pk):
 
         #####################################
 
+        p = figure(title="R", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, rbard4list, legend_label="Rbar . D4", line_width=2)
+        p.line(bot, r, legend_label="R", color="green", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptr, divr = components(p)
+
+        #####################################
+
         
         gabung = zip(bot, allt)
         subs = range(1, int(vxbarr.vxbarr_subgroup)+1)
 
-        return render(request,'xbarr/collection_xbarr.html', {'vxbarr':vxbarr, 'survey':survey, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar})
+        return render(request,'xbarr/comment_xbarr.html', {'vxbarr':vxbarr, 'survey':survey, 'usllsl':usllsl, 'cp':cp, 'cpk':cpk, 'pp':pp, 'ppk':ppk, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'scriptr':scriptr, 'divr':divr})
+    else:
+        return redirect('/logout')
+
+def storeCommentVxbarr(request, pk):
+    if 'user' in request.session:
+        vxbarr = Vxbarr.objects.get(id = pk)
+
+        vxbarr.vxbarr_stability = request.POST.get('vxbarr_stability')
+        vxbarr.vxbarr_capability = request.POST.get('vxbarr_capability')
+        vxbarr.save()
+
+        # return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey})
+        return redirect('coretoolcrud:viewFinalVxbarr',vxbarr.vxbarr_survey_id )
+    else:
+        return redirect('/logout')
+
+def viewFinalVxbarr(request, pk):
+    if 'user' in request.session:
+        vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        ##############################
+
+        r = []
+        temp = []
+        xbar = []
+        for i in range(days):
+            for j in range(vxbarr.vxbarr_subgroup):
+                temp.append(float(vxbarr.vxbarr_all[j][i]))
+            r.append(max(temp) - min(temp))
+            xbar.append(sum(temp) / vxbarr.vxbarr_subgroup)
+            temp = []
+
+        allflat = []
+        for ele in vxbarr.vxbarr_all:
+            for e in ele:
+                allflat.append(float(e))
+
+        xbar2 = sum(xbar) / days
+        rbar = sum(r) / days
+        sigma = statistics.stdev(allflat)
+
+        subgroup = [[2, 3.268, 1.88, 1.128, 0], [3, 2.574, 1.023, 1.693, 0], [4, 2.282, 0.729, 2.059, 0], [5, 2.114, 0.577, 2.326, 0]]
+
+        for ele in subgroup:
+            if ele[0] == vxbarr.vxbarr_subgroup:
+                d2 = ele[3]
+                d4 = ele[1]
+                a2 = ele[2]
+                d3 = ele[4]
+
+        usllsl = []
+        usllsl.append(vxbarr.vxbarr_usl - xbar2)
+        usllsl.append(xbar2 - vxbarr.vxbarr_lsl)
+
+        xbar2m = xbar2 - a2 * rbar 
+        xbar2p = xbar2 + a2 * rbar 
+        rbard4 = rbar * d4
+        rbard3 = rbar * d3
+
+        cp = (vxbarr.vxbarr_usl - vxbarr.vxbarr_lsl) / (6 * rbar / d2)
+        cpk = min(usllsl) / (3 * rbar / d2)
+        pp = (vxbarr.vxbarr_usl - vxbarr.vxbarr_lsl) / (6 * sigma)
+        ppk = min(usllsl) / (3 * sigma)
+
+        ###############################
+
+        bot = []
+        xbar2list = []
+        usllist = []
+        lsllist = []
+        xbar2mlist = []
+        xbar2plist = []
+        rbard4list = []
+        rbard3list = []
+
+
+        for i in range(days):
+            bot.append("T"+str(i+1))
+            xbar2list.append(xbar2)
+            usllist.append(vxbarr.vxbarr_usl)
+            lsllist.append(vxbarr.vxbarr_lsl)
+            xbar2mlist.append(xbar2m)
+            xbar2plist.append(xbar2p)
+            rbard4list.append(rbard4)
+            rbard3list.append(rbard3)
+
+        allt = np.array(vxbarr.vxbarr_all).T.tolist()
+
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, usllist, legend_label="USL", line_width=2)
+        p.line(bot, lsllist, legend_label="LSL", color="green", line_width=2)
+        p.line(bot, xbar2plist, legend_label="Xbar2 + a2 * Rbar", color="red", line_width=2)
+        p.line(bot, xbar2mlist, legend_label="Xbar2 - a2 * Rbar", color="yellow", line_width=2)
+        p.line(bot, xbar2list, legend_label="Xbar2", color="black", line_width=2)
+        p.line(bot, xbar, legend_label="Xbar", color="magenta", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxbar, divxbar = components(p)
+
+        #####################################
+
+        p = figure(title="R", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, rbard4list, legend_label="Rbar . D4", line_width=2)
+        p.line(bot, r, legend_label="R", color="green", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptr, divr = components(p)
+
+        #####################################
+
+        
+        gabung = zip(bot, allt)
+        subs = range(1, int(vxbarr.vxbarr_subgroup)+1)
+
+        return render(request,'xbarr/collection_xbarr.html', {'vxbarr':vxbarr, 'survey':survey, 'usllsl':usllsl, 'cp':cp, 'cpk':cpk, 'pp':pp, 'ppk':ppk, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'scriptr':scriptr, 'divr':divr})
+    else:
+        return redirect('/logout')
+
+def viewPrintVxbarr(request, pk):
+    if 'user' in request.session:
+        vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        ##############################
+
+        r = []
+        temp = []
+        xbar = []
+        for i in range(days):
+            for j in range(vxbarr.vxbarr_subgroup):
+                temp.append(float(vxbarr.vxbarr_all[j][i]))
+            r.append(max(temp) - min(temp))
+            xbar.append(sum(temp) / vxbarr.vxbarr_subgroup)
+            temp = []
+
+        allflat = []
+        for ele in vxbarr.vxbarr_all:
+            for e in ele:
+                allflat.append(float(e))
+
+        xbar2 = sum(xbar) / days
+        rbar = sum(r) / days
+        sigma = statistics.stdev(allflat)
+
+        subgroup = [[2, 3.268, 1.88, 1.128, 0], [3, 2.574, 1.023, 1.693, 0], [4, 2.282, 0.729, 2.059, 0], [5, 2.114, 0.577, 2.326, 0]]
+
+        for ele in subgroup:
+            if ele[0] == vxbarr.vxbarr_subgroup:
+                d2 = ele[3]
+                d4 = ele[1]
+                a2 = ele[2]
+                d3 = ele[4]
+
+        usllsl = []
+        usllsl.append(vxbarr.vxbarr_usl - xbar2)
+        usllsl.append(xbar2 - vxbarr.vxbarr_lsl)
+
+        xbar2m = xbar2 - a2 * rbar 
+        xbar2p = xbar2 + a2 * rbar 
+        rbard4 = rbar * d4
+        rbard3 = rbar * d3
+
+        cp = (vxbarr.vxbarr_usl - vxbarr.vxbarr_lsl) / (6 * rbar / d2)
+        cpk = min(usllsl) / (3 * rbar / d2)
+        pp = (vxbarr.vxbarr_usl - vxbarr.vxbarr_lsl) / (6 * sigma)
+        ppk = min(usllsl) / (3 * sigma)
+
+        ###############################
+
+        bot = []
+        xbar2list = []
+        usllist = []
+        lsllist = []
+        xbar2mlist = []
+        xbar2plist = []
+        rbard4list = []
+        rbard3list = []
+
+
+        for i in range(days):
+            bot.append("T"+str(i+1))
+            xbar2list.append(xbar2)
+            usllist.append(vxbarr.vxbarr_usl)
+            lsllist.append(vxbarr.vxbarr_lsl)
+            xbar2mlist.append(xbar2m)
+            xbar2plist.append(xbar2p)
+            rbard4list.append(rbard4)
+            rbard3list.append(rbard3)
+
+        allt = np.array(vxbarr.vxbarr_all).T.tolist()
+
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, usllist, legend_label="USL", line_width=2)
+        p.line(bot, lsllist, legend_label="LSL", color="green", line_width=2)
+        p.line(bot, xbar2plist, legend_label="Xbar2 + a2 * Rbar", color="red", line_width=2)
+        p.line(bot, xbar2mlist, legend_label="Xbar2 - a2 * Rbar", color="yellow", line_width=2)
+        p.line(bot, xbar2list, legend_label="Xbar2", color="black", line_width=2)
+        p.line(bot, xbar, legend_label="Xbar", color="magenta", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxbar, divxbar = components(p)
+
+        #####################################
+
+        p = figure(title="R", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, rbard4list, legend_label="Rbar . D4", line_width=2)
+        p.line(bot, r, legend_label="R", color="green", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptr, divr = components(p)
+
+        #####################################
+
+        
+        gabung = zip(bot, allt)
+        subs = range(1, int(vxbarr.vxbarr_subgroup)+1)
+
+        return render(request,'xbarr/print_xbarr.html', {'vxbarr':vxbarr, 'survey':survey, 'usllsl':usllsl, 'cp':cp, 'cpk':cpk, 'pp':pp, 'ppk':ppk, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'scriptr':scriptr, 'divr':divr})
     else:
         return redirect('/logout')

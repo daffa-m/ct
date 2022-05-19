@@ -51,36 +51,18 @@
     </style>
     
 </head>
-<body>
+<body onload="window.print()">
     <div class="container">
-      <div class="invoice-title">
-        <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
-            <h2>Xbar R</h2><br>
-        <ul class="breadcrumb">
-            <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
-            <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
-            <li><a href="{% url 'coretoolcrud:viewDetailSurvey' vxbarr.vxbarr_survey_id %}">Survey Result</a></li>
-            <li>Xbar R Result</li>
-        </ul>
-          {% if messages %}
-          {% for message in messages %}
-          {% if message.tags == 'error' %}
-          <div class="alert alert-danger" role="alert">
-            <h7>{{ message }}</h7>
-          </div>
-          {% else %}
-          <div class="alert alert-{{ message.tags }}" role="alert">
-              <h7>{{ message }}</h7>
-          </div>
-          {% endif %}
-          {% endfor %}
-          {% endif %}
-        </nav>
-        
-     
-      <hr>
-
-    </div>
+      
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="invoice-title">
+                    <a class="navbar-brand" href="#">
+                        <img src="https://mdbootstrap.com/img/logo/mdb-transparent.png" height="30" alt="mdb logo">
+                      </a>
+                    <h2>{{ request.session.company }}</h2><h2 class="float-end">XBAR R</h3>
+                </div>
+                <hr>
 
                 <table class="table table-hover table-bordered results">
                   <thead>
@@ -249,8 +231,7 @@
                       </div>
                       <br><br>
                     
-                      <a href="{% url 'coretoolcrud:deleteVxbarr' vxbarr.vxbarr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                    <a href="{% url 'coretoolcrud:viewPrintVxbarr' vxbarr.vxbarr_survey_id %}" class="btn btn-info">Print</a>
+                      
                       <br><br>
 
         </div>

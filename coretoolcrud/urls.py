@@ -5,7 +5,7 @@ from .views import viewGrrXbarr, viewPrintGrrXbarr, viewCommentGrrXbarr, viewFin
 from .views import viewCross, viewPrintCross, viewCommentCross, viewFinalCross, storeCross, storeCommentCross, storeAllCross, deleteCross
 from .views import viewNested, viewPrintNested, viewCommentNested, viewFinalNested, storeNested, storeCommentNested, storeAllNested, deleteNested
 from .views import viewLinearity, viewPrintLinearity, viewAverageLinearity, viewMasterLinearity, viewCommentLinearity, viewFinalLinearity, storeLinearity, storeMasterLinearity, storeAverageLinearity, storeCommentLinearity, storeAllLinearity, deleteLinearity
-from .views import viewVxbarr, viewFinalVxbarr, storeVxbarr, storeAllVxbarr, deleteVxbarr
+from .views import viewVxbarr, viewFinalVxbarr, viewCommentVxbarr, viewPrintVxbarr, storeVxbarr, storeCommentVxbarr, storeAllVxbarr, deleteVxbarr
 from .views import viewListSurvey, viewDetailSurvey, viewSurvey, viewManual, viewEditSurvey, viewEditManual, storeManual, storeSurvey, storeEditManual, storeEditSurvey, deleteSurvey
 from .views import viewLogin, login, logout
 app_name = "coretoolcrud"
@@ -73,6 +73,9 @@ urlpatterns = [
     path('viewVxbarr/<int:pk>',viewVxbarr,name='viewVxbarr'),
     path('viewFinalVxbarr/<int:pk>',viewFinalVxbarr,name='viewFinalVxbarr'),
     path('storeVxbarr/<int:pk>',storeVxbarr,name='storeVxbarr'),
+    path('viewCommentVxbarr/<int:pk>',viewCommentVxbarr,name='viewCommentVxbarr'),
+    path('viewPrintVxbarr/<int:pk>',viewPrintVxbarr,name='viewPrintVxbarr'),
+    path('storeCommentVxbarr/<int:pk>',storeCommentVxbarr,name='storeCommentVxbarr'),
     path('storeAllVxbarr/<int:pk>',storeAllVxbarr,name='storeAllVxbarr'),
     path('deleteVxbarr/<int:pk>',deleteVxbarr,name='deleteVxbarr'),
 

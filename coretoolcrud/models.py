@@ -100,6 +100,8 @@ class Vxbarr(models.Model):
     vxbarr_all = models.JSONField(null=True)
     vxbarr_measured = models.TextField()
     vxbarr_reviewed = models.TextField()
+    vxbarr_stability = models.TextField(null=True)
+    vxbarr_capability = models.TextField(null=True)
 
 class Survey(models.Model):
     survey_user_id = models.IntegerField()
