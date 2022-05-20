@@ -6124,10 +6124,11 @@ def viewVxbarr(request, pk):
                 survey = Survey.objects.get(id = pk)
                 month = survey.survey_plan.month
                 year = survey.survey_plan.year
-                days = range(monthrange(year, month)[1])
-                subs = range(int(vxbarr.vxbarr_subgroup))
+                days = range(1, monthrange(year, month)[1]+1)
+                subs = range(1, int(vxbarr.vxbarr_subgroup)+1)
+                sub = vxbarr.vxbarr_subgroup
                 plan = survey.survey_plan
-                return render(request,'xbarr/all_xbarr.html',{'days':days, 'subs':subs, 'plan':plan, 'vxbarr':vxbarr})
+                return render(request,'xbarr/all_xbarr.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'vxbarr':vxbarr})
             
         except Vxbarr.DoesNotExist:
             return render(request,'xbarr/xbarr.html',{'pk':pk})
@@ -6155,10 +6156,11 @@ def storeVxbarr(request, pk):
         survey = Survey.objects.get(id = pk)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
-        days = range(monthrange(year, month)[1])
-        subs = range(int(vxbarr.vxbarr_subgroup))
+        days = range(1, monthrange(year, month)[1]+1)
+        subs = range(1, int(vxbarr.vxbarr_subgroup)+1)
+        sub = vxbarr.vxbarr_subgroup
         plan = survey.survey_plan
-        return render(request,'xbarr/all_xbarr.html',{'days':days, 'subs':subs, 'plan':plan, 'vxbarr':vxbarr})
+        return render(request,'xbarr/all_xbarr.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'vxbarr':vxbarr})
     else:
         return redirect('/logout')
 
@@ -6169,14 +6171,14 @@ def storeAllVxbarr(request, pk):
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
-        print("days", days)
+        sub = vxbarr.vxbarr_subgroup
         temppart = []
         temptrial = []
         iter = 1
 
         vxbarr.vxbarr_all = request.POST.getlist('vxbarr_all')
         for i in range(int(days) * int(vxbarr.vxbarr_subgroup)):
-            if iter % days != 0:
+            if iter % sub != 0:
                 temppart.append(vxbarr.vxbarr_all[i])
                 iter = iter + 1
             else:
@@ -6185,9 +6187,11 @@ def storeAllVxbarr(request, pk):
                 temppart = []
                 iter = iter + 1
         
+        temptrial = np.array(temptrial).T.tolist()
         vxbarr.vxbarr_all = temptrial
         vxbarr.save()
-        return redirect('coretoolcrud:viewFinalVxbarr', pk)    
+
+        return redirect('coretoolcrud:viewCommentVxbarr', pk)    
     else:
         return redirect('/logout')        
 

@@ -92,9 +92,9 @@
         <table class="table table-hover table-bordered results" id="table">
             <thead>
               <tr>
-                <td scope="col">Subgroup</td>
-                {% for i in days %}
-                  <td scope="col">T-{{i}}</td>
+                <td scope="col">Days</td>
+                {% for i in subs %}
+                  <td scope="col">{{i}}</td>
                 {% endfor %}
               </tr>
              
@@ -103,10 +103,10 @@
                 
               
               
-                {% for sub in subs %} 
+                {% for day in days %} 
               <tr>
-                <td>{{sub}}</td>
-                {% for i in days %}
+                <td>{{day}}</td>
+                {% for i in subs %}
                 <td><input class="form-control" name="vxbarr_all" id="demoFormHorizontalEmail" type="text" pattern="^[0-9]*\.?[0-9]*$" required /></td>
                 {% endfor %}
               </tr>
@@ -142,7 +142,7 @@
             setTimeout(function () {
                 var columns = $this.val().split(/\s+/);
                 var i;
-                var days = getDaysInCurrentMonth();
+                var days = {{sub}};
                 var input = $this;
                 for (i = 0; i < columns.length; i++) {
                     input.val(columns[i]);
