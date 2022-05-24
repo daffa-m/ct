@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>GRR Xbar R</title>
+    <title>Xbar S</title>
     <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
@@ -81,12 +81,12 @@
     <div class="container">
         <div class="invoice-title">
           <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
-            <h2>Xbar-R</h2><br>
+            <h2>Xbar-S</h2><br>
         <ul class="breadcrumb">
           <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
           <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
           <li><a href="{% url 'coretoolcrud:viewDetailSurvey' pk %}">Survey Result</a></li>
-          <li>Fill Xbar-R Data</li>
+          <li>Fill Xbar-S Data</li>
         </ul>
           {% if messages %}
           {% for message in messages %}
@@ -107,31 +107,31 @@
       <hr>
 
         </div>
-        <form action="{% url 'coretoolcrud:storeVxbarr' pk %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'coretoolcrud:storeSbarr' pk %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group"><br>
               <label for="exampleInputEmail1">LSL</label>
-              <input class="form-control" name="vxbarr_lsl" id="demoFormHorizontalEmail" type="number" required />
+              <input class="form-control" name="sbarr_lsl" id="demoFormHorizontalEmail" type="number" required />
           </div>
           <div class="form-group"><br>
             <label for="exampleInputEmail1">USL</label>
-            <input class="form-control" name="vxbarr_usl" id="demoFormHorizontalEmail" type="number" required />
+            <input class="form-control" name="sbarr_usl" id="demoFormHorizontalEmail" type="number" required />
           </div>
           <div class="form-group"><br>
             <label for="exampleInputEmail1">Number of Subgroup</label>
-            <input class="form-control" name="vxbarr_subgroup" id="demoFormHorizontalEmail" type="number" min="2" max="5" required/>
+            <input class="form-control" name="sbarr_subgroup" id="demoFormHorizontalEmail" type="number" min="2" max="30" required/>
           </div>
           <div class="form-group"><br>
             <label for="exampleInputEmail1">Unit</label>
-            <input class="form-control" name="vxbarr_unit" id="demoFormHorizontalEmail" type="text" required />
+            <input class="form-control" name="sbarr_unit" id="demoFormHorizontalEmail" type="text" required />
           </div>
           <div class="form-group"><br>
             <label for="exampleInputEmail1">Input / Measured by</label>
-            <input class="form-control" name="vxbarr_measured" id="demoFormHorizontalEmail" type="text" required />
+            <input class="form-control" name="sbarr_measured" id="demoFormHorizontalEmail" type="text" required />
           </div>
           <div class="form-group"><br>
             <label for="exampleInputEmail1">Reviewed by</label>
-            <input class="form-control" name="vxbarr_reviewed" id="demoFormHorizontalEmail" type="text" required />
+            <input class="form-control" name="sbarr_reviewed" id="demoFormHorizontalEmail" type="text" required />
           </div>
             
             <br><button type="submit" class="btn btn-primary">Submit</button>

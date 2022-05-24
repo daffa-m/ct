@@ -103,6 +103,18 @@ class Vxbarr(models.Model):
     vxbarr_stability = models.TextField(null=True)
     vxbarr_capability = models.TextField(null=True)
 
+class Sbarr(models.Model):
+    sbarr_survey_id = models.IntegerField()
+    sbarr_lsl = models.IntegerField()
+    sbarr_usl = models.IntegerField()
+    sbarr_subgroup = models.IntegerField()
+    sbarr_unit = models.TextField()
+    sbarr_all = models.JSONField(null=True)
+    sbarr_measured = models.TextField()
+    sbarr_reviewed = models.TextField()
+    sbarr_stability = models.TextField(null=True)
+    sbarr_capability = models.TextField(null=True)
+
 class Survey(models.Model):
     survey_user_id = models.IntegerField()
     survey_date_project = models.DateField()

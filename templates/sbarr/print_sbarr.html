@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Xbar S</title>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
+    <style type="text/css" rel="stylesheet">
+    ul.breadcrumb {
+    padding: 10px 16px;
+    list-style: none;
+    background-color: #eee;
+    }
+    ul.breadcrumb li {
+    display: inline;
+    font-size: 18px;
+    }
+    ul.breadcrumb li+li:before {
+    padding: 8px;
+    color: black;
+    content: "/\00a0";
+    }
+    ul.breadcrumb li a {
+    color: #0275d8;
+    text-decoration: none;
+    }
+    ul.breadcrumb li a:hover {
+    color: #01447e;
+    text-decoration: underline;
+    }
+    .invoice-title h2, .invoice-title h3 {
+    display: inline-block;
+    }
+    h6 {
+    color: red;
+    }
+    .card {
+      display:inline-block;
+      width:100%;
+    } 
+    table {
+        text-align: center;
+    }
+    table thead th {
+        text-align: center;
+    }
+    </style>
+    
+</head>
+<body onload="window.print()">
+    <div class="container">
+      
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="invoice-title">
+                    <a class="navbar-brand" href="#">
+                        <img src="https://mdbootstrap.com/img/logo/mdb-transparent.png" height="30" alt="mdb logo">
+                      </a>
+                    <h2>{{ request.session.company }}</h2><h2 class="float-end">XBAR S</h3>
+                </div>
+                <hr>
+
+                <table class="table table-hover table-bordered results">
+                  <thead>
+                    <tr>
+                      <th scope="col">Measurement</th>
+                      <th scope="col">Identifying Character</th>
+                      <th scope="col">Part Information</th>
+                      <th scope="col">Statistical Study</th>
+                    </tr>
+                    
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <td>Name: {{ survey.survey_name }}</td>
+                          <td>Character: {{ survey.survey_character }}</td>
+                          <td>Date Project: {{ survey.survey_date_project }}</td>
+                          <td>Plan Date: {{ survey.survey_plan }}</td>
+                      </tr>
+                      <tr>
+                          <td>Serial Number: {{ survey.survey_sn }}</td>
+                          <td>Category: {{ survey.survey_category }}</td>
+                          <td>Customer Name: {{ survey.survey_cust_name }}</td>
+                          <td>Actual Date: {{ survey.survey_actual }}</td>
+                      </tr>
+                      <tr>
+                          <td>Resolution: {{ survey.survey_resolution }}</td>
+                          <td>Process Name: {{ survey.survey_process_name }}</td>
+                          <td>Part Name: {{ survey.survey_part_name }}</td>
+                          <td>Reason For Rev: {{ survey.survey_reason }}</td>
+                      </tr>
+                      <tr>
+                          <td>Unit: {{ survey.survey_unit }}</td>
+                          <td>Symbol: {{ survey.survey_symbol }}</td>
+                          <td>Part Number: {{ survey.survey_part_number }}</td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td>Next Calibration Date: {{ survey.survey_next_cal }}</td>
+                          <td>Reference: {{ survey.survey_ref }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td></td>
+                          <td>Range (Max to Min): {{ survey.survey_range_max }} to {{ survey.survey_range_min }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td></td>
+                          <td>FMEA Number: {{ survey.survey_fmea }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                      <tr>
+                          <td></td>
+                          <td>Control Plan Number: {{ survey.survey_control_plan }}</td>
+                          <td></td>
+                          <td></td>
+                      </tr>
+                  </tbody>
+                </table>
+
+                <table class="table table-hover table-bordered results">
+                  <thead>
+                    
+                    <tr>
+                      <th scope="col">LSL: {{sbarr.sbarr_lsl}}</th>
+                      <th scope="col">USL: {{sbarr.sbarr_usl}}</th>
+                      <th scope="col">Unit: {{sbarr.sbarr_unit}}</th>
+                      <th scope="col">Num of subgroup: {{sbarr.sbarr_subgroup}}</th>
+                    </tr>
+                    <tr>
+                      <th scope="col">Cp: {{cp|floatformat:2}}</th>
+                      <th scope="col">Cpk: {{cpk|floatformat:2}}</th>
+                      <th scope="col">Pp: {{pp|floatformat:2}}</th>
+                      <th scope="col">Ppk: {{ppk|floatformat:2}}</th>
+                    </tr>
+                    <tr>
+                      <th scope="col">USL - Xbar2: {{usllsl.0|floatformat:2}}</th>
+                      <th scope="col">Xbar2 - LSL: {{usllsl.1|floatformat:2}}</th>
+                      <th scope="col"></th>
+                      <th scope="col"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      
+                    
+                    
+                      
+                  </tbody>
+                </table>
+
+                
+                  
+                    <h6>Measurement</h6>
+                    <table class="table table-hover table-bordered results" id="table">
+                      <thead>
+                        <tr>
+                          <td scope="col">Days</td>
+                          {% for i in subs %}
+                            <td scope="col">{{i}}</td>
+                          {% endfor %}
+                        </tr>
+                       
+                      </thead>
+                      <tbody>
+                    
+
+                        {% for k, l in gabung %} 
+                        <tr>
+                          <td>{{ k }}</td>
+                          {% for j in l %}
+                          <td>{{j}}</td>
+                          {% endfor %}
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+
+                   
+
+                    
+                      <div class="card">
+                        
+                        <div class="card-body">
+                          
+                          {{divxbar| safe}}
+                          <br><br><br>
+                         
+                         
+                        </div>
+                      </div>
+                      <br><br>
+
+                      <div class="card">
+                        
+                        <div class="card-body">
+                          
+                          {{divr| safe}}
+                          <br><br><br>
+                         
+                         
+                        </div>
+                      </div>
+                      <br><br>
+                     
+                      <div class="card">
+                        <h5 class="card-header">Recommendation</h5>
+                        <div class="card-body">
+                          
+  
+                          <label for="exampleInputPassword1">Resume Stability of Process</label>
+                             
+                          <br>
+                          <h6>{{sbarr.sbarr_stability}}</h6><br><br>
+
+                          <label for="exampleInputPassword1">Resume Capability of Process</label>
+                             
+                          <br>
+                          <h6>{{sbarr.sbarr_capability}}</h6><br>
+                          
+  
+                        </div>
+  
+                      </div>
+                      <br><br>
+                    
+                      
+                      <br><br>
+
+        </div>
+        
+    </div>
+
+</body>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.2.min.js"></script>
+{{scriptxbar| safe}}
+{{scriptsd| safe}}
+</html>
+
