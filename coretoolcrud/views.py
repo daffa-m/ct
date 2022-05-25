@@ -6613,7 +6613,7 @@ def deleteSbarr(request, pk):
     if 'user' in request.session:
         sbarr = Sbarr.objects.get(sbarr_survey_id = pk)
         sbarr.delete()
-        messages.success(request, "Xbar S berhasil dihapus")
+        messages.success(request, "Sbar R berhasil dihapus")
         return redirect('coretoolcrud:viewDetailSurvey', pk)
     else:
         return redirect('/logout')
