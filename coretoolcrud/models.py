@@ -115,6 +115,17 @@ class Sbarr(models.Model):
     sbarr_stability = models.TextField(null=True)
     sbarr_capability = models.TextField(null=True)
 
+class Imr(models.Model):
+    imr_survey_id = models.IntegerField()
+    imr_lsl = models.IntegerField()
+    imr_usl = models.IntegerField()
+    imr_subgroup = models.IntegerField()
+    imr_all = models.JSONField(null=True)
+    imr_measured = models.TextField()
+    imr_reviewed = models.TextField()
+    imr_stability = models.TextField(null=True)
+    imr_capability = models.TextField(null=True)
+
 class Survey(models.Model):
     survey_user_id = models.IntegerField()
     survey_date_project = models.DateField()

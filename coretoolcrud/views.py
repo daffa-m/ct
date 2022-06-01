@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Survey, User
+from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Survey, User
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -6571,10 +6571,12 @@ def storeSbarr(request, pk):
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = range(1, monthrange(year, month)[1]+1)
+        divs = range(1, int(sbarr.sbarr_subgroup) // 10 + 1)
+        mods = range(1, int(sbarr.sbarr_subgroup) % 10 + 1)
         subs = range(1, int(sbarr.sbarr_subgroup)+1)
         sub = sbarr.sbarr_subgroup
         plan = survey.survey_plan
-        return render(request,'sbarr/all_sbarr.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'sbarr':sbarr})
+        return render(request,'sbarr/all_sbarr.html',{'days':days, 'subs':subs, 'divs':divs, 'mods':mods, 'sub':sub, 'plan':plan, 'sbarr':sbarr})
     else:
         return redirect('/logout')
 
@@ -6645,7 +6647,7 @@ def viewCommentSbarr(request, pk):
         xbar2 = sum(xbar) / days
         sigmabar = sum(sd) / days
 
-        subgroup = [[2, 2.2659, 0.7979, 0, 3.267], [3, 1.954, 0.8862, 0, 2.568], [4, 1.628, 0.9213, 0, 2.266], [5, 1.427, 0.94, 0, 2.089], [6, 1.287, 0.9515, 0.03, 1.97], [7, 1.182, 0.9594, 0.118, 1.882], [8, 1.099, 0.965, 0.185, 1.815], [9, 1.032, 0.9693, 0.239, 1.761], [10, 0.975, 0.9727, 0.284, 1.716], [15, 0.789, 0.9823, 0.428, 1.572], [0.606, 0.9896, 0.565, 1.435]]
+        subgroup = [[2, 2.2659, 0.7979, 0, 3.267], [3, 1.954, 0.8862, 0, 2.568], [4, 1.628, 0.9213, 0, 2.266], [5, 1.427, 0.94, 0, 2.089], [6, 1.287, 0.9515, 0.03, 1.97], [7, 1.182, 0.9594, 0.118, 1.882], [8, 1.099, 0.965, 0.185, 1.815], [9, 1.032, 0.9693, 0.239, 1.761], [10, 0.975, 0.9727, 0.284, 1.716], [15, 0.789, 0.9823, 0.428, 1.572], [25, 0.606, 0.9896, 0.565, 1.435]]
 
         for ele in subgroup:
             if ele[0] == sbarr.sbarr_subgroup:
@@ -6653,6 +6655,11 @@ def viewCommentSbarr(request, pk):
                 c4 = ele[2]
                 b3 = ele[3]
                 b4 = ele[4]
+            else:
+                a3 = 0
+                c4 = 0
+                b3 = 0
+                b4 = 0
         
         uclx = xbar2 + a3 * sigmabar
         lclx = xbar2 - a3 * sigmabar
@@ -6760,7 +6767,7 @@ def viewFinalSbarr(request, pk):
         xbar2 = sum(xbar) / days
         sigmabar = sum(sd) / days
 
-        subgroup = [[2, 2.2659, 0.7979, 0, 3.267], [3, 1.954, 0.8862, 0, 2.568], [4, 1.628, 0.9213, 0, 2.266], [5, 1.427, 0.94, 0, 2.089], [6, 1.287, 0.9515, 0.03, 1.97], [7, 1.182, 0.9594, 0.118, 1.882], [8, 1.099, 0.965, 0.185, 1.815], [9, 1.032, 0.9693, 0.239, 1.761], [10, 0.975, 0.9727, 0.284, 1.716], [15, 0.789, 0.9823, 0.428, 1.572], [0.606, 0.9896, 0.565, 1.435]]
+        subgroup = [[2, 2.2659, 0.7979, 0, 3.267], [3, 1.954, 0.8862, 0, 2.568], [4, 1.628, 0.9213, 0, 2.266], [5, 1.427, 0.94, 0, 2.089], [6, 1.287, 0.9515, 0.03, 1.97], [7, 1.182, 0.9594, 0.118, 1.882], [8, 1.099, 0.965, 0.185, 1.815], [9, 1.032, 0.9693, 0.239, 1.761], [10, 0.975, 0.9727, 0.284, 1.716], [15, 0.789, 0.9823, 0.428, 1.572], [25, 0.606, 0.9896, 0.565, 1.435]]
 
         for ele in subgroup:
             if ele[0] == sbarr.sbarr_subgroup:
@@ -6768,6 +6775,11 @@ def viewFinalSbarr(request, pk):
                 c4 = ele[2]
                 b3 = ele[3]
                 b4 = ele[4]
+            else:
+                a3 = 0
+                c4 = 0
+                b3 = 0
+                b4 = 0
         
         uclx = xbar2 + a3 * sigmabar
         lclx = xbar2 - a3 * sigmabar
@@ -6862,7 +6874,7 @@ def viewPrintSbarr(request, pk):
         xbar2 = sum(xbar) / days
         sigmabar = sum(sd) / days
 
-        subgroup = [[2, 2.2659, 0.7979, 0, 3.267], [3, 1.954, 0.8862, 0, 2.568], [4, 1.628, 0.9213, 0, 2.266], [5, 1.427, 0.94, 0, 2.089], [6, 1.287, 0.9515, 0.03, 1.97], [7, 1.182, 0.9594, 0.118, 1.882], [8, 1.099, 0.965, 0.185, 1.815], [9, 1.032, 0.9693, 0.239, 1.761], [10, 0.975, 0.9727, 0.284, 1.716], [15, 0.789, 0.9823, 0.428, 1.572], [0.606, 0.9896, 0.565, 1.435]]
+        subgroup = [[2, 2.2659, 0.7979, 0, 3.267], [3, 1.954, 0.8862, 0, 2.568], [4, 1.628, 0.9213, 0, 2.266], [5, 1.427, 0.94, 0, 2.089], [6, 1.287, 0.9515, 0.03, 1.97], [7, 1.182, 0.9594, 0.118, 1.882], [8, 1.099, 0.965, 0.185, 1.815], [9, 1.032, 0.9693, 0.239, 1.761], [10, 0.975, 0.9727, 0.284, 1.716], [15, 0.789, 0.9823, 0.428, 1.572], [25, 0.606, 0.9896, 0.565, 1.435]]
 
         for ele in subgroup:
             if ele[0] == sbarr.sbarr_subgroup:
@@ -6870,6 +6882,11 @@ def viewPrintSbarr(request, pk):
                 c4 = ele[2]
                 b3 = ele[3]
                 b4 = ele[4]
+            else:
+                a3 = 0
+                c4 = 0
+                b3 = 0
+                b4 = 0
         
         uclx = xbar2 + a3 * sigmabar
         lclx = xbar2 - a3 * sigmabar
@@ -6934,5 +6951,385 @@ def viewPrintSbarr(request, pk):
         subs = range(1, int(sbarr.sbarr_subgroup)+1)
 
         return render(request,'sbarr/print_sbarr.html', {'sbarr':sbarr, 'survey':survey, 'usllsl':usllsl, 'cp':cp, 'cpk':cpk, 'pp':pp, 'ppk':ppk, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'scriptsd':scriptsd, 'divsd':divsd})
+    else:
+        return redirect('/logout')
+
+#I-MR
+
+def viewImr(request, pk):
+    if 'user' in request.session:
+        try:
+            imr = Imr.objects.get(imr_survey_id = pk)
+            if imr.imr_all:
+                return redirect('coretoolcrud:viewFinalImr', pk)
+            else:
+                survey = Survey.objects.get(id = pk)
+                month = survey.survey_plan.month
+                year = survey.survey_plan.year
+                days = range(1, monthrange(year, month)[1]+1)
+                subs = range(1, int(imr.imr_subgroup)+1)
+                sub = imr.imr_subgroup
+                plan = survey.survey_plan
+                return render(request,'imr/all_imr.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'imr':imr})
+            
+        except Imr.DoesNotExist:
+            return render(request,'imr/imr.html',{'pk':pk})
+    else:
+        return redirect('/logout')
+
+def storeImr(request, pk):
+    if 'user' in request.session:
+        try:
+            imr = Imr.objects.get(imr_survey_id = pk)
+            imr.delete()
+        except Imr.DoesNotExist:
+            pass
+
+        imr = Imr()
+        imr.imr_survey_id = pk
+        imr.imr_usl = request.POST.get('imr_usl')
+        imr.imr_lsl = request.POST.get('imr_lsl')
+        imr.imr_subgroup = request.POST.get('imr_subgroup')
+        imr.imr_measured = request.POST.get('imr_measured')
+        imr.imr_reviewed = request.POST.get('imr_reviewed')
+        imr.save()
+
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = range(1, monthrange(year, month)[1]+1)
+        divs = range(1, int(imr.imr_subgroup) // 10 + 1)
+        mods = range(1, int(imr.imr_subgroup) % 10 + 1)
+        subs = range(1, int(imr.imr_subgroup)+1)
+        sub = imr.imr_subgroup
+        plan = survey.survey_plan
+        return render(request,'imr/all_imr.html',{'days':days, 'subs':subs, 'divs':divs, 'mods':mods, 'sub':sub, 'plan':plan, 'imr':imr})
+    else:
+        return redirect('/logout')
+
+def storeAllImr(request, pk):
+    if 'user' in request.session:
+        imr = Imr.objects.get(imr_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        sub = imr.imr_subgroup
+        temppart = []
+        temptrial = []
+        iter = 1
+
+        imr.imr_all = request.POST.getlist('imr_all')
+        for i in range(int(days) * int(imr.imr_subgroup)):
+            temppart.append(float(imr.imr_all[i]))
+                
+        imr.imr_all = temppart
+        imr.save()
+
+        return redirect('coretoolcrud:viewCommentImr', pk)    
+    else:
+        return redirect('/logout')        
+
+def deleteImr(request, pk):
+    if 'user' in request.session:
+        imr = Imr.objects.get(imr_survey_id = pk)
+        imr.delete()
+        messages.success(request, "I-MR berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pk)
+    else:
+        return redirect('/logout')
+
+def viewCommentImr(request, pk):
+    if 'user' in request.session:
+        imr = Imr.objects.get(imr_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        ##############################
+
+        data = imr.imr_all
+
+        mov = []
+        for i in range(1, len(data)):
+            mov.append(abs(data[i-1] - data[i]))
+
+        summov = sum(mov)
+        sumdata = sum(data)
+        avedata = sum(data) / len(data)
+        n = len(data)
+        sigmamov = statistics.stdev(mov)
+
+        subgroup = [[2, 3.268, 1.88, 1.128, 0], [3, 2.574, 1.023, 1.693, 0], [4, 2.282, 0.729, 2.059, 0], [5, 2.114, 0.577, 2.326, 0]]
+
+        for ele in subgroup:
+            if ele[0] == imr.imr_subgroup:
+                d2 = ele[3]
+                d4 = ele[1]
+                a2 = ele[2]
+                d3 = ele[4]
+
+        mrbar = summov / (n -1)
+        ucli = avedata + 3 * mrbar / d2
+        lcli = avedata - 3 * mrbar / d2
+        uclmr = d4 * mrbar
+        lclmr = d3 * mrbar
+        uslxbar = imr.imr_usl - avedata
+        xbarlsl = avedata - imr.imr_lsl
+        pp = (imr.imr_usl - imr.imr_lsl) / (6 * sigmamov)
+        usllsl = [uslxbar, xbarlsl]
+        ppk = min(usllsl) / (3 * sigmamov)
+        sigmaest = mrbar / d2
+        cp = (imr.imr_usl - imr.imr_lsl) / (6 * sigmaest)
+        cpk = min(usllsl) / (3 * sigmaest)
+
+        ###############################
+
+        bot = []
+        usllist = []
+        lsllist = []
+        uclilist = []
+        lclilist = []
+        uclmrlist = []
+        lclmrlist = []
+       
+
+
+        for i in range(days):
+            bot.append("T"+str(i+1))
+            usllist.append(imr.imr_usl)
+            lsllist.append(imr.imr_lsl)
+            uclilist.append(ucli)
+            lclilist.append(lcli)
+            uclmrlist.append(uclmr)
+            lclmrlist.append(lclmr)
+
+
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, usllist, legend_label="USL", line_width=2)
+        p.line(bot, lsllist, legend_label="LSL", color="green", line_width=2)
+        p.line(bot, lclilist, legend_label="UCLI", color="red", line_width=2)
+        p.line(bot, uclilist, legend_label="LCLI", color="yellow", line_width=2)
+        p.line(bot, imr.imr_all, legend_label="Data", color="black", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxbar, divxbar = components(p)
+
+        #####################################
+
+        p = figure(title="Stdev", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, uclmrlist, legend_label="UCLMR", line_width=2)
+        p.line(bot, lclmrlist, legend_label="LCLMR", color="green", line_width=2)
+        p.line(bot, mov, legend_label="Movement Range", color="green", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptsd, divsd = components(p)
+
+        #####################################
+
+        
+        gabung = zip(bot, imr.imr_all)
+        subs = range(1, int(imr.imr_subgroup)+1)
+
+        return render(request,'imr/comment_imr.html', {'imr':imr, 'survey':survey, 'usllsl':usllsl, 'cp':cp, 'cpk':cpk, 'pp':pp, 'ppk':ppk, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'scriptsd':scriptsd, 'divsd':divsd})
+    else:
+        return redirect('/logout')
+
+def storeCommentImr(request, pk):
+    if 'user' in request.session:
+        imr = Imr.objects.get(id = pk)
+
+        imr.imr_stability = request.POST.get('imr_stability')
+        imr.imr_capability = request.POST.get('imr_capability')
+        imr.save()
+
+        # return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey})
+        return redirect('coretoolcrud:viewFinalImr',imr.imr_survey_id )
+    else:
+        return redirect('/logout')
+
+def viewFinalImr(request, pk):
+    if 'user' in request.session:
+        imr = Imr.objects.get(imr_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        ##############################
+
+        data = imr.imr_all
+
+        mov = []
+        for i in range(1, len(data)):
+            mov.append(abs(data[i-1] - data[i]))
+
+        summov = sum(mov)
+        sumdata = sum(data)
+        avedata = sum(data) / len(data)
+        n = len(data)
+        sigmamov = statistics.stdev(mov)
+
+        subgroup = [[2, 3.268, 1.88, 1.128, 0], [3, 2.574, 1.023, 1.693, 0], [4, 2.282, 0.729, 2.059, 0], [5, 2.114, 0.577, 2.326, 0]]
+
+        for ele in subgroup:
+            if ele[0] == imr.imr_subgroup:
+                d2 = ele[3]
+                d4 = ele[1]
+                a2 = ele[2]
+                d3 = ele[4]
+
+        mrbar = summov / (n -1)
+        ucli = avedata + 3 * mrbar / d2
+        lcli = avedata - 3 * mrbar / d2
+        uclmr = d4 * mrbar
+        lclmr = d3 * mrbar
+        uslxbar = imr.imr_usl - avedata
+        xbarlsl = avedata - imr.imr_lsl
+        pp = (imr.imr_usl - imr.imr_lsl) / (6 * sigmamov)
+        usllsl = [uslxbar, xbarlsl]
+        ppk = min(usllsl) / (3 * sigmamov)
+        sigmaest = mrbar / d2
+        cp = (imr.imr_usl - imr.imr_lsl) / (6 * sigmaest)
+        cpk = min(usllsl) / (3 * sigmaest)
+
+        ###############################
+
+        bot = []
+        usllist = []
+        lsllist = []
+        uclilist = []
+        lclilist = []
+        uclmrlist = []
+        lclmrlist = []
+       
+
+
+        for i in range(days):
+            bot.append("T"+str(i+1))
+            usllist.append(imr.imr_usl)
+            lsllist.append(imr.imr_lsl)
+            uclilist.append(ucli)
+            lclilist.append(lcli)
+            uclmrlist.append(uclmr)
+            lclmrlist.append(lclmr)
+
+
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, usllist, legend_label="USL", line_width=2)
+        p.line(bot, lsllist, legend_label="LSL", color="green", line_width=2)
+        p.line(bot, lclilist, legend_label="UCLI", color="red", line_width=2)
+        p.line(bot, uclilist, legend_label="LCLI", color="yellow", line_width=2)
+        p.line(bot, imr.imr_all, legend_label="Data", color="black", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxbar, divxbar = components(p)
+
+        #####################################
+
+        p = figure(title="Stdev", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, uclmrlist, legend_label="UCLMR", line_width=2)
+        p.line(bot, lclmrlist, legend_label="LCLMR", color="green", line_width=2)
+        p.line(bot, mov, legend_label="Movement Range", color="green", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptsd, divsd = components(p)
+
+        #####################################
+
+        
+        gabung = zip(bot, imr.imr_all)
+        subs = range(1, int(imr.imr_subgroup)+1)
+
+        return render(request,'imr/collection_imr.html', {'imr':imr, 'survey':survey, 'usllsl':usllsl, 'cp':cp, 'cpk':cpk, 'pp':pp, 'ppk':ppk, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'scriptsd':scriptsd, 'divsd':divsd})
+    else:
+        return redirect('/logout')
+
+def viewPrintImr(request, pk):
+    if 'user' in request.session:
+        imr = Imr.objects.get(imr_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        ##############################
+
+        data = imr.imr_all
+
+        mov = []
+        for i in range(1, len(data)):
+            mov.append(abs(data[i-1] - data[i]))
+
+        summov = sum(mov)
+        sumdata = sum(data)
+        avedata = sum(data) / len(data)
+        n = len(data)
+        sigmamov = statistics.stdev(mov)
+
+        subgroup = [[2, 3.268, 1.88, 1.128, 0], [3, 2.574, 1.023, 1.693, 0], [4, 2.282, 0.729, 2.059, 0], [5, 2.114, 0.577, 2.326, 0]]
+
+        for ele in subgroup:
+            if ele[0] == imr.imr_subgroup:
+                d2 = ele[3]
+                d4 = ele[1]
+                a2 = ele[2]
+                d3 = ele[4]
+
+        mrbar = summov / (n -1)
+        ucli = avedata + 3 * mrbar / d2
+        lcli = avedata - 3 * mrbar / d2
+        uclmr = d4 * mrbar
+        lclmr = d3 * mrbar
+        uslxbar = imr.imr_usl - avedata
+        xbarlsl = avedata - imr.imr_lsl
+        pp = (imr.imr_usl - imr.imr_lsl) / (6 * sigmamov)
+        usllsl = [uslxbar, xbarlsl]
+        ppk = min(usllsl) / (3 * sigmamov)
+        sigmaest = mrbar / d2
+        cp = (imr.imr_usl - imr.imr_lsl) / (6 * sigmaest)
+        cpk = min(usllsl) / (3 * sigmaest)
+
+        ###############################
+
+        bot = []
+        usllist = []
+        lsllist = []
+        uclilist = []
+        lclilist = []
+        uclmrlist = []
+        lclmrlist = []
+       
+
+
+        for i in range(days):
+            bot.append("T"+str(i+1))
+            usllist.append(imr.imr_usl)
+            lsllist.append(imr.imr_lsl)
+            uclilist.append(ucli)
+            lclilist.append(lcli)
+            uclmrlist.append(uclmr)
+            lclmrlist.append(lclmr)
+
+
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, usllist, legend_label="USL", line_width=2)
+        p.line(bot, lsllist, legend_label="LSL", color="green", line_width=2)
+        p.line(bot, lclilist, legend_label="UCLI", color="red", line_width=2)
+        p.line(bot, uclilist, legend_label="LCLI", color="yellow", line_width=2)
+        p.line(bot, imr.imr_all, legend_label="Data", color="black", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxbar, divxbar = components(p)
+
+        #####################################
+
+        p = figure(title="Stdev", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, uclmrlist, legend_label="UCLMR", line_width=2)
+        p.line(bot, lclmrlist, legend_label="LCLMR", color="green", line_width=2)
+        p.line(bot, mov, legend_label="Movement Range", color="green", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptsd, divsd = components(p)
+
+        #####################################
+
+        
+        gabung = zip(bot, imr.imr_all)
+        subs = range(1, int(imr.imr_subgroup)+1)
+
+        return render(request,'imr/print_imr.html', {'imr':imr, 'survey':survey, 'usllsl':usllsl, 'cp':cp, 'cpk':cpk, 'pp':pp, 'ppk':ppk, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'scriptsd':scriptsd, 'divsd':divsd})
     else:
         return redirect('/logout')
