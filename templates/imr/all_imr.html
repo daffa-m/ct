@@ -83,7 +83,7 @@
           <hr>
 
         </div>
-        <form action="{% url 'coretoolcrud:storeAllSbarr' imr.imr_survey_id %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'coretoolcrud:storeAllImr' imr.imr_survey_id %}" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           
         
@@ -93,9 +93,9 @@
             <thead>
               <tr>
                 <td scope="col">Days</td>
-                {% for i in subs %}
-                  <td scope="col">{{i}}</td>
-                {% endfor %}
+                
+                  <td scope="col">Data</td>
+                
               </tr>
              
             </thead>
@@ -107,9 +107,9 @@
                 {% for day in days %} 
               <tr>
                 <td>{{day}}</td>
-                {% for i in subs %}
+                
                 <td><input class="form-control" name="imr_all" id="demoFormHorizontalEmail" type="text" pattern="^[0-9]*\.?[0-9]*$" required /></td>
-                {% endfor %}
+               
               </tr>
               {% endfor %}
             </tbody>
@@ -142,7 +142,7 @@
             setTimeout(function () {
                 var columns = $this.val().split(/\s+/);
                 var i;
-                var days = {{sub}};
+                var days = 1;
                 var input = $this;
                 for (i = 0; i < columns.length; i++) {
                     input.val(columns[i]);

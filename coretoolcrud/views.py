@@ -7020,7 +7020,7 @@ def storeAllImr(request, pk):
         iter = 1
 
         imr.imr_all = request.POST.getlist('imr_all')
-        for i in range(int(days) * int(imr.imr_subgroup)):
+        for i in range(len(imr.imr_all)):
             temppart.append(float(imr.imr_all[i]))
                 
         imr.imr_all = temppart

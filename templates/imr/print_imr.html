@@ -163,9 +163,9 @@
                       <thead>
                         <tr>
                           <td scope="col">Days</td>
-                          {% for i in subs %}
-                            <td scope="col">{{i}}</td>
-                          {% endfor %}
+
+                            <td scope="col">Data</td>
+                        
                         </tr>
                        
                       </thead>
@@ -175,9 +175,9 @@
                         {% for k, l in gabung %} 
                         <tr>
                           <td>{{ k }}</td>
-                          {% for j in l %}
-                          <td>{{j}}</td>
-                          {% endfor %}
+                      
+                          <td>{{l}}</td>
+                      
                         </tr>
                         {% endfor %}
                       </tbody>
@@ -202,7 +202,7 @@
                         
                         <div class="card-body">
                           
-                          {{divr| safe}}
+                          {{divsd| safe}}
                           <br><br><br>
                          
                          

@@ -59,8 +59,8 @@
         <ul class="breadcrumb">
             <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
             <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
-            <li><a href="{% url 'coretoolcrud:viewDetailSurvey' sbarr.sbarr_survey_id %}">Survey Result</a></li>
-            <li>Sbar R Result</li>
+            <li><a href="{% url 'coretoolcrud:viewDetailSurvey' imr.imr_survey_id %}">Survey Result</a></li>
+            <li>I-MR Result</li>
         </ul>
           {% if messages %}
           {% for message in messages %}
@@ -182,9 +182,9 @@
                       <thead>
                         <tr>
                           <td scope="col">Days</td>
-                          {% for i in subs %}
-                            <td scope="col">{{i}}</td>
-                          {% endfor %}
+                        
+                            <td scope="col">Data</td>
+                       
                         </tr>
                        
                       </thead>
@@ -194,9 +194,9 @@
                         {% for k, l in gabung %} 
                         <tr>
                           <td>{{ k }}</td>
-                          {% for j in l %}
-                          <td>{{j}}</td>
-                          {% endfor %}
+                         
+                          <td>{{l}}</td>
+                         
                         </tr>
                         {% endfor %}
                       </tbody>
@@ -250,8 +250,8 @@
                       </div>
                       <br><br>
                     
-                      <a href="{% url 'coretoolcrud:deleteSbarr' imr.imr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                      <a href="{% url 'coretoolcrud:viewPrintSbarr' imr.imr_survey_id %}" class="btn btn-info">Print</a>
+                      <a href="{% url 'coretoolcrud:deleteImr' imr.imr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                      <a href="{% url 'coretoolcrud:viewPrintImr' imr.imr_survey_id %}" class="btn btn-info">Print</a>
                       <br><br>
 
         </div>
