@@ -8,6 +8,7 @@ from .views import viewLinearity, viewPrintLinearity, viewAverageLinearity, view
 from .views import viewVxbarr, viewFinalVxbarr, viewCommentVxbarr, viewPrintVxbarr, storeVxbarr, storeCommentVxbarr, storeAllVxbarr, deleteVxbarr
 from .views import viewSbarr, viewFinalSbarr, viewCommentSbarr, viewPrintSbarr, storeSbarr, storeCommentSbarr, storeAllSbarr, deleteSbarr
 from .views import viewImr, viewFinalImr, viewCommentImr, viewPrintImr, storeImr, storeCommentImr, storeAllImr, deleteImr
+from .views import viewPchart, viewFinalPchart, viewPrintPchart, storePchart, storeAllPchart, deletePchart
 from .views import viewListSurvey, viewDetailSurvey, viewSurvey, viewManual, viewEditSurvey, viewEditManual, storeManual, storeSurvey, storeEditManual, storeEditSurvey, deleteSurvey
 from .views import viewLogin, login, logout
 app_name = "coretoolcrud"
@@ -98,5 +99,12 @@ urlpatterns = [
     path('storeCommentImr/<int:pk>',storeCommentImr,name='storeCommentImr'),
     path('storeAllImr/<int:pk>',storeAllImr,name='storeAllImr'),
     path('deleteImr/<int:pk>',deleteImr,name='deleteImr'),
+
+    path('viewPchart/<int:pk>',viewPchart,name='viewPchart'),
+    path('viewFinalPchart/<int:pk>',viewFinalPchart,name='viewFinalPchart'),
+    path('storePchart/<int:pk>',storePchart,name='storePchart'),
+    path('viewPrintPchart/<int:pk>',viewPrintPchart,name='viewPrintPchart'),
+    path('storeAllPchart/<int:pk>',storeAllPchart,name='storeAllPchart'),
+    path('deletePchart/<int:pk>',deletePchart,name='deletePchart'),
 
 ]

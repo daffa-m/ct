@@ -102,6 +102,7 @@ class Vxbarr(models.Model):
     vxbarr_reviewed = models.TextField()
     vxbarr_stability = models.TextField(null=True)
     vxbarr_capability = models.TextField(null=True)
+    vxbarr_reason = models.TextField(null=True)
 
 class Sbarr(models.Model):
     sbarr_survey_id = models.IntegerField()
@@ -114,6 +115,7 @@ class Sbarr(models.Model):
     sbarr_reviewed = models.TextField()
     sbarr_stability = models.TextField(null=True)
     sbarr_capability = models.TextField(null=True)
+    sbarr_reason = models.TextField(null=True)
 
 class Imr(models.Model):
     imr_survey_id = models.IntegerField()
@@ -125,6 +127,17 @@ class Imr(models.Model):
     imr_reviewed = models.TextField()
     imr_stability = models.TextField(null=True)
     imr_capability = models.TextField(null=True)
+    imr_reason = models.TextField(null=True)
+
+class Pchart(models.Model):
+    pchart_survey_id = models.IntegerField()
+    pchart_sample = models.IntegerField()
+    pchart_freq = models.IntegerField()
+    pchart_all = models.JSONField(null=True)
+    pchart_defect = models.TextField()
+    pchart_measured = models.TextField
+    pchart_reviewed = models.TextField()
+    pchart_reason = models.TextField(null=True)
 
 class Survey(models.Model):
     survey_user_id = models.IntegerField()

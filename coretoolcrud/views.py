@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Survey, User
+from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Survey, User
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -7331,5 +7331,242 @@ def viewPrintImr(request, pk):
         subs = range(1, int(imr.imr_subgroup)+1)
 
         return render(request,'imr/print_imr.html', {'imr':imr, 'survey':survey, 'usllsl':usllsl, 'cp':cp, 'cpk':cpk, 'pp':pp, 'ppk':ppk, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'scriptsd':scriptsd, 'divsd':divsd})
+    else:
+        return redirect('/logout')
+
+# P Chart
+
+def viewPchart(request, pk):
+    if 'user' in request.session:
+        try:
+            pchart = Pchart.objects.get(pchart_survey_id = pk)
+            if pchart.pchart_all:
+                return redirect('coretoolcrud:viewFinalPchart', pk)
+            else:
+                survey = Survey.objects.get(id = pk)
+                month = survey.survey_plan.month
+                year = survey.survey_plan.year
+                days = range(1, monthrange(year, month)[1]+1)
+                freq = pchart.pchart_freq
+                plan = survey.survey_plan
+                return render(request,'pchart/all_pchart.html',{'days':days, 'freq':freq, 'plan':plan, 'pchart':pchart})
+            
+        except Pchart.DoesNotExist:
+            return render(request,'pchart/pchart.html',{'pk':pk})
+    else:
+        return redirect('/logout')
+
+def storePchart(request, pk):
+    if 'user' in request.session:
+        try:
+            pchart = Pchart.objects.get(pchart_survey_id = pk)
+            pchart.delete()
+        except Pchart.DoesNotExist:
+            pass
+
+        pchart = Pchart()
+        pchart.pchart_survey_id = pk
+        pchart.pchart_sample = request.POST.get('pchart_sample')
+        pchart.pchart_freq = request.POST.get('pchart_freq')
+        pchart.pchart_measured = request.POST.get('pchart_measured')
+        pchart.pchart_reviewed = request.POST.get('pchart_reviewed')
+        pchart.save()
+
+        survey = Survey.objects.get(id = pk)
+        nos = range(1, int(pchart.pchart_freq) + 1)
+        plan = survey.survey_plan
+        return render(request,'pchart/all_pchart.html',{'nos':nos, 'plan':plan, 'pchart':pchart})
+    else:
+        return redirect('/logout')
+
+def storeAllPchart(request, pk):
+    if 'user' in request.session:
+        pchart = Pchart.objects.get(pchart_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        tempall = []
+        tempdefect = []
+        iter = 1
+
+        pchart.pchart_all = request.POST.getlist('pchart_all')
+        for i in range(len(pchart.pchart_all)):
+            tempall.append(float(pchart.pchart_all[i]))
+
+        pchart.pchart_defect = request.POST.getlist('pchart_defect')
+       
+                
+        pchart.pchart_all = tempall
+        pchart.save()
+
+        return redirect('coretoolcrud:viewFinalPchart', pk)    
+    else:
+        return redirect('/logout')     
+
+def deletePchart(request, pk):
+    if 'user' in request.session:
+        pchart = Pchart.objects.get(pchart_survey_id = pk)
+        pchart.delete()
+        messages.success(request, "P Chart berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pk)
+    else:
+        return redirect('/logout')
+
+def viewFinalPchart(request, pk):
+    if 'user' in request.session:
+        pchart = Pchart.objects.get(pchart_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        ##############################
+
+        all = pchart.pchart_all
+
+        cattotal = []
+        for i in all:
+            cattotal.append(sum(i))
+
+        pcattotal = []
+        for i in cattotal:
+            pcattotal.append(i / sum(cattotal) * 100)
+        
+        unittotal = []
+        temp = []
+
+        for i in range(pchart.pchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        p = []
+
+        for i in unittotal:
+            p.append(i / pchart.pchart_sample)
+        
+        pbar = sum(unittotal) / (pchart.pchart_sample * pchart.pchart_freq)
+        gambar = (pbar * (1 - pbar) / pchart.pchart_sample) ** 0.5
+        ucl = pbar + 3 * gambar
+        lcl = 0
+        
+        pbarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+
+        for i in range(pchart.pchart_freq):
+            bot.append(i)
+            pbarlist.append(pbar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+
+        ###############################
+
+
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
+        p.line(bot, pbarlist, legend_label="P Bar", color="red", line_width=2)
+        p.line(bot, p, legend_label="P", color="yellow", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptpchart, divpchart = components(p)
+
+         #####################################
+
+        p = figure(title="Stdev", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, uclmrlist, legend_label="UCLMR", line_width=2)
+        p.line(bot, lclmrlist, legend_label="LCLMR", color="green", line_width=2)
+        p.line(bot, mov, legend_label="Movement Range", color="green", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptsd, divsd = components(p)
+
+        #####################################
+
+        
+        gabung = zip(pchart.pchart_defect, pchart.pchart_all)
+        freq = range(1, int(pchart.pchart_freq)+1)
+
+        return render(request,'pchart/collection_pchart.html', {'pchart':pchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'scriptpchart':scriptpchart, 'divpchart':divpchart})
+    else:
+        return redirect('/logout')
+
+def viewPrintPchart(request, pk):
+    if 'user' in request.session:
+        pchart = Pchart.objects.get(pchart_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        ##############################
+
+        all = pchart.pchart_all
+
+        cattotal = []
+        for i in all:
+            cattotal.append(sum(i))
+
+        pcattotal = []
+        for i in cattotal:
+            pcattotal.append(i / sum(cattotal) * 100)
+        
+        unittotal = []
+        temp = []
+
+        for i in range(pchart.pchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        p = []
+
+        for i in unittotal:
+            p.append(i / pchart.pchart_sample)
+        
+        pbar = sum(unittotal) / (pchart.pchart_sample * pchart.pchart_freq)
+        gambar = (pbar * (1 - pbar) / pchart.pchart_sample) ** 0.5
+        ucl = pbar + 3 * gambar
+        lcl = 0
+        
+        pbarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+
+        for i in range(pchart.pchart_freq):
+            bot.append(i)
+            pbarlist.append(pbar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+
+        ###############################
+
+
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
+        p.line(bot, pbarlist, legend_label="P Bar", color="red", line_width=2)
+        p.line(bot, p, legend_label="P", color="yellow", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptpchart, divpchart = components(p)
+
+         #####################################
+
+        p = figure(title="Stdev", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, uclmrlist, legend_label="UCLMR", line_width=2)
+        p.line(bot, lclmrlist, legend_label="LCLMR", color="green", line_width=2)
+        p.line(bot, mov, legend_label="Movement Range", color="green", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptsd, divsd = components(p)
+
+        #####################################
+
+        
+        gabung = zip(pchart.pchart_defect, pchart.pchart_all)
+        freq = range(1, int(pchart.pchart_freq)+1)
+
+        return render(request,'pchart/print_pchart.html', {'pchart':pchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'scriptpchart':scriptpchart, 'divpchart':divpchart})
     else:
         return redirect('/logout')
