@@ -134,8 +134,8 @@ class Pchart(models.Model):
     pchart_sample = models.IntegerField()
     pchart_freq = models.IntegerField()
     pchart_all = models.JSONField(null=True)
-    pchart_defect = models.TextField()
-    pchart_measured = models.TextField
+    pchart_defect = models.JSONField(null=True)
+    pchart_measured = models.TextField()
     pchart_reviewed = models.TextField()
     pchart_reason = models.TextField(null=True)
 

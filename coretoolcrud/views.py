@@ -6151,6 +6151,7 @@ def storeVxbarr(request, pk):
         vxbarr.vxbarr_subgroup = request.POST.get('vxbarr_subgroup')
         vxbarr.vxbarr_measured = request.POST.get('vxbarr_measured')
         vxbarr.vxbarr_reviewed = request.POST.get('vxbarr_reviewed')
+        vxbarr.vxbarr_reason = request.POST.get('vxbarr_reason')
         vxbarr.save()
 
         survey = Survey.objects.get(id = pk)
@@ -6565,6 +6566,7 @@ def storeSbarr(request, pk):
         sbarr.sbarr_subgroup = request.POST.get('sbarr_subgroup')
         sbarr.sbarr_measured = request.POST.get('sbarr_measured')
         sbarr.sbarr_reviewed = request.POST.get('sbarr_reviewed')
+        sbarr.sbarr_reason = request.POST.get('sbarr_reason')
         sbarr.save()
 
         survey = Survey.objects.get(id = pk)
@@ -6992,6 +6994,7 @@ def storeImr(request, pk):
         imr.imr_subgroup = request.POST.get('imr_subgroup')
         imr.imr_measured = request.POST.get('imr_measured')
         imr.imr_reviewed = request.POST.get('imr_reviewed')
+        imr.imr_reason = request.POST.get('imr_reason')
         imr.save()
 
         survey = Survey.objects.get(id = pk)
@@ -7372,10 +7375,7 @@ def storePchart(request, pk):
         pchart.pchart_reviewed = request.POST.get('pchart_reviewed')
         pchart.save()
 
-        survey = Survey.objects.get(id = pk)
-        nos = range(1, int(pchart.pchart_freq) + 1)
-        plan = survey.survey_plan
-        return render(request,'pchart/all_pchart.html',{'nos':nos, 'plan':plan, 'pchart':pchart})
+        return redirect('coretoolcrud:viewAllPchart', pk)    
     else:
         return redirect('/logout')
 
@@ -7385,19 +7385,33 @@ def storeAllPchart(request, pk):
         survey = Survey.objects.get(id = pk)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
-        days = monthrange(year, month)[1]
         tempall = []
+        tempall1 = []
+        tempall2 = []
         tempdefect = []
         iter = 1
 
-        pchart.pchart_all = request.POST.getlist('pchart_all')
-        for i in range(len(pchart.pchart_all)):
-            tempall.append(float(pchart.pchart_all[i]))
+        tempall = request.POST.getlist('pchart_all')
+        for i in range(len(tempall)):
+            tempall1.append(float(tempall[i]))
 
-        pchart.pchart_defect = request.POST.getlist('pchart_defect')
+        defect = request.POST.get('pchart_defect')
+        tempdefect.append(defect)
        
-                
-        pchart.pchart_all = tempall
+        tempall2.append(tempall1)
+
+        if pchart.pchart_all is None:
+            pchart.pchart_all = tempall2
+        elif pchart.pchart_all is not None:
+            pchart.pchart_all.append(tempall1)
+        
+        if pchart.pchart_defect is None:
+            pchart.pchart_defect = tempdefect
+        elif pchart.pchart_defect is not None:
+            pchart.pchart_defect.append(defect)
+
+        # pchart.pchart_all = pchart.pchart_all.append(tempall1)
+        # pchart.pchart_defect = pchart.pchart_defect.append(tempdefect)
         pchart.save()
 
         return redirect('coretoolcrud:viewFinalPchart', pk)    
@@ -7417,9 +7431,6 @@ def viewFinalPchart(request, pk):
     if 'user' in request.session:
         pchart = Pchart.objects.get(pchart_survey_id = pk)
         survey = Survey.objects.get(id = pk)
-        month = survey.survey_plan.month
-        year = survey.survey_plan.year
-        days = monthrange(year, month)[1]
         ##############################
 
         all = pchart.pchart_all
@@ -7441,10 +7452,10 @@ def viewFinalPchart(request, pk):
             unittotal.append(sum(temp))
             temp = []
         
-        p = []
+        plist = []
 
         for i in unittotal:
-            p.append(i / pchart.pchart_sample)
+            plist.append(i / pchart.pchart_sample)
         
         pbar = sum(unittotal) / (pchart.pchart_sample * pchart.pchart_freq)
         gambar = (pbar * (1 - pbar) / pchart.pchart_sample) ** 0.5
@@ -7457,7 +7468,7 @@ def viewFinalPchart(request, pk):
         bot = []
 
         for i in range(pchart.pchart_freq):
-            bot.append(i)
+            bot.append(i+1)
             pbarlist.append(pbar)
             ucllist.append(ucl)
             lcllist.append(lcl)
@@ -7465,22 +7476,17 @@ def viewFinalPchart(request, pk):
         ###############################
 
 
-        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
         p.line(bot, ucllist, legend_label="UCL", line_width=2)
         p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
         p.line(bot, pbarlist, legend_label="P Bar", color="red", line_width=2)
-        p.line(bot, p, legend_label="P", color="yellow", line_width=2)
+        p.line(bot, plist, legend_label="P", color="yellow", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptpchart, divpchart = components(p)
 
          #####################################
 
-        p = figure(title="Stdev", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
-        p.line(bot, uclmrlist, legend_label="UCLMR", line_width=2)
-        p.line(bot, lclmrlist, legend_label="LCLMR", color="green", line_width=2)
-        p.line(bot, mov, legend_label="Movement Range", color="green", line_width=2)
-        p.xaxis.major_label_orientation = "vertical"
-        scriptsd, divsd = components(p)
+
 
         #####################################
 
@@ -7488,17 +7494,26 @@ def viewFinalPchart(request, pk):
         gabung = zip(pchart.pchart_defect, pchart.pchart_all)
         freq = range(1, int(pchart.pchart_freq)+1)
 
-        return render(request,'pchart/collection_pchart.html', {'pchart':pchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'scriptpchart':scriptpchart, 'divpchart':divpchart})
+        return render(request,'pchart/collection_pchart.html', {'pchart':pchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'pbar':pbar, 'ucl':ucl, 'lcl':lcl, 'scriptpchart':scriptpchart, 'divpchart':divpchart})
     else:
         return redirect('/logout')
+
+def viewAllPchart(request, pk):
+    if 'user' in request.session:
+        try:
+            pchart = Pchart.objects.get(pchart_survey_id = pk)
+            nos = range(1, int(pchart.pchart_freq) + 1)
+            return render(request,'pchart/all_pchart.html',{'nos':nos, 'pchart':pchart})
+        
+        except Pchart.DoesNotExist:
+            return render(request,'pchart/pchart.html',{'pk':pk})
+    else:
+        return redirect('/logout')     
 
 def viewPrintPchart(request, pk):
     if 'user' in request.session:
         pchart = Pchart.objects.get(pchart_survey_id = pk)
         survey = Survey.objects.get(id = pk)
-        month = survey.survey_plan.month
-        year = survey.survey_plan.year
-        days = monthrange(year, month)[1]
         ##############################
 
         all = pchart.pchart_all
@@ -7520,10 +7535,10 @@ def viewPrintPchart(request, pk):
             unittotal.append(sum(temp))
             temp = []
         
-        p = []
+        plist = []
 
         for i in unittotal:
-            p.append(i / pchart.pchart_sample)
+            plist.append(i / pchart.pchart_sample)
         
         pbar = sum(unittotal) / (pchart.pchart_sample * pchart.pchart_freq)
         gambar = (pbar * (1 - pbar) / pchart.pchart_sample) ** 0.5
@@ -7536,7 +7551,7 @@ def viewPrintPchart(request, pk):
         bot = []
 
         for i in range(pchart.pchart_freq):
-            bot.append(i)
+            bot.append(i+1)
             pbarlist.append(pbar)
             ucllist.append(ucl)
             lcllist.append(lcl)
@@ -7544,22 +7559,17 @@ def viewPrintPchart(request, pk):
         ###############################
 
 
-        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
         p.line(bot, ucllist, legend_label="UCL", line_width=2)
         p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
         p.line(bot, pbarlist, legend_label="P Bar", color="red", line_width=2)
-        p.line(bot, p, legend_label="P", color="yellow", line_width=2)
+        p.line(bot, plist, legend_label="P", color="yellow", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptpchart, divpchart = components(p)
 
          #####################################
 
-        p = figure(title="Stdev", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
-        p.line(bot, uclmrlist, legend_label="UCLMR", line_width=2)
-        p.line(bot, lclmrlist, legend_label="LCLMR", color="green", line_width=2)
-        p.line(bot, mov, legend_label="Movement Range", color="green", line_width=2)
-        p.xaxis.major_label_orientation = "vertical"
-        scriptsd, divsd = components(p)
+
 
         #####################################
 
@@ -7567,6 +7577,13 @@ def viewPrintPchart(request, pk):
         gabung = zip(pchart.pchart_defect, pchart.pchart_all)
         freq = range(1, int(pchart.pchart_freq)+1)
 
-        return render(request,'pchart/print_pchart.html', {'pchart':pchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'scriptpchart':scriptpchart, 'divpchart':divpchart})
+        return render(request,'pchart/print_pchart.html', {'pchart':pchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'pbar':pbar, 'ucl':ucl, 'lcl':lcl, 'scriptpchart':scriptpchart, 'divpchart':divpchart})
+    else:
+        return redirect('/logout')
+
+def viewListPchart(request, pk):
+    if 'user' in request.session:
+        pchart = Pchart.objects.filter(pchart_survey_id=pk)
+        return render(request,'pchart/list_pchart.html',{'pchart':pchart})
     else:
         return redirect('/logout')

@@ -110,6 +110,18 @@
         <form action="{% url 'coretoolcrud:storeSbarr' pk %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group"><br>
+              <label for="exampleInputPassword1">Reason For Rev</label>
+              <select name="sbarr_reason" id="demoSelectbox" class="form-control">
+                  <option value="" selected disabled hidden>Please Choose</option>
+                  <option>New Model</option>
+                  <option>Change</option>
+                  <option>Massprod Monitoring</option>
+                  <option>Problem</option>
+                  <option>External Request</option>
+                  <option>Control Plan</option>
+              </select>
+          </div>
+            <div class="form-group"><br>
               <label for="exampleInputEmail1">LSL</label>
               <input class="form-control" name="sbarr_lsl" id="demoFormHorizontalEmail" type="number" required />
           </div>
