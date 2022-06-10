@@ -83,7 +83,7 @@
           <hr>
 
         </div>
-        <form action="{% url 'coretoolcrud:storeAllPchart' pchart.pchart_survey_id %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'coretoolcrud:storeAllPchart' pchart.id pchart.pchart_survey_id %}" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           
         

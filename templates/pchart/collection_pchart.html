@@ -211,9 +211,9 @@
                      
                       
                     
-                      <a href="{% url 'coretoolcrud:deletePchart' pchart.pchart_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                      <a href="{% url 'coretoolcrud:viewPrintPchart' pchart.pchart_survey_id %}" class="btn btn-info">Print</a>
-                      <a href="{% url 'coretoolcrud:viewAllPchart' pchart.pchart_survey_id %}" class="btn btn-info">Add Defect</a>
+                      <a href="{% url 'coretoolcrud:deletePchart' pchart.id pchart.pchart_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                      <a href="{% url 'coretoolcrud:viewPrintPchart' pchart.id pchart.pchart_survey_id %}" class="btn btn-info">Print</a>
+                      <a href="{% url 'coretoolcrud:viewAllPchart' pchart.id pchart.pchart_survey_id %}" class="btn btn-info">Add Defect</a>
                       <br><br>
 
         </div>

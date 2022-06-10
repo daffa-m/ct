@@ -93,14 +93,14 @@
         </div>
 
       
-          <br><h3>P Chart Study That Has Been Done: </h3>
+          <br><h3>I-MR Study That Has Been Done: </h3>
         <div class="row" data-masonry='{"percentPosition": true }'>
-          {% for pchart_list in pchart %}
+          {% for imr_list in imr %}
             <div class="col-sm-3 col-md-4 py-3">
                 <div class="card border-primary">
                     <div class="card-body">
                      
-                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewPchart' pchart_list.id pchart_list.pchart_survey_id %}">{{ pchart_list.pchart_reason }}</a></h3>
+                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewImr' imr_list.id imr_list.imr_survey_id %}">{{ imr_list.imr_reason }}</a></h3>
                       
                     </div>
                 </div>
@@ -109,7 +109,7 @@
             
         </div>
        
-        <a href="{% url 'coretoolcrud:viewPchart' 0 survey.id %}" class="btn btn-primary"><span>New Study</span></a>
+        <a href="{% url 'coretoolcrud:viewImr' 0 survey.id %}" class="btn btn-primary"><span>New Study</span></a>
        
     
     </div>

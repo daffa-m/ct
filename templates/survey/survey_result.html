@@ -168,13 +168,13 @@
                         {% elif study == "Linearity" %}
                         <h3 class="card-title"><a href="{% url 'coretoolcrud:viewLinearity' survey.id %}">{{ study }}</a></h3>
                         {% elif study == "Xbar-R" %}
-                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewVxbarr' survey.id %}">{{ study }}</a></h3>
+                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewListVxbarr' survey.id %}">{{ study }}</a></h3>
                         {% elif study == "Xbar-S" %}
-                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewSbarr' survey.id %}">{{ study }}</a></h3>
+                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewListSbarr' survey.id %}">{{ study }}</a></h3>
                         {% elif study == "I-MR" %}
-                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewImr' survey.id %}">{{ study }}</a></h3>
+                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewListImr' survey.id %}">{{ study }}</a></h3>
                         {% elif study == "P Chart" %}
-                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewPchart' survey.id %}">{{ study }}</a></h3>
+                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewListPchart' survey.id %}">{{ study }}</a></h3>
                         {% else %}
                         <h3 class="card-title">{{ study }}</h3>
                         {% endif %}

@@ -250,8 +250,8 @@
                       </div>
                       <br><br>
                     
-                      <a href="{% url 'coretoolcrud:deleteImr' imr.imr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                      <a href="{% url 'coretoolcrud:viewPrintImr' imr.imr_survey_id %}" class="btn btn-info">Print</a>
+                      <a href="{% url 'coretoolcrud:deleteImr' imr.id imr.imr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                      <a href="{% url 'coretoolcrud:viewPrintImr' imr.id imr.imr_survey_id %}" class="btn btn-info">Print</a>
                       <br><br>
 
         </div>

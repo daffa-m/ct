@@ -249,8 +249,8 @@
                       </div>
                       <br><br>
                     
-                      <a href="{% url 'coretoolcrud:deleteVxbarr' vxbarr.vxbarr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                    <a href="{% url 'coretoolcrud:viewPrintVxbarr' vxbarr.vxbarr_survey_id %}" class="btn btn-info">Print</a>
+                      <a href="{% url 'coretoolcrud:deleteVxbarr' vxbarr.id vxbarr.vxbarr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    <a href="{% url 'coretoolcrud:viewPrintVxbarr' vxbarr.id vxbarr.vxbarr_survey_id %}" class="btn btn-info">Print</a>
                       <br><br>
 
         </div>

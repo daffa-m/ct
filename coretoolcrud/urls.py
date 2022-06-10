@@ -5,10 +5,10 @@ from .views import viewGrrXbarr, viewPrintGrrXbarr, viewCommentGrrXbarr, viewFin
 from .views import viewCross, viewPrintCross, viewCommentCross, viewFinalCross, storeCross, storeCommentCross, storeAllCross, deleteCross
 from .views import viewNested, viewPrintNested, viewCommentNested, viewFinalNested, storeNested, storeCommentNested, storeAllNested, deleteNested
 from .views import viewLinearity, viewPrintLinearity, viewAverageLinearity, viewMasterLinearity, viewCommentLinearity, viewFinalLinearity, storeLinearity, storeMasterLinearity, storeAverageLinearity, storeCommentLinearity, storeAllLinearity, deleteLinearity
-from .views import viewVxbarr, viewFinalVxbarr, viewCommentVxbarr, viewPrintVxbarr, storeVxbarr, storeCommentVxbarr, storeAllVxbarr, deleteVxbarr
-from .views import viewSbarr, viewFinalSbarr, viewCommentSbarr, viewPrintSbarr, storeSbarr, storeCommentSbarr, storeAllSbarr, deleteSbarr
-from .views import viewImr, viewFinalImr, viewCommentImr, viewPrintImr, storeImr, storeCommentImr, storeAllImr, deleteImr
-from .views import viewPchart, viewFinalPchart, viewPrintPchart, storePchart, storeAllPchart, viewAllPchart, deletePchart
+from .views import viewVxbarr, viewFinalVxbarr, viewCommentVxbarr, viewPrintVxbarr, storeVxbarr, storeCommentVxbarr, storeAllVxbarr, deleteVxbarr, viewAllVxbarr, viewListVxbarr
+from .views import viewSbarr, viewFinalSbarr, viewCommentSbarr, viewPrintSbarr, storeSbarr, storeCommentSbarr, storeAllSbarr, deleteSbarr, viewAllSbarr, viewListSbarr
+from .views import viewImr, viewFinalImr, viewCommentImr, viewPrintImr, storeImr, storeCommentImr, storeAllImr, deleteImr, viewAllImr, viewListImr
+from .views import viewPchart, viewFinalPchart, viewPrintPchart, storePchart, storeAllPchart, viewAllPchart, viewListPchart, deletePchart
 from .views import viewListSurvey, viewDetailSurvey, viewSurvey, viewManual, viewEditSurvey, viewEditManual, storeManual, storeSurvey, storeEditManual, storeEditSurvey, deleteSurvey
 from .views import viewLogin, login, logout
 app_name = "coretoolcrud"
@@ -73,39 +73,46 @@ urlpatterns = [
     path('storeCommentLinearity/<int:pk>',storeCommentLinearity,name='storeCommentLinearity'),
     path('deleteLinearity/<int:pk>',deleteLinearity,name='deleteLinearity'),
 
-    path('viewVxbarr/<int:pk>',viewVxbarr,name='viewVxbarr'),
-    path('viewFinalVxbarr/<int:pk>',viewFinalVxbarr,name='viewFinalVxbarr'),
-    path('storeVxbarr/<int:pk>',storeVxbarr,name='storeVxbarr'),
-    path('viewCommentVxbarr/<int:pk>',viewCommentVxbarr,name='viewCommentVxbarr'),
-    path('viewPrintVxbarr/<int:pk>',viewPrintVxbarr,name='viewPrintVxbarr'),
-    path('storeCommentVxbarr/<int:pk>',storeCommentVxbarr,name='storeCommentVxbarr'),
-    path('storeAllVxbarr/<int:pk>',storeAllVxbarr,name='storeAllVxbarr'),
-    path('deleteVxbarr/<int:pk>',deleteVxbarr,name='deleteVxbarr'),
+    path('viewVxbarr/<int:pkid>/<int:pksurveyid>',viewVxbarr,name='viewVxbarr'),
+    path('viewFinalVxbarr/<int:pkid>/<int:pksurveyid>',viewFinalVxbarr,name='viewFinalVxbarr'),
+    path('storeVxbarr/<int:pkid>/<int:pksurveyid>',storeVxbarr,name='storeVxbarr'),
+    path('viewCommentVxbarr/<int:pkid>/<int:pksurveyid>',viewCommentVxbarr,name='viewCommentVxbarr'),
+    path('viewPrintVxbarr/<int:pkid>/<int:pksurveyid>',viewPrintVxbarr,name='viewPrintVxbarr'),
+    path('storeCommentVxbarr/<int:pkid>/<int:pksurveyid>',storeCommentVxbarr,name='storeCommentVxbarr'),
+    path('storeAllVxbarr/<int:pkid>/<int:pksurveyid>',storeAllVxbarr,name='storeAllVxbarr'),
+    path('deleteVxbarr/<int:pkid>/<int:pksurveyid>',deleteVxbarr,name='deleteVxbarr'),
+    path('viewAllVxbarr/<int:pkid>/<int:pksurveyid>',viewAllVxbarr,name='viewAllVxbarr'),
+    path('viewListVxbarr/<int:pk>',viewListVxbarr,name='viewListVxbarr'),
 
-    path('viewSbarr/<int:pk>',viewSbarr,name='viewSbarr'),
-    path('viewFinalSbarr/<int:pk>',viewFinalSbarr,name='viewFinalSbarr'),
-    path('storeSbarr/<int:pk>',storeSbarr,name='storeSbarr'),
-    path('viewCommentSbarr/<int:pk>',viewCommentSbarr,name='viewCommentSbarr'),
-    path('viewPrintSbarr/<int:pk>',viewPrintSbarr,name='viewPrintSbarr'),
-    path('storeCommentSbarr/<int:pk>',storeCommentSbarr,name='storeCommentSbarr'),
-    path('storeAllSbarr/<int:pk>',storeAllSbarr,name='storeAllSbarr'),
-    path('deleteSbarr/<int:pk>',deleteSbarr,name='deleteSbarr'),
+    path('viewSbarr/<int:pkid>/<int:pksurveyid>',viewSbarr,name='viewSbarr'),
+    path('viewFinalSbarr/<int:pkid>/<int:pksurveyid>',viewFinalSbarr,name='viewFinalSbarr'),
+    path('storeSbarr/<int:pkid>/<int:pksurveyid>',storeSbarr,name='storeSbarr'),
+    path('viewCommentSbarr/<int:pkid>/<int:pksurveyid>',viewCommentSbarr,name='viewCommentSbarr'),
+    path('viewPrintSbarr/<int:pkid>/<int:pksurveyid>',viewPrintSbarr,name='viewPrintSbarr'),
+    path('storeCommentSbarr/<int:pkid>/<int:pksurveyid>',storeCommentSbarr,name='storeCommentSbarr'),
+    path('storeAllSbarr/<int:pkid>/<int:pksurveyid>',storeAllSbarr,name='storeAllSbarr'),
+    path('deleteSbarr/<int:pkid>/<int:pksurveyid>',deleteSbarr,name='deleteSbarr'),
+    path('viewAllSbarr/<int:pkid>/<int:pksurveyid>',viewAllSbarr,name='viewAllSbarr'),
+    path('viewListSbarr/<int:pk>',viewListSbarr,name='viewListSbarr'),
 
-    path('viewImr/<int:pk>',viewImr,name='viewImr'),
-    path('viewFinalImr/<int:pk>',viewFinalImr,name='viewFinalImr'),
-    path('storeImr/<int:pk>',storeImr,name='storeImr'),
-    path('viewCommentImr/<int:pk>',viewCommentImr,name='viewCommentImr'),
-    path('viewPrintImr/<int:pk>',viewPrintImr,name='viewPrintImr'),
-    path('storeCommentImr/<int:pk>',storeCommentImr,name='storeCommentImr'),
-    path('storeAllImr/<int:pk>',storeAllImr,name='storeAllImr'),
-    path('deleteImr/<int:pk>',deleteImr,name='deleteImr'),
+    path('viewImr/<int:pkid>/<int:pksurveyid>',viewImr,name='viewImr'),
+    path('viewFinalImr/<int:pkid>/<int:pksurveyid>',viewFinalImr,name='viewFinalImr'),
+    path('storeImr/<int:pkid>/<int:pksurveyid>',storeImr,name='storeImr'),
+    path('viewCommentImr/<int:pkid>/<int:pksurveyid>',viewCommentImr,name='viewCommentImr'),
+    path('viewPrintImr/<int:pkid>/<int:pksurveyid>',viewPrintImr,name='viewPrintImr'),
+    path('storeCommentImr/<int:pkid>/<int:pksurveyid>',storeCommentImr,name='storeCommentImr'),
+    path('storeAllImr/<int:pkid>/<int:pksurveyid>',storeAllImr,name='storeAllImr'),
+    path('deleteImr/<int:pkid>/<int:pksurveyid>',deleteImr,name='deleteImr'),
+    path('viewAllImr/<int:pkid>/<int:pksurveyid>',viewAllImr,name='viewAllImr'),
+    path('viewListImr/<int:pk>',viewListImr,name='viewListImr'),
 
-    path('viewPchart/<int:pk>',viewPchart,name='viewPchart'),
-    path('viewFinalPchart/<int:pk>',viewFinalPchart,name='viewFinalPchart'),
-    path('storePchart/<int:pk>',storePchart,name='storePchart'),
-    path('viewPrintPchart/<int:pk>',viewPrintPchart,name='viewPrintPchart'),
-    path('storeAllPchart/<int:pk>',storeAllPchart,name='storeAllPchart'),
-    path('viewAllPchart/<int:pk>',viewAllPchart,name='viewAllPchart'),
-    path('deletePchart/<int:pk>',deletePchart,name='deletePchart'),
+    path('viewPchart/<int:pkid>/<int:pksurveyid>',viewPchart,name='viewPchart'),
+    path('viewFinalPchart/<int:pkid>/<int:pksurveyid>',viewFinalPchart,name='viewFinalPchart'),
+    path('storePchart/<int:pkid>/<int:pksurveyid>',storePchart,name='storePchart'),
+    path('viewPrintPchart/<int:pkid>/<int:pksurveyid>',viewPrintPchart,name='viewPrintPchart'),
+    path('storeAllPchart/<int:pkid>/<int:pksurveyid>',storeAllPchart,name='storeAllPchart'),
+    path('viewAllPchart/<int:pkid>/<int:pksurveyid>',viewAllPchart,name='viewAllPchart'),
+    path('viewListPchart/<int:pk>',viewListPchart,name='viewListPchart'),
+    path('deletePchart/<int:pkid>/<int:pksurveyid>',deletePchart,name='deletePchart'),
 
 ]

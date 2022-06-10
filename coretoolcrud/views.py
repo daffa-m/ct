@@ -6114,14 +6114,14 @@ def deleteLinearity(request, pk):
 
 # Xbarr
 
-def viewVxbarr(request, pk):
+def viewVxbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
         try:
-            vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
+            vxbarr = Vxbarr.objects.get(id = pkid)
             if vxbarr.vxbarr_all:
-                return redirect('coretoolcrud:viewFinalVxbarr', pk)
+                return redirect('coretoolcrud:viewFinalVxbarr', pkid, pksurveyid)
             else:
-                survey = Survey.objects.get(id = pk)
+                survey = Survey.objects.get(id = pksurveyid)
                 month = survey.survey_plan.month
                 year = survey.survey_plan.year
                 days = range(1, monthrange(year, month)[1]+1)
@@ -6131,20 +6131,20 @@ def viewVxbarr(request, pk):
                 return render(request,'xbarr/all_xbarr.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'vxbarr':vxbarr})
             
         except Vxbarr.DoesNotExist:
-            return render(request,'xbarr/xbarr.html',{'pk':pk})
+            return render(request,'xbarr/xbarr.html',{'pkid':pkid, 'pksurveyid':pksurveyid})
     else:
         return redirect('/logout')
 
-def storeVxbarr(request, pk):
+def storeVxbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
         try:
-            vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
+            vxbarr = Vxbarr.objects.get(id = pkid)
             vxbarr.delete()
         except Vxbarr.DoesNotExist:
             pass
 
         vxbarr = Vxbarr()
-        vxbarr.vxbarr_survey_id = pk
+        vxbarr.vxbarr_survey_id = pksurveyid
         vxbarr.vxbarr_usl = request.POST.get('vxbarr_usl')
         vxbarr.vxbarr_lsl = request.POST.get('vxbarr_lsl')
         vxbarr.vxbarr_unit = request.POST.get('vxbarr_unit')
@@ -6154,7 +6154,7 @@ def storeVxbarr(request, pk):
         vxbarr.vxbarr_reason = request.POST.get('vxbarr_reason')
         vxbarr.save()
 
-        survey = Survey.objects.get(id = pk)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = range(1, monthrange(year, month)[1]+1)
@@ -6165,10 +6165,10 @@ def storeVxbarr(request, pk):
     else:
         return redirect('/logout')
 
-def storeAllVxbarr(request, pk):
+def storeAllVxbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        vxbarr = Vxbarr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -6196,19 +6196,19 @@ def storeAllVxbarr(request, pk):
     else:
         return redirect('/logout')        
 
-def deleteVxbarr(request, pk):
+def deleteVxbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
+        vxbarr = Vxbarr.objects.get(id = pkid)
         vxbarr.delete()
         messages.success(request, "Xbar R berhasil dihapus")
-        return redirect('coretoolcrud:viewDetailSurvey', pk)
+        return redirect('coretoolcrud:viewDetailSurvey', pksurveyid)
     else:
         return redirect('/logout')
 
-def viewCommentVxbarr(request, pk):
+def viewCommentVxbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        vxbarr = Vxbarr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -6308,23 +6308,23 @@ def viewCommentVxbarr(request, pk):
     else:
         return redirect('/logout')
 
-def storeCommentVxbarr(request, pk):
+def storeCommentVxbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        vxbarr = Vxbarr.objects.get(id = pk)
+        vxbarr = Vxbarr.objects.get(id = pkid)
 
         vxbarr.vxbarr_stability = request.POST.get('vxbarr_stability')
         vxbarr.vxbarr_capability = request.POST.get('vxbarr_capability')
         vxbarr.save()
 
         # return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey})
-        return redirect('coretoolcrud:viewFinalVxbarr',vxbarr.vxbarr_survey_id )
+        return redirect('coretoolcrud:viewFinalVxbarr', pkid, pksurveyid)
     else:
         return redirect('/logout')
 
-def viewFinalVxbarr(request, pk):
+def viewFinalVxbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        vxbarr = Vxbarr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -6424,10 +6424,10 @@ def viewFinalVxbarr(request, pk):
     else:
         return redirect('/logout')
 
-def viewPrintVxbarr(request, pk):
+def viewPrintVxbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        vxbarr = Vxbarr.objects.get(vxbarr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        vxbarr = Vxbarr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -6527,16 +6527,42 @@ def viewPrintVxbarr(request, pk):
     else:
         return redirect('/logout')
 
-# Sbarr
-
-def viewSbarr(request, pk):
+def viewAllVxbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
         try:
-            sbarr = Sbarr.objects.get(sbarr_survey_id = pk)
+            vxbarr = Vxbarr.objects.get(id = pkid)
+            survey = Survey.objects.get(id = pksurveyid)
+            month = survey.survey_plan.month
+            year = survey.survey_plan.year
+            days = range(1, monthrange(year, month)[1]+1)
+            subs = range(1, int(vxbarr.vxbarr_subgroup)+1)
+            sub = vxbarr.vxbarr_subgroup
+            plan = survey.survey_plan
+            return render(request,'xbarr/all_xbarr.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'vxbarr':vxbarr})
+        
+        except Pchart.DoesNotExist:
+            return redirect('coretoolcrud:viewVxbarr', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')   
+
+def viewListVxbarr(request, pk):
+    if 'user' in request.session:
+        vxbarr = Vxbarr.objects.filter(vxbarr_survey_id=pk)
+        survey = Survey.objects.get(id = pk)
+        return render(request,'xbarr/list_xbarr.html',{'vxbarr':vxbarr, 'survey':survey})
+    else:
+        return redirect('/logout')
+
+# Sbarr
+
+def viewSbarr(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            sbarr = Sbarr.objects.get(id = pkid)
             if sbarr.sbarr_all:
-                return redirect('coretoolcrud:viewFinalSbarr', pk)
+                return redirect('coretoolcrud:viewFinalSbarr', pkid, pksurveyid)
             else:
-                survey = Survey.objects.get(id = pk)
+                survey = Survey.objects.get(id = pksurveyid)
                 month = survey.survey_plan.month
                 year = survey.survey_plan.year
                 days = range(1, monthrange(year, month)[1]+1)
@@ -6546,20 +6572,20 @@ def viewSbarr(request, pk):
                 return render(request,'sbarr/all_sbarr.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'sbarr':sbarr})
             
         except Sbarr.DoesNotExist:
-            return render(request,'sbarr/sbarr.html',{'pk':pk})
+            return render(request,'sbarr/sbarr.html',{'pkid':pkid, 'pksurveyid':pksurveyid})
     else:
         return redirect('/logout')
 
-def storeSbarr(request, pk):
+def storeSbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
         try:
-            sbarr = Sbarr.objects.get(sbarr_survey_id = pk)
+            sbarr = Sbarr.objects.get(id = pkid)
             sbarr.delete()
         except Sbarr.DoesNotExist:
             pass
 
         sbarr = Sbarr()
-        sbarr.sbarr_survey_id = pk
+        sbarr.sbarr_survey_id = pksurveyid
         sbarr.sbarr_usl = request.POST.get('sbarr_usl')
         sbarr.sbarr_lsl = request.POST.get('sbarr_lsl')
         sbarr.sbarr_unit = request.POST.get('sbarr_unit')
@@ -6569,7 +6595,7 @@ def storeSbarr(request, pk):
         sbarr.sbarr_reason = request.POST.get('sbarr_reason')
         sbarr.save()
 
-        survey = Survey.objects.get(id = pk)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = range(1, monthrange(year, month)[1]+1)
@@ -6582,10 +6608,10 @@ def storeSbarr(request, pk):
     else:
         return redirect('/logout')
 
-def storeAllSbarr(request, pk):
+def storeAllSbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        sbarr = Sbarr.objects.get(sbarr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        sbarr = Sbarr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -6609,23 +6635,23 @@ def storeAllSbarr(request, pk):
         sbarr.sbarr_all = temptrial
         sbarr.save()
 
-        return redirect('coretoolcrud:viewCommentSbarr', pk)    
+        return redirect('coretoolcrud:viewCommentSbarr', pkid, pksurveyid)    
     else:
         return redirect('/logout')        
 
-def deleteSbarr(request, pk):
+def deleteSbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        sbarr = Sbarr.objects.get(sbarr_survey_id = pk)
+        sbarr = Sbarr.objects.get(id = pkid)
         sbarr.delete()
         messages.success(request, "Sbar R berhasil dihapus")
-        return redirect('coretoolcrud:viewDetailSurvey', pk)
+        return redirect('coretoolcrud:viewDetailSurvey', pksurveyid)
     else:
         return redirect('/logout')
 
-def viewCommentSbarr(request, pk):
+def viewCommentSbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        sbarr = Sbarr.objects.get(sbarr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        sbarr = Sbarr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -6729,23 +6755,23 @@ def viewCommentSbarr(request, pk):
     else:
         return redirect('/logout')
 
-def storeCommentSbarr(request, pk):
+def storeCommentSbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        sbarr = Sbarr.objects.get(id = pk)
+        sbarr = Sbarr.objects.get(id = pkid)
 
         sbarr.sbarr_stability = request.POST.get('sbarr_stability')
         sbarr.sbarr_capability = request.POST.get('sbarr_capability')
         sbarr.save()
 
         # return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey})
-        return redirect('coretoolcrud:viewFinalSbarr',sbarr.sbarr_survey_id )
+        return redirect('coretoolcrud:viewFinalSbarr', pkid, pksurveyid)
     else:
         return redirect('/logout')
 
-def viewFinalSbarr(request, pk):
+def viewFinalSbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        sbarr = Sbarr.objects.get(sbarr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        sbarr = Sbarr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -6849,10 +6875,10 @@ def viewFinalSbarr(request, pk):
     else:
         return redirect('/logout')
 
-def viewPrintSbarr(request, pk):
+def viewPrintSbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        sbarr = Sbarr.objects.get(sbarr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        sbarr = Sbarr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -6956,39 +6982,58 @@ def viewPrintSbarr(request, pk):
     else:
         return redirect('/logout')
 
-#I-MR
-
-def viewImr(request, pk):
+def viewAllSbarr(request, pkid, pksurveyid):
     if 'user' in request.session:
         try:
-            imr = Imr.objects.get(imr_survey_id = pk)
-            if imr.imr_all:
-                return redirect('coretoolcrud:viewFinalImr', pk)
-            else:
-                survey = Survey.objects.get(id = pk)
-                month = survey.survey_plan.month
-                year = survey.survey_plan.year
-                days = range(1, monthrange(year, month)[1]+1)
-                subs = range(1, int(imr.imr_subgroup)+1)
-                sub = imr.imr_subgroup
-                plan = survey.survey_plan
-                return render(request,'imr/all_imr.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'imr':imr})
-            
-        except Imr.DoesNotExist:
-            return render(request,'imr/imr.html',{'pk':pk})
+            sbarr = Sbarr.objects.get(id = pkid)
+            survey = Survey.objects.get(id = pksurveyid)
+            month = survey.survey_plan.month
+            year = survey.survey_plan.year
+            days = range(1, monthrange(year, month)[1]+1)
+            subs = range(1, int(sbarr.sbarr_subgroup)+1)
+            sub = sbarr.sbarr_subgroup
+            plan = survey.survey_plan
+            return render(request,'sbarr/all_sbarr.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'sbarr':sbarr})
+        
+        except Pchart.DoesNotExist:
+            return redirect('coretoolcrud:viewSbarr', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')     
+
+def viewListSbarr(request, pk):
+    if 'user' in request.session:
+        sbarr = Sbarr.objects.filter(sbarr_survey_id=pk)
+        survey = Survey.objects.get(id = pk)
+        return render(request,'sbarr/list_sbarr.html',{'sbarr':sbarr, 'survey':survey})
     else:
         return redirect('/logout')
 
-def storeImr(request, pk):
+#I-MR
+
+def viewImr(request, pkid, pksurveyid):
     if 'user' in request.session:
         try:
-            imr = Imr.objects.get(imr_survey_id = pk)
+            imr = Imr.objects.get(id = pkid)
+            if imr.imr_all:
+                return redirect('coretoolcrud:viewFinalImr', pkid, pksurveyid)
+            else:
+                return redirect('coretoolcrud:viewAllImr', pkid, pksurveyid)  
+            
+        except Imr.DoesNotExist:
+            return render(request,'imr/imr.html',{'pkid':pkid, 'pksurveyid':pksurveyid})
+    else:
+        return redirect('/logout')
+
+def storeImr(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            imr = Imr.objects.get(id = pkid)
             imr.delete()
         except Imr.DoesNotExist:
             pass
 
         imr = Imr()
-        imr.imr_survey_id = pk
+        imr.imr_survey_id = pksurveyid
         imr.imr_usl = request.POST.get('imr_usl')
         imr.imr_lsl = request.POST.get('imr_lsl')
         imr.imr_subgroup = request.POST.get('imr_subgroup')
@@ -6997,23 +7042,15 @@ def storeImr(request, pk):
         imr.imr_reason = request.POST.get('imr_reason')
         imr.save()
 
-        survey = Survey.objects.get(id = pk)
-        month = survey.survey_plan.month
-        year = survey.survey_plan.year
-        days = range(1, monthrange(year, month)[1]+1)
-        divs = range(1, int(imr.imr_subgroup) // 10 + 1)
-        mods = range(1, int(imr.imr_subgroup) % 10 + 1)
-        subs = range(1, int(imr.imr_subgroup)+1)
-        sub = imr.imr_subgroup
-        plan = survey.survey_plan
-        return render(request,'imr/all_imr.html',{'days':days, 'subs':subs, 'divs':divs, 'mods':mods, 'sub':sub, 'plan':plan, 'imr':imr})
+       
+        return redirect('coretoolcrud:viewAllImr', pkid, pksurveyid)  
     else:
         return redirect('/logout')
 
-def storeAllImr(request, pk):
+def storeAllImr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        imr = Imr.objects.get(imr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        imr = Imr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -7029,23 +7066,23 @@ def storeAllImr(request, pk):
         imr.imr_all = temppart
         imr.save()
 
-        return redirect('coretoolcrud:viewCommentImr', pk)    
+        return redirect('coretoolcrud:viewCommentImr', pkid, pksurveyid)    
     else:
         return redirect('/logout')        
 
-def deleteImr(request, pk):
+def deleteImr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        imr = Imr.objects.get(imr_survey_id = pk)
+        imr = Imr.objects.get(id = pkid)
         imr.delete()
         messages.success(request, "I-MR berhasil dihapus")
-        return redirect('coretoolcrud:viewDetailSurvey', pk)
+        return redirect('coretoolcrud:viewDetailSurvey', pksurveyid)
     else:
         return redirect('/logout')
 
-def viewCommentImr(request, pk):
+def viewCommentImr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        imr = Imr.objects.get(imr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        imr = Imr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -7066,7 +7103,7 @@ def viewCommentImr(request, pk):
         subgroup = [[2, 3.268, 1.88, 1.128, 0], [3, 2.574, 1.023, 1.693, 0], [4, 2.282, 0.729, 2.059, 0], [5, 2.114, 0.577, 2.326, 0]]
 
         for ele in subgroup:
-            if ele[0] == imr.imr_subgroup:
+            if ele[0] == 2:
                 d2 = ele[3]
                 d4 = ele[1]
                 a2 = ele[2]
@@ -7098,7 +7135,7 @@ def viewCommentImr(request, pk):
        
 
 
-        for i in range(days):
+        for i in range(imr.imr_subgroup):
             bot.append("T"+str(i+1))
             usllist.append(imr.imr_usl)
             lsllist.append(imr.imr_lsl)
@@ -7136,23 +7173,23 @@ def viewCommentImr(request, pk):
     else:
         return redirect('/logout')
 
-def storeCommentImr(request, pk):
+def storeCommentImr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        imr = Imr.objects.get(id = pk)
+        imr = Imr.objects.get(id = pkid)
 
         imr.imr_stability = request.POST.get('imr_stability')
         imr.imr_capability = request.POST.get('imr_capability')
         imr.save()
 
         # return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey})
-        return redirect('coretoolcrud:viewFinalImr',imr.imr_survey_id )
+        return redirect('coretoolcrud:viewFinalImr', pkid, pksurveyid )
     else:
         return redirect('/logout')
 
-def viewFinalImr(request, pk):
+def viewFinalImr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        imr = Imr.objects.get(imr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        imr = Imr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -7173,7 +7210,7 @@ def viewFinalImr(request, pk):
         subgroup = [[2, 3.268, 1.88, 1.128, 0], [3, 2.574, 1.023, 1.693, 0], [4, 2.282, 0.729, 2.059, 0], [5, 2.114, 0.577, 2.326, 0]]
 
         for ele in subgroup:
-            if ele[0] == imr.imr_subgroup:
+            if ele[0] == 2:
                 d2 = ele[3]
                 d4 = ele[1]
                 a2 = ele[2]
@@ -7205,7 +7242,7 @@ def viewFinalImr(request, pk):
        
 
 
-        for i in range(days):
+        for i in range(imr.imr_subgroup):
             bot.append("T"+str(i+1))
             usllist.append(imr.imr_usl)
             lsllist.append(imr.imr_lsl)
@@ -7243,10 +7280,10 @@ def viewFinalImr(request, pk):
     else:
         return redirect('/logout')
 
-def viewPrintImr(request, pk):
+def viewPrintImr(request, pkid, pksurveyid):
     if 'user' in request.session:
-        imr = Imr.objects.get(imr_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        imr = Imr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         month = survey.survey_plan.month
         year = survey.survey_plan.year
         days = monthrange(year, month)[1]
@@ -7267,7 +7304,7 @@ def viewPrintImr(request, pk):
         subgroup = [[2, 3.268, 1.88, 1.128, 0], [3, 2.574, 1.023, 1.693, 0], [4, 2.282, 0.729, 2.059, 0], [5, 2.114, 0.577, 2.326, 0]]
 
         for ele in subgroup:
-            if ele[0] == imr.imr_subgroup:
+            if ele[0] == 2:
                 d2 = ele[3]
                 d4 = ele[1]
                 a2 = ele[2]
@@ -7299,7 +7336,7 @@ def viewPrintImr(request, pk):
        
 
 
-        for i in range(days):
+        for i in range(imr.imr_subgroup):
             bot.append("T"+str(i+1))
             usllist.append(imr.imr_usl)
             lsllist.append(imr.imr_lsl)
@@ -7337,59 +7374,81 @@ def viewPrintImr(request, pk):
     else:
         return redirect('/logout')
 
-# P Chart
-
-def viewPchart(request, pk):
+def viewAllImr(request, pkid, pksurveyid):
     if 'user' in request.session:
         try:
-            pchart = Pchart.objects.get(pchart_survey_id = pk)
-            if pchart.pchart_all:
-                return redirect('coretoolcrud:viewFinalPchart', pk)
-            else:
-                survey = Survey.objects.get(id = pk)
-                month = survey.survey_plan.month
-                year = survey.survey_plan.year
-                days = range(1, monthrange(year, month)[1]+1)
-                freq = pchart.pchart_freq
-                plan = survey.survey_plan
-                return render(request,'pchart/all_pchart.html',{'days':days, 'freq':freq, 'plan':plan, 'pchart':pchart})
-            
+            survey = Survey.objects.get(id = pksurveyid)
+            imr = Imr.objects.get(id = pkid)
+            month = survey.survey_plan.month
+            year = survey.survey_plan.year
+            # days = range(1, monthrange(year, month)[1]+1)
+            subs = range(1, int(imr.imr_subgroup)+1)
+            days = range(1, imr.imr_subgroup + 1)
+            sub = imr.imr_subgroup
+            plan = survey.survey_plan
+            return render(request,'imr/all_imr.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'imr':imr})
+        
         except Pchart.DoesNotExist:
-            return render(request,'pchart/pchart.html',{'pk':pk})
+            return redirect('coretoolcrud:viewImr', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')    
+
+def viewListImr(request, pk):
+    if 'user' in request.session:
+        imr = Imr.objects.filter(imr_survey_id=pk)
+        survey = Survey.objects.get(id = pk)
+        return render(request,'imr/list_imr.html',{'imr':imr, 'survey':survey})
     else:
         return redirect('/logout')
 
-def storePchart(request, pk):
+# P Chart
+
+def viewPchart(request, pkid, pksurveyid):
     if 'user' in request.session:
         try:
-            pchart = Pchart.objects.get(pchart_survey_id = pk)
+            pchart = Pchart.objects.get(id = pkid)
+            if pchart.pchart_all:
+                return redirect('coretoolcrud:viewFinalPchart', pkid, pksurveyid)
+            else:
+                survey = Survey.objects.get(id = pksurveyid)
+                freq = pchart.pchart_freq
+                plan = survey.survey_plan
+                return render(request,'pchart/all_pchart.html',{'freq':freq, 'plan':plan, 'pchart':pchart, 'survey':survey})
+            
+        except Pchart.DoesNotExist:
+            return render(request,'pchart/pchart.html',{'pkid':pkid, 'pksurveyid':pksurveyid})
+    else:
+        return redirect('/logout')
+
+def storePchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            pchart = Pchart.objects.get(id = pkid)
             pchart.delete()
         except Pchart.DoesNotExist:
             pass
 
         pchart = Pchart()
-        pchart.pchart_survey_id = pk
+        pchart.pchart_survey_id = pksurveyid
         pchart.pchart_sample = request.POST.get('pchart_sample')
         pchart.pchart_freq = request.POST.get('pchart_freq')
         pchart.pchart_measured = request.POST.get('pchart_measured')
         pchart.pchart_reviewed = request.POST.get('pchart_reviewed')
+        pchart.pchart_reason = request.POST.get('pchart_reason')
         pchart.save()
 
-        return redirect('coretoolcrud:viewAllPchart', pk)    
+        return redirect('coretoolcrud:viewAllPchart', pchart.id, pksurveyid)    
     else:
         return redirect('/logout')
 
-def storeAllPchart(request, pk):
+def storeAllPchart(request, pkid, pksurveyid):
     if 'user' in request.session:
-        pchart = Pchart.objects.get(pchart_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
-        month = survey.survey_plan.month
-        year = survey.survey_plan.year
+        pchart = Pchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         tempall = []
         tempall1 = []
         tempall2 = []
         tempdefect = []
-        iter = 1
 
         tempall = request.POST.getlist('pchart_all')
         for i in range(len(tempall)):
@@ -7414,23 +7473,23 @@ def storeAllPchart(request, pk):
         # pchart.pchart_defect = pchart.pchart_defect.append(tempdefect)
         pchart.save()
 
-        return redirect('coretoolcrud:viewFinalPchart', pk)    
+        return redirect('coretoolcrud:viewFinalPchart', pkid, pksurveyid)    
     else:
         return redirect('/logout')     
 
-def deletePchart(request, pk):
+def deletePchart(request, pkid, pksurveyid):
     if 'user' in request.session:
-        pchart = Pchart.objects.get(pchart_survey_id = pk)
+        pchart = Pchart.objects.get(id = pkid)
         pchart.delete()
         messages.success(request, "P Chart berhasil dihapus")
-        return redirect('coretoolcrud:viewDetailSurvey', pk)
+        return redirect('coretoolcrud:viewDetailSurvey', pksurveyid)
     else:
         return redirect('/logout')
 
-def viewFinalPchart(request, pk):
+def viewFinalPchart(request, pkid, pksurveyid):
     if 'user' in request.session:
-        pchart = Pchart.objects.get(pchart_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        pchart = Pchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         ##############################
 
         all = pchart.pchart_all
@@ -7476,7 +7535,7 @@ def viewFinalPchart(request, pk):
         ###############################
 
 
-        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p = figure(title="P Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
         p.line(bot, ucllist, legend_label="UCL", line_width=2)
         p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
         p.line(bot, pbarlist, legend_label="P Bar", color="red", line_width=2)
@@ -7498,22 +7557,22 @@ def viewFinalPchart(request, pk):
     else:
         return redirect('/logout')
 
-def viewAllPchart(request, pk):
+def viewAllPchart(request, pkid, pksurveyid):
     if 'user' in request.session:
         try:
-            pchart = Pchart.objects.get(pchart_survey_id = pk)
+            pchart = Pchart.objects.get(id = pkid)
             nos = range(1, int(pchart.pchart_freq) + 1)
             return render(request,'pchart/all_pchart.html',{'nos':nos, 'pchart':pchart})
         
         except Pchart.DoesNotExist:
-            return render(request,'pchart/pchart.html',{'pk':pk})
+            return redirect('coretoolcrud:viewPchart', pkid, pksurveyid)    
     else:
         return redirect('/logout')     
 
-def viewPrintPchart(request, pk):
+def viewPrintPchart(request, pkid, pksurveyid):
     if 'user' in request.session:
-        pchart = Pchart.objects.get(pchart_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        pchart = Pchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
         ##############################
 
         all = pchart.pchart_all
@@ -7584,6 +7643,7 @@ def viewPrintPchart(request, pk):
 def viewListPchart(request, pk):
     if 'user' in request.session:
         pchart = Pchart.objects.filter(pchart_survey_id=pk)
-        return render(request,'pchart/list_pchart.html',{'pchart':pchart})
+        survey = Survey.objects.get(id = pk)
+        return render(request,'pchart/list_pchart.html',{'pchart':pchart, 'survey':survey})
     else:
         return redirect('/logout')

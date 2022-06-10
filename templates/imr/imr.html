@@ -85,7 +85,7 @@
         <ul class="breadcrumb">
           <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
           <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
-          <li><a href="{% url 'coretoolcrud:viewDetailSurvey' pk %}">Survey Result</a></li>
+          <li><a href="{% url 'coretoolcrud:viewDetailSurvey' pksurveyid %}">Survey Result</a></li>
           <li>Fill I-MR Data</li>
         </ul>
           {% if messages %}
@@ -107,7 +107,7 @@
       <hr>
 
         </div>
-        <form action="{% url 'coretoolcrud:storeImr' pk %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'coretoolcrud:storeImr' 0 pksurveyid %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group"><br>
               <label for="exampleInputPassword1">Reason For Rev</label>
@@ -130,7 +130,7 @@
             <input class="form-control" name="imr_usl" id="demoFormHorizontalEmail" type="number" required />
           </div>
           <div class="form-group"><br>
-            <label for="exampleInputEmail1">Number of Subgroup</label>
+            <label for="exampleInputEmail1">Number of Data</label>
             <input class="form-control" name="imr_subgroup" id="demoFormHorizontalEmail" type="number" min="2" max="30" required/>
           </div>
           <div class="form-group"><br>
