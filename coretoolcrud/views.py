@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Survey, User
+from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Npchart, Uchart, Cchart, Survey, User
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -7520,7 +7520,32 @@ def viewFinalPchart(request, pkid, pksurveyid):
         gambar = (pbar * (1 - pbar) / pchart.pchart_sample) ** 0.5
         ucl = pbar + 3 * gambar
         lcl = 0
+
+
+        #EDIT THIS SOON
+        kelas = 7
+        kelaslist = []
+        nkelaslist = []
+        bot2 = []
+        temp = min(plist)
+        lebar = (max(plist) - min(plist)) / kelas
+
+        for i in range(kelas):
+            kelaslist.append(temp + lebar)
+            temp = temp + lebar
+            bot2.append(i + 1)
         
+        nkelaslist = []
+        temp = min(plist)
+        for i in kelaslist:
+            n = 0
+            for j in plist:
+                if temp <= j < i:
+                    n = n + 1
+            nkelaslist.append(n) 
+            temp = temp + lebar
+        
+
         pbarlist = []
         ucllist = []
         lcllist = []
@@ -7531,6 +7556,8 @@ def viewFinalPchart(request, pkid, pksurveyid):
             pbarlist.append(pbar)
             ucllist.append(ucl)
             lcllist.append(lcl)
+        
+
 
         ###############################
 
@@ -7545,7 +7572,10 @@ def viewFinalPchart(request, pkid, pksurveyid):
 
          #####################################
 
-
+        p = figure(title="P Chart Histogram", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='N of P Bar Per Class', x_axis_label='Class')
+        p.vbar(x=bot2, top=nkelaslist, width=0.9)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptpcharth, divpcharth = components(p)
 
         #####################################
 
@@ -7553,7 +7583,7 @@ def viewFinalPchart(request, pkid, pksurveyid):
         gabung = zip(pchart.pchart_defect, pchart.pchart_all)
         freq = range(1, int(pchart.pchart_freq)+1)
 
-        return render(request,'pchart/collection_pchart.html', {'pchart':pchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'pbar':pbar, 'ucl':ucl, 'lcl':lcl, 'scriptpchart':scriptpchart, 'divpchart':divpchart})
+        return render(request,'pchart/collection_pchart.html', {'pchart':pchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'pbar':pbar, 'ucl':ucl, 'lcl':lcl, 'scriptpchart':scriptpchart, 'divpchart':divpchart, 'scriptpcharth':scriptpcharth, 'divpcharth':divpcharth})
     else:
         return redirect('/logout')
 
@@ -7604,6 +7634,30 @@ def viewPrintPchart(request, pkid, pksurveyid):
         ucl = pbar + 3 * gambar
         lcl = 0
         
+        #EDIT THIS SOON
+        kelas = 7
+        kelaslist = []
+        nkelaslist = []
+        bot2 = []
+        temp = min(plist)
+        lebar = (max(plist) - min(plist)) / kelas
+
+        for i in range(kelas):
+            kelaslist.append(temp + lebar)
+            temp = temp + lebar
+            bot2.append(i + 1)
+        
+        nkelaslist = []
+        temp = min(plist)
+        for i in kelaslist:
+            n = 0
+            for j in plist:
+                if temp <= j < i:
+                    n = n + 1
+            nkelaslist.append(n) 
+            temp = temp + lebar
+
+
         pbarlist = []
         ucllist = []
         lcllist = []
@@ -7628,7 +7682,10 @@ def viewPrintPchart(request, pkid, pksurveyid):
 
          #####################################
 
-
+        p = figure(title="P Chart Histogram", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='N of P Bar Per Class', x_axis_label='Class')
+        p.vbar(x=bot2, top=nkelaslist, width=0.9)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptpcharth, divpcharth = components(p)
 
         #####################################
 
@@ -7636,7 +7693,7 @@ def viewPrintPchart(request, pkid, pksurveyid):
         gabung = zip(pchart.pchart_defect, pchart.pchart_all)
         freq = range(1, int(pchart.pchart_freq)+1)
 
-        return render(request,'pchart/print_pchart.html', {'pchart':pchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'pbar':pbar, 'ucl':ucl, 'lcl':lcl, 'scriptpchart':scriptpchart, 'divpchart':divpchart})
+        return render(request,'pchart/print_pchart.html', {'pchart':pchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'pbar':pbar, 'ucl':ucl, 'lcl':lcl, 'scriptpchart':scriptpchart, 'divpchart':divpchart, 'scriptpcharth':scriptpcharth, 'divpcharth':divpcharth})
     else:
         return redirect('/logout')
 
@@ -7647,3 +7704,709 @@ def viewListPchart(request, pk):
         return render(request,'pchart/list_pchart.html',{'pchart':pchart, 'survey':survey})
     else:
         return redirect('/logout')
+
+#NP Chart
+
+def viewNpchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            npchart = Npchart.objects.get(id = pkid)
+            if npchart.npchart_all:
+                return redirect('coretoolcrud:viewFinalNpchart', pkid, pksurveyid)
+            else:
+                survey = Survey.objects.get(id = pksurveyid)
+                freq = npchart.npchart_freq
+                plan = survey.survey_plan
+                return render(request,'npchart/all_npchart.html',{'freq':freq, 'plan':plan, 'npchart':npchart, 'survey':survey})
+            
+        except Npchart.DoesNotExist:
+            return render(request,'npchart/npchart.html',{'pkid':pkid, 'pksurveyid':pksurveyid})
+    else:
+        return redirect('/logout')
+
+def storeNpchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            npchart = Npchart.objects.get(id = pkid)
+            npchart.delete()
+        except Npchart.DoesNotExist:
+            pass
+
+        npchart = Npchart()
+        npchart.npchart_survey_id = pksurveyid
+        npchart.npchart_sample = request.POST.get('npchart_sample')
+        npchart.npchart_freq = request.POST.get('npchart_freq')
+        npchart.npchart_measured = request.POST.get('npchart_measured')
+        npchart.npchart_reviewed = request.POST.get('npchart_reviewed')
+        npchart.npchart_reason = request.POST.get('npchart_reason')
+        npchart.save()
+
+        return redirect('coretoolcrud:viewAllNpchart', npchart.id, pksurveyid)    
+    else:
+        return redirect('/logout')
+
+def storeAllNpchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        npchart = Npchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        tempall = []
+        tempall1 = []
+        tempall2 = []
+        tempdefect = []
+
+        tempall = request.POST.getlist('npchart_all')
+        for i in range(len(tempall)):
+            tempall1.append(float(tempall[i]))
+
+        defect = request.POST.get('npchart_defect')
+        tempdefect.append(defect)
+       
+        tempall2.append(tempall1)
+
+        if npchart.npchart_all is None:
+            npchart.npchart_all = tempall2
+        elif npchart.npchart_all is not None:
+            npchart.npchart_all.append(tempall1)
+        
+        if npchart.npchart_defect is None:
+            npchart.npchart_defect = tempdefect
+        elif npchart.npchart_defect is not None:
+            npchart.npchart_defect.append(defect)
+
+        # pchart.pchart_all = pchart.pchart_all.append(tempall1)
+        # pchart.pchart_defect = pchart.pchart_defect.append(tempdefect)
+        npchart.save()
+
+        return redirect('coretoolcrud:viewFinalNpchart', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')     
+
+def deleteNpchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        npchart = Npchart.objects.get(id = pkid)
+        npchart.delete()
+        messages.success(request, "NP Chart berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pksurveyid)
+    else:
+        return redirect('/logout')
+
+def viewFinalNpchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        npchart = Npchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        ##############################
+
+        all = npchart.npchart_all
+
+        cattotal = []
+        for i in all:
+            cattotal.append(sum(i))
+
+        pcattotal = []
+        for i in cattotal:
+            pcattotal.append(i / sum(cattotal) * 100)
+        
+        unittotal = []
+        temp = []
+
+        for i in range(npchart.npchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        npbar = sum(unittotal) / len(unittotal)
+        pbar = sum(unittotal) / (npchart.npchart_sample * npchart.npchart_freq)
+        gambar = (npbar * (1 - pbar)) ** 0.5
+        ucl = npbar + 3 * gambar
+        lcl = 0
+                
+        npbarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+
+        for i in range(npchart.npchart_freq):
+            bot.append(i+1)
+            npbarlist.append(npbar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+
+        ###############################
+
+
+        p = figure(title="NP Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
+        p.line(bot, npbarlist, legend_label="NP Bar", color="red", line_width=2)
+        p.line(bot, unittotal, legend_label="Total Unit", color="yellow", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptnpchart, divnpchart = components(p)
+
+         #####################################
+
+
+
+        #####################################
+
+        
+        gabung = zip(npchart.npchart_defect, npchart.npchart_all)
+        freq = range(1, int(npchart.npchart_freq)+1)
+
+        return render(request,'npchart/collection_npchart.html', {'npchart':npchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'npbar':npbar, 'ucl':ucl, 'lcl':lcl, 'pbar':pbar, 'scriptnpchart':scriptnpchart, 'divnpchart':divnpchart})
+    else:
+        return redirect('/logout')
+
+def viewAllNpchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            npchart = Npchart.objects.get(id = pkid)
+            nos = range(1, int(npchart.npchart_freq) + 1)
+            return render(request,'npchart/all_npchart.html',{'nos':nos, 'npchart':npchart})
+        
+        except Npchart.DoesNotExist:
+            return redirect('coretoolcrud:viewNpchart', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')   
+
+def viewPrintNpchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        npchart = Npchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        ##############################
+
+        all = npchart.npchart_all
+
+        cattotal = []
+        for i in all:
+            cattotal.append(sum(i))
+
+        pcattotal = []
+        for i in cattotal:
+            pcattotal.append(i / sum(cattotal) * 100)
+        
+        unittotal = []
+        temp = []
+
+        for i in range(npchart.npchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        npbar = sum(unittotal) / len(unittotal)
+        pbar = sum(unittotal) / (npchart.npchart_sample * npchart.npchart_freq)
+        gambar = (npbar * (1 - pbar)) ** 0.5
+        ucl = npbar + 3 * gambar
+        lcl = 0
+                
+        npbarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+
+        for i in range(npchart.npchart_freq):
+            bot.append(i+1)
+            npbarlist.append(npbar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+
+        ###############################
+
+
+        p = figure(title="P Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
+        p.line(bot, npbarlist, legend_label="NP Bar", color="red", line_width=2)
+        p.line(bot, unittotal, legend_label="Total Unit", color="yellow", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptnpchart, divnpchart = components(p)
+
+         #####################################
+
+
+
+        #####################################
+
+        
+        gabung = zip(npchart.npchart_defect, npchart.npchart_all)
+        freq = range(1, int(npchart.npchart_freq)+1)
+
+        return render(request,'npchart/print_npchart.html', {'npchart':npchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'npbar':npbar, 'ucl':ucl, 'lcl':lcl, 'scriptnpchart':scriptnpchart, 'divnpchart':divnpchart})
+    else:
+        return redirect('/logout')
+
+def viewListNpchart(request, pk):
+    if 'user' in request.session:
+        npchart = Npchart.objects.filter(npchart_survey_id=pk)
+        survey = Survey.objects.get(id = pk)
+        return render(request,'npchart/list_npchart.html',{'npchart':npchart, 'survey':survey})
+    else:
+        return redirect('/logout')
+
+#U Chart
+
+def viewUchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            uchart = Uchart.objects.get(id = pkid)
+            if uchart.uchart_all:
+                return redirect('coretoolcrud:viewFinalUchart', pkid, pksurveyid)
+            else:
+                survey = Survey.objects.get(id = pksurveyid)
+                freq = uchart.uchart_freq
+                plan = survey.survey_plan
+                return render(request,'uchart/all_uchart.html',{'freq':freq, 'plan':plan, 'uchart':uchart, 'survey':survey})
+            
+        except Uchart.DoesNotExist:
+            return render(request,'uchart/uchart.html',{'pkid':pkid, 'pksurveyid':pksurveyid})
+    else:
+        return redirect('/logout')
+
+def storeUchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            uchart = Uchart.objects.get(id = pkid)
+            uchart.delete()
+        except Uchart.DoesNotExist:
+            pass
+
+        uchart = Uchart()
+        uchart.uchart_survey_id = pksurveyid
+        uchart.uchart_sample = request.POST.get('uchart_sample')
+        uchart.uchart_freq = request.POST.get('uchart_freq')
+        uchart.uchart_measured = request.POST.get('uchart_measured')
+        uchart.uchart_reviewed = request.POST.get('uchart_reviewed')
+        uchart.uchart_reason = request.POST.get('uchart_reason')
+        uchart.save()
+
+        return redirect('coretoolcrud:viewAllUchart', uchart.id, pksurveyid)    
+    else:
+        return redirect('/logout')
+
+def storeAllUchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        uchart = Uchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        tempall = []
+        tempall1 = []
+        tempall2 = []
+        tempdefect = []
+
+        tempall = request.POST.getlist('uchart_all')
+        for i in range(len(tempall)):
+            tempall1.append(float(tempall[i]))
+
+        defect = request.POST.get('uchart_defect')
+        tempdefect.append(defect)
+       
+        tempall2.append(tempall1)
+
+        if uchart.uchart_all is None:
+            uchart.uchart_all = tempall2
+        elif uchart.uchart_all is not None:
+            uchart.uchart_all.append(tempall1)
+        
+        if uchart.uchart_defect is None:
+            uchart.uchart_defect = tempdefect
+        elif uchart.uchart_defect is not None:
+            uchart.uchart_defect.append(defect)
+
+        # pchart.pchart_all = pchart.pchart_all.append(tempall1)
+        # pchart.pchart_defect = pchart.pchart_defect.append(tempdefect)
+        uchart.save()
+
+        return redirect('coretoolcrud:viewFinalUchart', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')    
+
+def deleteUchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        uchart = Uchart.objects.get(id = pkid)
+        uchart.delete()
+        messages.success(request, "U Chart berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pksurveyid)
+    else:
+        return redirect('/logout')
+
+def viewFinalUchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        uchart = Uchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        ##############################
+
+        all = uchart.uchart_all
+
+        unittotal = []
+        temp = []
+
+        for i in range(uchart.uchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        #EDIT THIS SOON!!!!
+        nsample = [8, 8, 9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]
+        #DONT FORGET!!!
+
+        ups = []
+        for i in range(uchart.uchart_freq):
+            ups.append(unittotal[i] / nsample[i])
+        
+        nbar = sum(nsample) / len(nsample)
+        ubar = sum(ups) / len(ups)
+        ucl = ubar + 3 * (ubar / nbar) ** 0.5
+        lcl = ubar - 3 * (ubar / nbar) ** 0.5
+                
+        ubarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+
+        for i in range(uchart.uchart_freq):
+            bot.append(i+1)
+            ubarlist.append(ubar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+
+        ###############################
+
+
+        p = figure(title="U Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
+        p.line(bot, ubarlist, legend_label="U Bar", color="red", line_width=2)
+        p.line(bot, ups, legend_label="Unit / Sample", color="yellow", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptuchart, divuchart = components(p)
+
+         #####################################
+
+
+
+        #####################################
+
+        
+        gabung = zip(uchart.uchart_defect, uchart.uchart_all)
+        freq = range(1, int(uchart.uchart_freq)+1)
+
+        return render(request,'uchart/collection_uchart.html', {'uchart':uchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'ubar':ubar, 'ucl':ucl, 'lcl':lcl, 'nbar':nbar, 'scriptuchart':scriptuchart, 'divuchart':divuchart})
+    else:
+        return redirect('/logout')
+
+def viewAllUchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            uchart = Uchart.objects.get(id = pkid)
+            nos = range(1, int(uchart.uchart_freq) + 1)
+            return render(request,'uchart/all_uchart.html',{'nos':nos, 'uchart':uchart})
+        
+        except Uchart.DoesNotExist:
+            return redirect('coretoolcrud:viewUchart', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')   
+
+def viewPrintUchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        uchart = Uchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        ##############################
+
+        all = uchart.uchart_all
+
+        unittotal = []
+        temp = []
+
+        for i in range(uchart.uchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        #EDIT THIS SOON!!!!
+        nsample = [8, 8, 9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]
+        #DONT FORGET!!!
+
+        ups = []
+        for i in range(uchart.uchart_freq):
+            ups.append(unittotal[i] / nsample[i])
+        
+        nbar = sum(nsample) / len(nsample)
+        ubar = sum(ups) / len(ups)
+        ucl = ubar + 3 * (ubar / nbar) ** 0.5
+        lcl = ubar - 3 * (ubar / nbar) ** 0.5
+                
+        ubarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+
+        for i in range(uchart.uchart_freq):
+            bot.append(i+1)
+            ubarlist.append(ubar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+
+        ###############################
+
+
+        p = figure(title="P Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
+        p.line(bot, ubarlist, legend_label="U Bar", color="red", line_width=2)
+        p.line(bot, ups, legend_label="Unit / Sample", color="yellow", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptuchart, divuchart = components(p)
+
+         #####################################
+
+
+
+        #####################################
+
+        
+        gabung = zip(uchart.uchart_defect, uchart.uchart_all)
+        freq = range(1, int(uchart.uchart_freq)+1)
+
+        return render(request,'uchart/print_uchart.html', {'uchart':uchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'ubar':ubar, 'ucl':ucl, 'lcl':lcl, 'scriptuchart':scriptuchart, 'divuchart':divuchart})
+    else:
+        return redirect('/logout')
+
+def viewListUchart(request, pk):
+    if 'user' in request.session:
+        uchart = Uchart.objects.filter(uchart_survey_id=pk)
+        survey = Survey.objects.get(id = pk)
+        return render(request,'uchart/list_uchart.html',{'uchart':uchart, 'survey':survey})
+    else:
+        return redirect('/logout')
+
+#C Chart
+
+def viewCchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            cchart = Cchart.objects.get(id = pkid)
+            if cchart.cchart_all:
+                return redirect('coretoolcrud:viewFinalCchart', pkid, pksurveyid)
+            else:
+                survey = Survey.objects.get(id = pksurveyid)
+                freq = cchart.cchart_freq
+                plan = survey.survey_plan
+                return render(request,'cchart/all_cchart.html',{'freq':freq, 'plan':plan, 'cchart':cchart, 'survey':survey})
+            
+        except Cchart.DoesNotExist:
+            return render(request,'cchart/cchart.html',{'pkid':pkid, 'pksurveyid':pksurveyid})
+    else:
+        return redirect('/logout')
+
+def storeCchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            cchart = Cchart.objects.get(id = pkid)
+            cchart.delete()
+        except Cchart.DoesNotExist:
+            pass
+
+        cchart = Cchart()
+        cchart.cchart_survey_id = pksurveyid
+        cchart.cchart_sample = request.POST.get('cchart_sample')
+        cchart.cchart_freq = request.POST.get('cchart_freq')
+        cchart.cchart_measured = request.POST.get('cchart_measured')
+        cchart.cchart_reviewed = request.POST.get('cchart_reviewed')
+        cchart.cchart_reason = request.POST.get('cchart_reason')
+        cchart.save()
+
+        return redirect('coretoolcrud:viewAllCchart', cchart.id, pksurveyid)    
+    else:
+        return redirect('/logout')
+
+def storeAllCchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        cchart = Cchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        tempall = []
+        tempall1 = []
+        tempall2 = []
+        tempdefect = []
+
+        tempall = request.POST.getlist('cchart_all')
+        for i in range(len(tempall)):
+            tempall1.append(float(tempall[i]))
+
+        defect = request.POST.get('cchart_defect')
+        tempdefect.append(defect)
+       
+        tempall2.append(tempall1)
+
+        if cchart.cchart_all is None:
+            cchart.cchart_all = tempall2
+        elif cchart.cchart_all is not None:
+            cchart.cchart_all.append(tempall1)
+        
+        if cchart.cchart_defect is None:
+            cchart.cchart_defect = tempdefect
+        elif cchart.cchart_defect is not None:
+            cchart.cchart_defect.append(defect)
+
+        # pchart.pchart_all = pchart.pchart_all.append(tempall1)
+        # pchart.pchart_defect = pchart.pchart_defect.append(tempdefect)
+        cchart.save()
+
+        return redirect('coretoolcrud:viewFinalCchart', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')    
+
+def deleteCchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        cchart = Cchart.objects.get(id = pkid)
+        cchart.delete()
+        messages.success(request, "C Chart berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pksurveyid)
+    else:
+        return redirect('/logout')
+
+def viewFinalCchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        cchart = Cchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        ##############################
+
+        all = cchart.cchart_all
+
+        unittotal = []
+        temp = []
+
+        for i in range(cchart.cchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        sumc = sum(unittotal)
+        cbar = sum(unittotal) / len(unittotal)
+        ucl = cbar + 3 * cbar ** 0.5
+        if (cbar - 3 * cbar ** 0.5) < 0:
+            lcl = 0
+        else:
+            lcl = cbar - 3 * cbar ** 0.5
+
+                
+        cbarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+
+        for i in range(cchart.cchart_freq):
+            bot.append(i+1)
+            cbarlist.append(cbar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+
+        ###############################
+
+
+        p = figure(title="C Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
+        p.line(bot, cbarlist, legend_label="C Bar", color="red", line_width=2)
+        p.line(bot, unittotal, legend_label="Total Unit", color="yellow", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptcchart, divcchart = components(p)
+
+         #####################################
+
+
+
+        #####################################
+
+        
+        gabung = zip(cchart.cchart_defect, cchart.cchart_all)
+        freq = range(1, int(cchart.cchart_freq)+1)
+
+        return render(request,'cchart/collection_cchart.html', {'cchart':cchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'cbar':cbar, 'ucl':ucl, 'lcl':lcl, 'sumc':sumc, 'scriptcchart':scriptcchart, 'divcchart':divcchart})
+    else:
+        return redirect('/logout')
+
+def viewAllCchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            cchart = Cchart.objects.get(id = pkid)
+            nos = range(1, int(cchart.cchart_freq) + 1)
+            return render(request,'cchart/all_cchart.html',{'nos':nos, 'cchart':cchart})
+        
+        except Cchart.DoesNotExist:
+            return redirect('coretoolcrud:viewCchart', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')   
+
+def viewPrintCchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        cchart = Cchart.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        ##############################
+
+        all = cchart.cchart_all
+
+        unittotal = []
+        temp = []
+
+        for i in range(cchart.cchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        sumc = sum(unittotal)
+        cbar = sum(unittotal) / len(unittotal)
+        ucl = cbar + 3 * cbar ** 0.5
+        if (cbar - 3 * cbar ** 0.5) < 0:
+            lcl = 0
+        else:
+            lcl = cbar - 3 * cbar ** 0.5
+
+                
+        cbarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+
+        for i in range(cchart.cchart_freq):
+            bot.append(i+1)
+            cbarlist.append(cbar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+
+        ###############################
+
+
+        p = figure(title="P Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
+        p.line(bot, cbarlist, legend_label="C Bar", color="red", line_width=2)
+        p.line(bot, unittotal, legend_label="Total Unit", color="yellow", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptcchart, divcchart = components(p)
+
+         #####################################
+
+
+
+        #####################################
+
+        
+        gabung = zip(cchart.cchart_defect, cchart.cchart_all)
+        freq = range(1, int(cchart.cchart_freq)+1)
+
+        return render(request,'cchart/print_cchart.html', {'cchart':cchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'cbar':cbar, 'ucl':ucl, 'lcl':lcl, 'scriptcchart':scriptcchart, 'divcchart':divcchart})
+    else:
+        return redirect('/logout')
+
+def viewListCchart(request, pk):
+    if 'user' in request.session:
+        cchart = Cchart.objects.filter(cchart_survey_id=pk)
+        survey = Survey.objects.get(id = pk)
+        return render(request,'cchart/list_cchart.html',{'cchart':cchart, 'survey':survey})
+    else:
+        return redirect('/logout')
+

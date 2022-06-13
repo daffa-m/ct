@@ -55,12 +55,12 @@
     <div class="container">
       <div class="invoice-title">
         <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
-            <h2>P Chart</h2><br>
+            <h2>NP Chart</h2><br>
         <ul class="breadcrumb">
             <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
             <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
-            <li><a href="{% url 'coretoolcrud:viewDetailSurvey' pchart.pchart_survey_id %}">Survey Result</a></li>
-            <li>P Chart Result</li>
+            <li><a href="{% url 'coretoolcrud:viewDetailSurvey' npchart.npchart_survey_id %}">Survey Result</a></li>
+            <li>NP Chart Result</li>
         </ul>
           {% if messages %}
           {% for message in messages %}
@@ -150,8 +150,8 @@
                     <tr>
                       <th scope="col">LCL: {{lcl|floatformat:2}}</th>
                       <th scope="col">UCL: {{ucl|floatformat:2}}</th>
+                      <th scope="col">NP Bar: {{npbar|floatformat:2}}</th>
                       <th scope="col">P Bar: {{pbar|floatformat:2}}</th>
-                      <th scope="col"></th>
                       
                     </tr>
                    
@@ -200,31 +200,20 @@
                         
                         <div class="card-body">
                           
-                          {{divpchart| safe}}
+                          {{divnpchart| safe}}
                           <br><br><br>
                          
                          
                         </div>
                       </div>
                       <br><br>
-                      
-                      <div class="card">
-                        
-                        <div class="card-body">
-                          
-                          {{divpcharth| safe}}
-                          <br><br><br>
-                         
-                         
-                        </div>
-                      </div>
-                      <br><br>
+
                      
                       
                     
-                      <a href="{% url 'coretoolcrud:deletePchart' pchart.id pchart.pchart_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                      <a href="{% url 'coretoolcrud:viewPrintPchart' pchart.id pchart.pchart_survey_id %}" class="btn btn-info">Print</a>
-                      <a href="{% url 'coretoolcrud:viewAllPchart' pchart.id pchart.pchart_survey_id %}" class="btn btn-info">Add Defect</a>
+                      <a href="{% url 'coretoolcrud:deleteNpchart' npchart.id npchart.npchart_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                      <a href="{% url 'coretoolcrud:viewPrintNpchart' npchart.id npchart.npchart_survey_id %}" class="btn btn-info">Print</a>
+                      <a href="{% url 'coretoolcrud:viewAllNpchart' npchart.id npchart.npchart_survey_id %}" class="btn btn-info">Add Defect</a>
                       <br><br>
 
         </div>
@@ -236,7 +225,6 @@
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.2.min.js"></script>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.2.min.js"></script>
-{{scriptpchart| safe}}
-{{scriptpcharth| safe}}
+{{scriptnpchart| safe}}
 </html>
 

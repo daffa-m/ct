@@ -9,6 +9,9 @@ from .views import viewVxbarr, viewFinalVxbarr, viewCommentVxbarr, viewPrintVxba
 from .views import viewSbarr, viewFinalSbarr, viewCommentSbarr, viewPrintSbarr, storeSbarr, storeCommentSbarr, storeAllSbarr, deleteSbarr, viewAllSbarr, viewListSbarr
 from .views import viewImr, viewFinalImr, viewCommentImr, viewPrintImr, storeImr, storeCommentImr, storeAllImr, deleteImr, viewAllImr, viewListImr
 from .views import viewPchart, viewFinalPchart, viewPrintPchart, storePchart, storeAllPchart, viewAllPchart, viewListPchart, deletePchart
+from .views import viewNpchart, viewFinalNpchart, viewPrintNpchart, storeNpchart, storeAllNpchart, viewAllNpchart, viewListNpchart, deleteNpchart
+from .views import viewUchart, viewFinalUchart, viewPrintUchart, storeUchart, storeAllUchart, viewAllUchart, viewListUchart, deleteUchart
+from .views import viewCchart, viewFinalCchart, viewPrintCchart, storeCchart, storeAllCchart, viewAllCchart, viewListCchart, deleteCchart
 from .views import viewListSurvey, viewDetailSurvey, viewSurvey, viewManual, viewEditSurvey, viewEditManual, storeManual, storeSurvey, storeEditManual, storeEditSurvey, deleteSurvey
 from .views import viewLogin, login, logout
 app_name = "coretoolcrud"
@@ -114,5 +117,32 @@ urlpatterns = [
     path('viewAllPchart/<int:pkid>/<int:pksurveyid>',viewAllPchart,name='viewAllPchart'),
     path('viewListPchart/<int:pk>',viewListPchart,name='viewListPchart'),
     path('deletePchart/<int:pkid>/<int:pksurveyid>',deletePchart,name='deletePchart'),
+
+    path('viewNpchart/<int:pkid>/<int:pksurveyid>',viewNpchart,name='viewNpchart'),
+    path('viewFinalNpchart/<int:pkid>/<int:pksurveyid>',viewFinalNpchart,name='viewFinalNpchart'),
+    path('storeNpchart/<int:pkid>/<int:pksurveyid>',storeNpchart,name='storeNpchart'),
+    path('viewPrintNpchart/<int:pkid>/<int:pksurveyid>',viewPrintNpchart,name='viewPrintNpchart'),
+    path('storeAllNpchart/<int:pkid>/<int:pksurveyid>',storeAllNpchart,name='storeAllNpchart'),
+    path('viewAllNpchart/<int:pkid>/<int:pksurveyid>',viewAllNpchart,name='viewAllNpchart'),
+    path('viewListNpchart/<int:pk>',viewListNpchart,name='viewListNpchart'),
+    path('deleteNpchart/<int:pkid>/<int:pksurveyid>',deleteNpchart,name='deleteNpchart'),
+
+    path('viewUchart/<int:pkid>/<int:pksurveyid>',viewUchart,name='viewUchart'),
+    path('viewFinalUchart/<int:pkid>/<int:pksurveyid>',viewFinalUchart,name='viewFinalUchart'),
+    path('storeUchart/<int:pkid>/<int:pksurveyid>',storeUchart,name='storeUchart'),
+    path('viewPrintUchart/<int:pkid>/<int:pksurveyid>',viewPrintUchart,name='viewPrintUchart'),
+    path('storeAllUchart/<int:pkid>/<int:pksurveyid>',storeAllUchart,name='storeAllUchart'),
+    path('viewAllUchart/<int:pkid>/<int:pksurveyid>',viewAllUchart,name='viewAllUchart'),
+    path('viewListUchart/<int:pk>',viewListUchart,name='viewListUchart'),
+    path('deleteUchart/<int:pkid>/<int:pksurveyid>',deleteUchart,name='deleteUchart'),
+
+    path('viewCchart/<int:pkid>/<int:pksurveyid>',viewCchart,name='viewCchart'),
+    path('viewFinalCchart/<int:pkid>/<int:pksurveyid>',viewFinalCchart,name='viewFinalCchart'),
+    path('storeCchart/<int:pkid>/<int:pksurveyid>',storeCchart,name='storeCchart'),
+    path('viewPrintCchart/<int:pkid>/<int:pksurveyid>',viewPrintCchart,name='viewPrintCchart'),
+    path('storeAllCchart/<int:pkid>/<int:pksurveyid>',storeAllCchart,name='storeAllCchart'),
+    path('viewAllCchart/<int:pkid>/<int:pksurveyid>',viewAllCchart,name='viewAllCchart'),
+    path('viewListCchart/<int:pk>',viewListCchart,name='viewListCchart'),
+    path('deleteCchart/<int:pkid>/<int:pksurveyid>',deleteCchart,name='deleteCchart'),
 
 ]

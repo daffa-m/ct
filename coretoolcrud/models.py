@@ -139,6 +139,39 @@ class Pchart(models.Model):
     pchart_reviewed = models.TextField()
     pchart_reason = models.TextField(null=True)
 
+class Npchart(models.Model):
+    npchart_survey_id = models.IntegerField()
+    npchart_sample = models.IntegerField()
+    npchart_freq = models.IntegerField()
+    npchart_all = models.JSONField(null=True)
+    npchart_defect = models.JSONField(null=True)
+    npchart_measured = models.TextField()
+    npchart_reviewed = models.TextField()
+    npchart_reason = models.TextField(null=True)
+    npchart_recommendation = models.JSONField(null=True)
+
+class Uchart(models.Model):
+    uchart_survey_id = models.IntegerField()
+    uchart_sample = models.IntegerField()
+    uchart_freq = models.IntegerField()
+    uchart_all = models.JSONField(null=True)
+    uchart_defect = models.JSONField(null=True)
+    uchart_measured = models.TextField()
+    uchart_reviewed = models.TextField()
+    uchart_reason = models.TextField(null=True)
+    uchart_recommendation = models.JSONField(null=True)
+
+class Cchart(models.Model):
+    cchart_survey_id = models.IntegerField()
+    cchart_sample = models.IntegerField()
+    cchart_freq = models.IntegerField()
+    cchart_all = models.JSONField(null=True)
+    cchart_defect = models.JSONField(null=True)
+    cchart_measured = models.TextField()
+    cchart_reviewed = models.TextField()
+    cchart_reason = models.TextField(null=True)
+    cchart_recommendation = models.JSONField(null=True)
+
 class Survey(models.Model):
     survey_user_id = models.IntegerField()
     survey_date_project = models.DateField()
