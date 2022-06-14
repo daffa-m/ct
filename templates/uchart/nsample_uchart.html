@@ -83,16 +83,9 @@
           <hr>
 
         </div>
-        <form action="{% url 'coretoolcrud:storeAllUchart' uchart.id uchart.uchart_survey_id %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'coretoolcrud:storeNsampleUchart' uchart.id uchart.uchart_survey_id %}" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           
-        
-        
-        <div class="form-group"><br>
-            <label for="exampleInputEmail1">Defect Name</label>
-            <input class="form-control" name="uchart_defect" id="demoFormHorizontalEmail" type="text" required />
-        </div>
-        <br>
         <table class="table table-hover table-bordered results" id="table">
             <thead>
               <tr>
@@ -112,7 +105,7 @@
               <tr>
                 <td>{{no}}</td>
                 
-                <td><input class="form-control" name="uchart_all" id="demoFormHorizontalEmail" type="text" pattern="^[0-9]*\.?[0-9]*$" required /></td>
+                <td><input class="form-control" name="uchart_nsample" id="demoFormHorizontalEmail" type="text" pattern="^[0-9]*\.?[0-9]*$" required /></td>
                
               </tr>
               {% endfor %}

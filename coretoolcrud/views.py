@@ -7043,7 +7043,7 @@ def storeImr(request, pkid, pksurveyid):
         imr.save()
 
        
-        return redirect('coretoolcrud:viewAllImr', pkid, pksurveyid)  
+        return redirect('coretoolcrud:viewAllImr', imr.id, pksurveyid)  
     else:
         return redirect('/logout')
 
@@ -7432,9 +7432,16 @@ def storePchart(request, pkid, pksurveyid):
         pchart.pchart_survey_id = pksurveyid
         pchart.pchart_sample = request.POST.get('pchart_sample')
         pchart.pchart_freq = request.POST.get('pchart_freq')
+        pchart.pchart_class = request.POST.get('pchart_class')
         pchart.pchart_measured = request.POST.get('pchart_measured')
         pchart.pchart_reviewed = request.POST.get('pchart_reviewed')
         pchart.pchart_reason = request.POST.get('pchart_reason')
+
+        if pchart.pchart_reason == "New Model":
+            pchartlist = Pchart.objects.filter(pchart_survey_id = pksurveyid, pchart_reason = "New Model")
+            if pchartlist:
+                Pchart.objects.filter(pchart_survey_id = pksurveyid, pchart_reason = "New Model").delete()
+
         pchart.save()
 
         return redirect('coretoolcrud:viewAllPchart', pchart.id, pksurveyid)    
@@ -7489,21 +7496,33 @@ def deletePchart(request, pkid, pksurveyid):
 def viewFinalPchart(request, pkid, pksurveyid):
     if 'user' in request.session:
         pchart = Pchart.objects.get(id = pkid)
+        pchart2 = Pchart.objects.get(pchart_survey_id = pksurveyid, pchart_reason = "New Model")
         survey = Survey.objects.get(id = pksurveyid)
         ##############################
 
         all = pchart.pchart_all
+        all2 = pchart2.pchart_all
 
         cattotal = []
+        cattotal2 = []
         for i in all:
             cattotal.append(sum(i))
+        
+        for i in all2:
+            cattotal2.append(sum(i))
 
         pcattotal = []
+        pcattotal2 = []
         for i in cattotal:
             pcattotal.append(i / sum(cattotal) * 100)
         
+        for i in cattotal2:
+            pcattotal2.append(i / sum(cattotal2) * 100)
+        
         unittotal = []
         temp = []
+        unittotal2 = []
+        temp2 = []
 
         for i in range(pchart.pchart_freq):
             for j in all:
@@ -7511,19 +7530,49 @@ def viewFinalPchart(request, pkid, pksurveyid):
             unittotal.append(sum(temp))
             temp = []
         
+        for i in range(pchart2.pchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
+        
         plist = []
+        plist2 = []
 
         for i in unittotal:
             plist.append(i / pchart.pchart_sample)
+        
+        for i in unittotal2:
+            plist2.append(i / pchart2.pchart_sample)
         
         pbar = sum(unittotal) / (pchart.pchart_sample * pchart.pchart_freq)
         gambar = (pbar * (1 - pbar) / pchart.pchart_sample) ** 0.5
         ucl = pbar + 3 * gambar
         lcl = 0
 
+        pbar2 = sum(unittotal2) / (pchart2.pchart_sample * pchart2.pchart_freq)
+        gambar2 = (pbar2 * (1 - pbar2) / pchart2.pchart_sample) ** 0.5
+        ucl2 = pbar2 + 3 * gambar2
+        lcl2 = 0
+        
 
-        #EDIT THIS SOON
-        kelas = 7
+        pbarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+        ucllist2 = []
+        lcllist2 = []
+
+        for i in range(pchart.pchart_freq):
+            bot.append(i+1)
+            pbarlist.append(pbar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
+        
+        
+        kelas = pchart.pchart_class
         kelaslist = []
         nkelaslist = []
         bot2 = []
@@ -7544,29 +7593,17 @@ def viewFinalPchart(request, pkid, pksurveyid):
                     n = n + 1
             nkelaslist.append(n) 
             temp = temp + lebar
-        
-
-        pbarlist = []
-        ucllist = []
-        lcllist = []
-        bot = []
-
-        for i in range(pchart.pchart_freq):
-            bot.append(i+1)
-            pbarlist.append(pbar)
-            ucllist.append(ucl)
-            lcllist.append(lcl)
-        
-
 
         ###############################
 
 
         p = figure(title="P Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
         p.line(bot, ucllist, legend_label="UCL", line_width=2)
-        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
-        p.line(bot, pbarlist, legend_label="P Bar", color="red", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="red", line_width=2)
+        p.line(bot, pbarlist, legend_label="P Bar", color="blue", line_width=2)
         p.line(bot, plist, legend_label="P", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptpchart, divpchart = components(p)
 
@@ -7602,21 +7639,33 @@ def viewAllPchart(request, pkid, pksurveyid):
 def viewPrintPchart(request, pkid, pksurveyid):
     if 'user' in request.session:
         pchart = Pchart.objects.get(id = pkid)
+        pchart2 = Pchart.objects.get(pchart_survey_id = pksurveyid, pchart_reason = "New Model")
         survey = Survey.objects.get(id = pksurveyid)
         ##############################
 
         all = pchart.pchart_all
+        all2 = pchart2.pchart_all
 
         cattotal = []
+        cattotal2 = []
         for i in all:
             cattotal.append(sum(i))
+        
+        for i in all2:
+            cattotal2.append(sum(i))
 
         pcattotal = []
+        pcattotal2 = []
         for i in cattotal:
             pcattotal.append(i / sum(cattotal) * 100)
         
+        for i in cattotal2:
+            pcattotal2.append(i / sum(cattotal2) * 100)
+        
         unittotal = []
         temp = []
+        unittotal2 = []
+        temp2 = []
 
         for i in range(pchart.pchart_freq):
             for j in all:
@@ -7624,18 +7673,33 @@ def viewPrintPchart(request, pkid, pksurveyid):
             unittotal.append(sum(temp))
             temp = []
         
+        for i in range(pchart2.pchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
+        
         plist = []
+        plist2 = []
 
         for i in unittotal:
             plist.append(i / pchart.pchart_sample)
+        
+        for i in unittotal2:
+            plist2.append(i / pchart2.pchart_sample)
         
         pbar = sum(unittotal) / (pchart.pchart_sample * pchart.pchart_freq)
         gambar = (pbar * (1 - pbar) / pchart.pchart_sample) ** 0.5
         ucl = pbar + 3 * gambar
         lcl = 0
-        
-        #EDIT THIS SOON
-        kelas = 7
+
+        pbar2 = sum(unittotal2) / (pchart2.pchart_sample * pchart2.pchart_freq)
+        gambar2 = (pbar2 * (1 - pbar2) / pchart2.pchart_sample) ** 0.5
+        ucl2 = pbar2 + 3 * gambar2
+        lcl2 = 0
+
+
+        kelas = pchart.pchart_class
         kelaslist = []
         nkelaslist = []
         bot2 = []
@@ -7656,27 +7720,35 @@ def viewPrintPchart(request, pkid, pksurveyid):
                     n = n + 1
             nkelaslist.append(n) 
             temp = temp + lebar
-
+        
 
         pbarlist = []
         ucllist = []
         lcllist = []
         bot = []
+        ucllist2 = []
+        lcllist2 = []
 
         for i in range(pchart.pchart_freq):
             bot.append(i+1)
             pbarlist.append(pbar)
             ucllist.append(ucl)
             lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
+        
+        print(unittotal2)
 
         ###############################
 
 
-        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p = figure(title="P Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
         p.line(bot, ucllist, legend_label="UCL", line_width=2)
-        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
-        p.line(bot, pbarlist, legend_label="P Bar", color="red", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="red", line_width=2)
+        p.line(bot, pbarlist, legend_label="P Bar", color="blue", line_width=2)
         p.line(bot, plist, legend_label="P", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptpchart, divpchart = components(p)
 
@@ -7736,9 +7808,16 @@ def storeNpchart(request, pkid, pksurveyid):
         npchart.npchart_survey_id = pksurveyid
         npchart.npchart_sample = request.POST.get('npchart_sample')
         npchart.npchart_freq = request.POST.get('npchart_freq')
+        npchart.npchart_class = request.POST.get('npchart_class')
         npchart.npchart_measured = request.POST.get('npchart_measured')
         npchart.npchart_reviewed = request.POST.get('npchart_reviewed')
         npchart.npchart_reason = request.POST.get('npchart_reason')
+
+        if npchart.npchart_reason == "New Model":
+            npchartlist = Npchart.objects.filter(npchart_survey_id = pksurveyid, npchart_reason = "New Model")
+            if npchartlist:
+                Npchart.objects.filter(npchart_survey_id = pksurveyid, npchart_reason = "New Model").delete()
+
         npchart.save()
 
         return redirect('coretoolcrud:viewAllNpchart', npchart.id, pksurveyid)    
@@ -7773,11 +7852,9 @@ def storeAllNpchart(request, pkid, pksurveyid):
         elif npchart.npchart_defect is not None:
             npchart.npchart_defect.append(defect)
 
-        # pchart.pchart_all = pchart.pchart_all.append(tempall1)
-        # pchart.pchart_defect = pchart.pchart_defect.append(tempdefect)
         npchart.save()
 
-        return redirect('coretoolcrud:viewFinalNpchart', pkid, pksurveyid)    
+        return redirect('coretoolcrud:viewCommentNpchart', pkid, pksurveyid)    
     else:
         return redirect('/logout')     
 
@@ -7793,21 +7870,33 @@ def deleteNpchart(request, pkid, pksurveyid):
 def viewFinalNpchart(request, pkid, pksurveyid):
     if 'user' in request.session:
         npchart = Npchart.objects.get(id = pkid)
+        npchart2 = Npchart.objects.get(npchart_survey_id = pksurveyid, npchart_reason = "New Model")
         survey = Survey.objects.get(id = pksurveyid)
         ##############################
 
         all = npchart.npchart_all
+        all2 = npchart2.npchart_all
 
         cattotal = []
+        cattotal2 = []
         for i in all:
             cattotal.append(sum(i))
+        
+        for i in all2:
+            cattotal2.append(sum(i))
 
         pcattotal = []
+        pcattotal2 = []
         for i in cattotal:
             pcattotal.append(i / sum(cattotal) * 100)
         
+        for i in cattotal2:
+            pcattotal2.append(i / sum(cattotal2) * 100)
+        
         unittotal = []
         temp = []
+        unittotal2 = []
+        temp2 = []
 
         for i in range(npchart.npchart_freq):
             for j in all:
@@ -7815,37 +7904,81 @@ def viewFinalNpchart(request, pkid, pksurveyid):
             unittotal.append(sum(temp))
             temp = []
         
+        for i in range(npchart2.npchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
+        
         npbar = sum(unittotal) / len(unittotal)
         pbar = sum(unittotal) / (npchart.npchart_sample * npchart.npchart_freq)
         gambar = (npbar * (1 - pbar)) ** 0.5
         ucl = npbar + 3 * gambar
         lcl = 0
+
+        npbar2 = sum(unittotal2) / len(unittotal2)
+        pbar2 = sum(unittotal2) / (npchart2.npchart_sample * npchart2.npchart_freq)
+        gambar2 = (npbar2 * (1 - pbar2)) ** 0.5
+        ucl2 = npbar2 + 3 * gambar2
+        lcl2 = 0
                 
         npbarlist = []
         ucllist = []
         lcllist = []
         bot = []
+        ucllist2 = []
+        lcllist2 = []
 
         for i in range(npchart.npchart_freq):
             bot.append(i+1)
             npbarlist.append(npbar)
             ucllist.append(ucl)
             lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
+        
+
+        kelas = npchart.npchart_class
+        kelaslist = []
+        nkelaslist = []
+        bot2 = []
+        temp = min(unittotal)
+        lebar = (max(unittotal) - min(unittotal)) / kelas
+
+        for i in range(kelas):
+            kelaslist.append(temp + lebar)
+            temp = temp + lebar
+            bot2.append(i + 1)
+        
+        nkelaslist = []
+        temp = min(unittotal)
+        for i in kelaslist:
+            n = 0
+            for j in unittotal:
+                if temp <= j < i:
+                    n = n + 1
+            nkelaslist.append(n) 
+            temp = temp + lebar
 
         ###############################
 
 
         p = figure(title="NP Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
         p.line(bot, ucllist, legend_label="UCL", line_width=2)
-        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
-        p.line(bot, npbarlist, legend_label="NP Bar", color="red", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="red", line_width=2)
+        p.line(bot, npbarlist, legend_label="NP Bar", color="green", line_width=2)
         p.line(bot, unittotal, legend_label="Total Unit", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptnpchart, divnpchart = components(p)
 
          #####################################
 
-
+        p = figure(title="NP Chart Histogram", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='N of P Bar Per Class', x_axis_label='Class')
+        p.vbar(x=bot2, top=nkelaslist, width=0.9)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptnpcharth, divnpcharth = components(p)
 
         #####################################
 
@@ -7853,7 +7986,7 @@ def viewFinalNpchart(request, pkid, pksurveyid):
         gabung = zip(npchart.npchart_defect, npchart.npchart_all)
         freq = range(1, int(npchart.npchart_freq)+1)
 
-        return render(request,'npchart/collection_npchart.html', {'npchart':npchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'npbar':npbar, 'ucl':ucl, 'lcl':lcl, 'pbar':pbar, 'scriptnpchart':scriptnpchart, 'divnpchart':divnpchart})
+        return render(request,'npchart/collection_npchart.html', {'npchart':npchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'npbar':npbar, 'ucl':ucl, 'lcl':lcl, 'pbar':pbar, 'scriptnpchart':scriptnpchart, 'divnpchart':divnpchart, 'scriptnpcharth':scriptnpcharth, 'divnpcharth':divnpcharth})
     else:
         return redirect('/logout')
 
@@ -7872,21 +8005,33 @@ def viewAllNpchart(request, pkid, pksurveyid):
 def viewPrintNpchart(request, pkid, pksurveyid):
     if 'user' in request.session:
         npchart = Npchart.objects.get(id = pkid)
+        npchart2 = Npchart.objects.get(npchart_survey_id = pksurveyid, npchart_reason = "New Model")
         survey = Survey.objects.get(id = pksurveyid)
         ##############################
 
         all = npchart.npchart_all
+        all2 = npchart2.npchart_all
 
         cattotal = []
+        cattotal2 = []
         for i in all:
             cattotal.append(sum(i))
+        
+        for i in all2:
+            cattotal2.append(sum(i))
 
         pcattotal = []
+        pcattotal2 = []
         for i in cattotal:
             pcattotal.append(i / sum(cattotal) * 100)
         
+        for i in cattotal2:
+            pcattotal2.append(i / sum(cattotal2) * 100)
+        
         unittotal = []
         temp = []
+        unittotal2 = []
+        temp2 = []
 
         for i in range(npchart.npchart_freq):
             for j in all:
@@ -7894,37 +8039,81 @@ def viewPrintNpchart(request, pkid, pksurveyid):
             unittotal.append(sum(temp))
             temp = []
         
+        for i in range(npchart2.npchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
+        
         npbar = sum(unittotal) / len(unittotal)
         pbar = sum(unittotal) / (npchart.npchart_sample * npchart.npchart_freq)
         gambar = (npbar * (1 - pbar)) ** 0.5
         ucl = npbar + 3 * gambar
         lcl = 0
+
+        npbar2 = sum(unittotal2) / len(unittotal2)
+        pbar2 = sum(unittotal2) / (npchart2.npchart_sample * npchart2.npchart_freq)
+        gambar2 = (npbar2 * (1 - pbar2)) ** 0.5
+        ucl2 = npbar2 + 3 * gambar2
+        lcl2 = 0
                 
         npbarlist = []
         ucllist = []
         lcllist = []
         bot = []
+        ucllist2 = []
+        lcllist2 = []
 
         for i in range(npchart.npchart_freq):
             bot.append(i+1)
             npbarlist.append(npbar)
             ucllist.append(ucl)
             lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
+        
+
+        kelas = npchart.npchart_class
+        kelaslist = []
+        nkelaslist = []
+        bot2 = []
+        temp = min(unittotal)
+        lebar = (max(unittotal) - min(unittotal)) / kelas
+
+        for i in range(kelas):
+            kelaslist.append(temp + lebar)
+            temp = temp + lebar
+            bot2.append(i + 1)
+        
+        nkelaslist = []
+        temp = min(unittotal)
+        for i in kelaslist:
+            n = 0
+            for j in unittotal:
+                if temp <= j < i:
+                    n = n + 1
+            nkelaslist.append(n) 
+            temp = temp + lebar
 
         ###############################
 
 
-        p = figure(title="P Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p = figure(title="NP Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
         p.line(bot, ucllist, legend_label="UCL", line_width=2)
-        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
-        p.line(bot, npbarlist, legend_label="NP Bar", color="red", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="red", line_width=2)
+        p.line(bot, npbarlist, legend_label="NP Bar", color="green", line_width=2)
         p.line(bot, unittotal, legend_label="Total Unit", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptnpchart, divnpchart = components(p)
 
          #####################################
 
-
+        p = figure(title="NP Chart Histogram", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='N of P Bar Per Class', x_axis_label='Class')
+        p.vbar(x=bot2, top=nkelaslist, width=0.9)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptnpcharth, divnpcharth = components(p)
 
         #####################################
 
@@ -7932,7 +8121,7 @@ def viewPrintNpchart(request, pkid, pksurveyid):
         gabung = zip(npchart.npchart_defect, npchart.npchart_all)
         freq = range(1, int(npchart.npchart_freq)+1)
 
-        return render(request,'npchart/print_npchart.html', {'npchart':npchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'npbar':npbar, 'ucl':ucl, 'lcl':lcl, 'scriptnpchart':scriptnpchart, 'divnpchart':divnpchart})
+        return render(request,'npchart/print_npchart.html', {'npchart':npchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'npbar':npbar, 'ucl':ucl, 'lcl':lcl, 'pbar':pbar, 'scriptnpchart':scriptnpchart, 'divnpchart':divnpchart, 'scriptnpcharth':scriptnpcharth, 'divnpcharth':divnpcharth})
     else:
         return redirect('/logout')
 
@@ -7944,6 +8133,270 @@ def viewListNpchart(request, pk):
     else:
         return redirect('/logout')
 
+def viewPrintNpchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        npchart = Npchart.objects.get(id = pkid)
+        npchart2 = Npchart.objects.get(npchart_survey_id = pksurveyid, npchart_reason = "New Model")
+        survey = Survey.objects.get(id = pksurveyid)
+        ##############################
+
+        all = npchart.npchart_all
+        all2 = npchart2.npchart_all
+
+        cattotal = []
+        cattotal2 = []
+        for i in all:
+            cattotal.append(sum(i))
+        
+        for i in all2:
+            cattotal2.append(sum(i))
+
+        pcattotal = []
+        pcattotal2 = []
+        for i in cattotal:
+            pcattotal.append(i / sum(cattotal) * 100)
+        
+        for i in cattotal2:
+            pcattotal2.append(i / sum(cattotal2) * 100)
+        
+        unittotal = []
+        temp = []
+        unittotal2 = []
+        temp2 = []
+
+        for i in range(npchart.npchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        for i in range(npchart2.npchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
+        
+        npbar = sum(unittotal) / len(unittotal)
+        pbar = sum(unittotal) / (npchart.npchart_sample * npchart.npchart_freq)
+        gambar = (npbar * (1 - pbar)) ** 0.5
+        ucl = npbar + 3 * gambar
+        lcl = 0
+
+        npbar2 = sum(unittotal2) / len(unittotal2)
+        pbar2 = sum(unittotal2) / (npchart2.npchart_sample * npchart2.npchart_freq)
+        gambar2 = (npbar2 * (1 - pbar2)) ** 0.5
+        ucl2 = npbar2 + 3 * gambar2
+        lcl2 = 0
+                
+        npbarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+        ucllist2 = []
+        lcllist2 = []
+
+        for i in range(npchart.npchart_freq):
+            bot.append(i+1)
+            npbarlist.append(npbar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
+        
+
+        kelas = npchart.npchart_class
+        kelaslist = []
+        nkelaslist = []
+        bot2 = []
+        temp = min(unittotal)
+        lebar = (max(unittotal) - min(unittotal)) / kelas
+
+        for i in range(kelas):
+            kelaslist.append(temp + lebar)
+            temp = temp + lebar
+            bot2.append(i + 1)
+        
+        nkelaslist = []
+        temp = min(unittotal)
+        for i in kelaslist:
+            n = 0
+            for j in unittotal:
+                if temp <= j < i:
+                    n = n + 1
+            nkelaslist.append(n) 
+            temp = temp + lebar
+
+        ###############################
+
+
+        p = figure(title="NP Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="red", line_width=2)
+        p.line(bot, npbarlist, legend_label="NP Bar", color="green", line_width=2)
+        p.line(bot, unittotal, legend_label="Total Unit", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptnpchart, divnpchart = components(p)
+
+         #####################################
+
+        p = figure(title="NP Chart Histogram", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='N of P Bar Per Class', x_axis_label='Class')
+        p.vbar(x=bot2, top=nkelaslist, width=0.9)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptnpcharth, divnpcharth = components(p)
+
+        #####################################
+
+        
+        gabung = zip(npchart.npchart_defect, npchart.npchart_all)
+        freq = range(1, int(npchart.npchart_freq)+1)
+
+        return render(request,'npchart/print_npchart.html', {'npchart':npchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'npbar':npbar, 'ucl':ucl, 'lcl':lcl, 'pbar':pbar, 'scriptnpchart':scriptnpchart, 'divnpchart':divnpchart, 'scriptnpcharth':scriptnpcharth, 'divnpcharth':divnpcharth})
+    else:
+        return redirect('/logout')
+
+def viewCommentNpchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        npchart = Npchart.objects.get(id = pkid)
+        npchart2 = Npchart.objects.get(npchart_survey_id = pksurveyid, npchart_reason = "New Model")
+        survey = Survey.objects.get(id = pksurveyid)
+        ##############################
+
+        all = npchart.npchart_all
+        all2 = npchart2.npchart_all
+
+        cattotal = []
+        cattotal2 = []
+        for i in all:
+            cattotal.append(sum(i))
+        
+        for i in all2:
+            cattotal2.append(sum(i))
+
+        pcattotal = []
+        pcattotal2 = []
+        for i in cattotal:
+            pcattotal.append(i / sum(cattotal) * 100)
+        
+        for i in cattotal2:
+            pcattotal2.append(i / sum(cattotal2) * 100)
+        
+        unittotal = []
+        temp = []
+        unittotal2 = []
+        temp2 = []
+
+        for i in range(npchart.npchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        for i in range(npchart2.npchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
+        
+        npbar = sum(unittotal) / len(unittotal)
+        pbar = sum(unittotal) / (npchart.npchart_sample * npchart.npchart_freq)
+        gambar = (npbar * (1 - pbar)) ** 0.5
+        ucl = npbar + 3 * gambar
+        lcl = 0
+
+        npbar2 = sum(unittotal2) / len(unittotal2)
+        pbar2 = sum(unittotal2) / (npchart2.npchart_sample * npchart2.npchart_freq)
+        gambar2 = (npbar2 * (1 - pbar2)) ** 0.5
+        ucl2 = npbar2 + 3 * gambar2
+        lcl2 = 0
+                
+        npbarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+        ucllist2 = []
+        lcllist2 = []
+
+        for i in range(npchart.npchart_freq):
+            bot.append(i+1)
+            npbarlist.append(npbar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
+        
+
+        kelas = npchart.npchart_class
+        kelaslist = []
+        nkelaslist = []
+        bot2 = []
+        temp = min(unittotal)
+        lebar = (max(unittotal) - min(unittotal)) / kelas
+
+        for i in range(kelas):
+            kelaslist.append(temp + lebar)
+            temp = temp + lebar
+            bot2.append(i + 1)
+        
+        nkelaslist = []
+        temp = min(unittotal)
+        for i in kelaslist:
+            n = 0
+            for j in unittotal:
+                if temp <= j < i:
+                    n = n + 1
+            nkelaslist.append(n) 
+            temp = temp + lebar
+
+        ###############################
+
+
+        p = figure(title="NP Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="red", line_width=2)
+        p.line(bot, npbarlist, legend_label="NP Bar", color="green", line_width=2)
+        p.line(bot, unittotal, legend_label="Total Unit", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptnpchart, divnpchart = components(p)
+
+         #####################################
+
+        p = figure(title="NP Chart Histogram", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='N of P Bar Per Class', x_axis_label='Class')
+        p.vbar(x=bot2, top=nkelaslist, width=0.9)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptnpcharth, divnpcharth = components(p)
+
+        #####################################
+
+        
+        gabung = zip(npchart.npchart_defect, npchart.npchart_all)
+        freq = range(1, int(npchart.npchart_freq)+1)
+
+        return render(request,'npchart/comment_npchart.html', {'npchart':npchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'npbar':npbar, 'ucl':ucl, 'lcl':lcl, 'pbar':pbar, 'scriptnpchart':scriptnpchart, 'divnpchart':divnpchart, 'scriptnpcharth':scriptnpcharth, 'divnpcharth':divnpcharth})
+    else:
+        return redirect('/logout')
+
+def storeCommentNpchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        npchart = Npchart.objects.get(id = pkid)
+
+        resume = request.POST.get('npchart_resume')
+
+        if resume == "Stable":
+            npchart.npchart_recommendation = request.POST.getlist('npchart_resume')
+        else:
+            npchart.npchart_recommendation = request.POST.getlist('npchart_action')
+
+        npchart.save()
+
+        # return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey})
+        return redirect('coretoolcrud:viewFinalNpchart', pkid, pksurveyid )
+    else:
+        return redirect('/logout')
+
 #U Chart
 
 def viewUchart(request, pkid, pksurveyid):
@@ -7952,11 +8405,10 @@ def viewUchart(request, pkid, pksurveyid):
             uchart = Uchart.objects.get(id = pkid)
             if uchart.uchart_all:
                 return redirect('coretoolcrud:viewFinalUchart', pkid, pksurveyid)
+            elif uchart.uchart_nsample:
+                return redirect('coretoolcrud:viewAllUchart', pkid, pksurveyid)
             else:
-                survey = Survey.objects.get(id = pksurveyid)
-                freq = uchart.uchart_freq
-                plan = survey.survey_plan
-                return render(request,'uchart/all_uchart.html',{'freq':freq, 'plan':plan, 'uchart':uchart, 'survey':survey})
+                return redirect('coretoolcrud:viewNsampleUchart', pkid, pksurveyid)
             
         except Uchart.DoesNotExist:
             return render(request,'uchart/uchart.html',{'pkid':pkid, 'pksurveyid':pksurveyid})
@@ -7975,19 +8427,25 @@ def storeUchart(request, pkid, pksurveyid):
         uchart.uchart_survey_id = pksurveyid
         uchart.uchart_sample = request.POST.get('uchart_sample')
         uchart.uchart_freq = request.POST.get('uchart_freq')
+        uchart.uchart_class = request.POST.get('uchart_class')
         uchart.uchart_measured = request.POST.get('uchart_measured')
         uchart.uchart_reviewed = request.POST.get('uchart_reviewed')
         uchart.uchart_reason = request.POST.get('uchart_reason')
+
+        if uchart.uchart_reason == "New Model":
+            uchartlist = Uchart.objects.filter(uchart_survey_id = pksurveyid, uchart_reason = "New Model")
+            if uchartlist:
+                Uchart.objects.filter(uchart_survey_id = pksurveyid, uchart_reason = "New Model").delete()
+
         uchart.save()
 
-        return redirect('coretoolcrud:viewAllUchart', uchart.id, pksurveyid)    
+        return redirect('coretoolcrud:viewNsampleUchart', uchart.id, pksurveyid)    
     else:
         return redirect('/logout')
 
 def storeAllUchart(request, pkid, pksurveyid):
     if 'user' in request.session:
         uchart = Uchart.objects.get(id = pkid)
-        survey = Survey.objects.get(id = pksurveyid)
         tempall = []
         tempall1 = []
         tempall2 = []
@@ -8012,11 +8470,9 @@ def storeAllUchart(request, pkid, pksurveyid):
         elif uchart.uchart_defect is not None:
             uchart.uchart_defect.append(defect)
 
-        # pchart.pchart_all = pchart.pchart_all.append(tempall1)
-        # pchart.pchart_defect = pchart.pchart_defect.append(tempdefect)
         uchart.save()
 
-        return redirect('coretoolcrud:viewFinalUchart', pkid, pksurveyid)    
+        return redirect('coretoolcrud:viewCommentUchart', pkid, pksurveyid)    
     else:
         return redirect('/logout')    
 
@@ -8032,13 +8488,17 @@ def deleteUchart(request, pkid, pksurveyid):
 def viewFinalUchart(request, pkid, pksurveyid):
     if 'user' in request.session:
         uchart = Uchart.objects.get(id = pkid)
+        uchart2 = Uchart.objects.get(uchart_survey_id = pksurveyid, uchart_reason = "New Model")
         survey = Survey.objects.get(id = pksurveyid)
         ##############################
 
         all = uchart.uchart_all
+        all2 = uchart2.uchart_all
 
         unittotal = []
         temp = []
+        unittotal2 = []
+        temp2 = []
 
         for i in range(uchart.uchart_freq):
             for j in all:
@@ -8046,29 +8506,70 @@ def viewFinalUchart(request, pkid, pksurveyid):
             unittotal.append(sum(temp))
             temp = []
         
+        for i in range(uchart2.uchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
+        
         #EDIT THIS SOON!!!!
-        nsample = [8, 8, 9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]
+        nsample = uchart.uchart_nsample
         #DONT FORGET!!!
 
         ups = []
+        ups2 = []
         for i in range(uchart.uchart_freq):
             ups.append(unittotal[i] / nsample[i])
+        
+        for i in range(uchart2.uchart_freq):
+            ups2.append(unittotal2[i] / nsample[i])
         
         nbar = sum(nsample) / len(nsample)
         ubar = sum(ups) / len(ups)
         ucl = ubar + 3 * (ubar / nbar) ** 0.5
         lcl = ubar - 3 * (ubar / nbar) ** 0.5
+
+        nbar2 = sum(nsample) / len(nsample)
+        ubar2 = sum(ups2) / len(ups2)
+        ucl2 = ubar2 + 3 * (ubar2 / nbar2) ** 0.5
+        lcl2 = ubar2 - 3 * (ubar2 / nbar2) ** 0.5
                 
         ubarlist = []
         ucllist = []
         lcllist = []
         bot = []
+        ucllist2 = []
+        lcllist2 = []
 
         for i in range(uchart.uchart_freq):
             bot.append(i+1)
             ubarlist.append(ubar)
             ucllist.append(ucl)
             lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
+        
+        kelas = uchart.uchart_class
+        kelaslist = []
+        nkelaslist = []
+        bot2 = []
+        temp = min(ups)
+        lebar = (max(ups) - min(ups)) / kelas
+
+        for i in range(kelas):
+            kelaslist.append(temp + lebar)
+            temp = temp + lebar
+            bot2.append(i + 1)
+        
+        nkelaslist = []
+        temp = min(ups)
+        for i in kelaslist:
+            n = 0
+            for j in ups:
+                if temp <= j < i:
+                    n = n + 1
+            nkelaslist.append(n) 
+            temp = temp + lebar
 
         ###############################
 
@@ -8078,12 +8579,17 @@ def viewFinalUchart(request, pkid, pksurveyid):
         p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
         p.line(bot, ubarlist, legend_label="U Bar", color="red", line_width=2)
         p.line(bot, ups, legend_label="Unit / Sample", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptuchart, divuchart = components(p)
 
          #####################################
 
-
+        p = figure(title="U Chart Histogram", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='N of P Bar Per Class', x_axis_label='Class')
+        p.vbar(x=bot2, top=nkelaslist, width=0.9)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptucharth, divucharth = components(p)
 
         #####################################
 
@@ -8091,7 +8597,7 @@ def viewFinalUchart(request, pkid, pksurveyid):
         gabung = zip(uchart.uchart_defect, uchart.uchart_all)
         freq = range(1, int(uchart.uchart_freq)+1)
 
-        return render(request,'uchart/collection_uchart.html', {'uchart':uchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'ubar':ubar, 'ucl':ucl, 'lcl':lcl, 'nbar':nbar, 'scriptuchart':scriptuchart, 'divuchart':divuchart})
+        return render(request,'uchart/collection_uchart.html', {'uchart':uchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'ubar':ubar, 'ucl':ucl, 'lcl':lcl, 'nbar':nbar, 'scriptuchart':scriptuchart, 'divuchart':divuchart, 'scriptucharth':scriptucharth, 'divucharth':divucharth})
     else:
         return redirect('/logout')
 
@@ -8110,13 +8616,17 @@ def viewAllUchart(request, pkid, pksurveyid):
 def viewPrintUchart(request, pkid, pksurveyid):
     if 'user' in request.session:
         uchart = Uchart.objects.get(id = pkid)
+        uchart2 = Uchart.objects.get(uchart_survey_id = pksurveyid, uchart_reason = "New Model")
         survey = Survey.objects.get(id = pksurveyid)
         ##############################
 
         all = uchart.uchart_all
+        all2 = uchart2.uchart_all
 
         unittotal = []
         temp = []
+        unittotal2 = []
+        temp2 = []
 
         for i in range(uchart.uchart_freq):
             for j in all:
@@ -8124,38 +8634,59 @@ def viewPrintUchart(request, pkid, pksurveyid):
             unittotal.append(sum(temp))
             temp = []
         
+        for i in range(uchart2.uchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
+        
         #EDIT THIS SOON!!!!
-        nsample = [8, 8, 9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8]
+        nsample = uchart.uchart_nsample
         #DONT FORGET!!!
 
         ups = []
+        ups2 = []
         for i in range(uchart.uchart_freq):
             ups.append(unittotal[i] / nsample[i])
+        
+        for i in range(uchart2.uchart_freq):
+            ups2.append(unittotal2[i] / nsample[i])
         
         nbar = sum(nsample) / len(nsample)
         ubar = sum(ups) / len(ups)
         ucl = ubar + 3 * (ubar / nbar) ** 0.5
         lcl = ubar - 3 * (ubar / nbar) ** 0.5
+
+        nbar2 = sum(nsample) / len(nsample)
+        ubar2 = sum(ups2) / len(ups2)
+        ucl2 = ubar2 + 3 * (ubar2 / nbar2) ** 0.5
+        lcl2 = ubar2 - 3 * (ubar2 / nbar2) ** 0.5
                 
         ubarlist = []
         ucllist = []
         lcllist = []
         bot = []
+        ucllist2 = []
+        lcllist2 = []
 
         for i in range(uchart.uchart_freq):
             bot.append(i+1)
             ubarlist.append(ubar)
             ucllist.append(ucl)
             lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
 
         ###############################
 
 
-        p = figure(title="P Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p = figure(title="U Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
         p.line(bot, ucllist, legend_label="UCL", line_width=2)
         p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
         p.line(bot, ubarlist, legend_label="U Bar", color="red", line_width=2)
         p.line(bot, ups, legend_label="Unit / Sample", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptuchart, divuchart = components(p)
 
@@ -8169,7 +8700,7 @@ def viewPrintUchart(request, pkid, pksurveyid):
         gabung = zip(uchart.uchart_defect, uchart.uchart_all)
         freq = range(1, int(uchart.uchart_freq)+1)
 
-        return render(request,'uchart/print_uchart.html', {'uchart':uchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'ubar':ubar, 'ucl':ucl, 'lcl':lcl, 'scriptuchart':scriptuchart, 'divuchart':divuchart})
+        return render(request,'uchart/collection_uchart.html', {'uchart':uchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'ubar':ubar, 'ucl':ucl, 'lcl':lcl, 'nbar':nbar, 'scriptuchart':scriptuchart, 'divuchart':divuchart})
     else:
         return redirect('/logout')
 
@@ -8180,6 +8711,145 @@ def viewListUchart(request, pk):
         return render(request,'uchart/list_uchart.html',{'uchart':uchart, 'survey':survey})
     else:
         return redirect('/logout')
+
+def viewCommentUchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        uchart = Uchart.objects.get(id = pkid)
+        uchart2 = Uchart.objects.get(uchart_survey_id = pksurveyid, uchart_reason = "New Model")
+        survey = Survey.objects.get(id = pksurveyid)
+        ##############################
+
+        all = uchart.uchart_all
+        all2 = uchart2.uchart_all
+
+        unittotal = []
+        temp = []
+        unittotal2 = []
+        temp2 = []
+
+        for i in range(uchart.uchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        for i in range(uchart2.uchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
+        
+        #EDIT THIS SOON!!!!
+        nsample = uchart.uchart_nsample
+        #DONT FORGET!!!
+
+        ups = []
+        ups2 = []
+        for i in range(uchart.uchart_freq):
+            ups.append(unittotal[i] / nsample[i])
+        
+        for i in range(uchart2.uchart_freq):
+            ups2.append(unittotal2[i] / nsample[i])
+        
+        nbar = sum(nsample) / len(nsample)
+        ubar = sum(ups) / len(ups)
+        ucl = ubar + 3 * (ubar / nbar) ** 0.5
+        lcl = ubar - 3 * (ubar / nbar) ** 0.5
+
+        nbar2 = sum(nsample) / len(nsample)
+        ubar2 = sum(ups2) / len(ups2)
+        ucl2 = ubar2 + 3 * (ubar2 / nbar2) ** 0.5
+        lcl2 = ubar2 - 3 * (ubar2 / nbar2) ** 0.5
+                
+        ubarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+        ucllist2 = []
+        lcllist2 = []
+
+        for i in range(uchart.uchart_freq):
+            bot.append(i+1)
+            ubarlist.append(ubar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
+
+        ###############################
+
+
+        p = figure(title="U Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
+        p.line(bot, ubarlist, legend_label="U Bar", color="red", line_width=2)
+        p.line(bot, ups, legend_label="Unit / Sample", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptuchart, divuchart = components(p)
+
+         #####################################
+
+
+
+        #####################################
+
+        
+        gabung = zip(uchart.uchart_defect, uchart.uchart_all)
+        freq = range(1, int(uchart.uchart_freq)+1)
+
+        return render(request,'uchart/comment_uchart.html', {'uchart':uchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'ubar':ubar, 'ucl':ucl, 'lcl':lcl, 'nbar':nbar, 'scriptuchart':scriptuchart, 'divuchart':divuchart})
+    else:
+        return redirect('/logout')
+
+def storeCommentUchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        uchart = Uchart.objects.get(id = pkid)
+
+        resume = request.POST.get('uchart_resume')
+
+        if resume == "Stable":
+            uchart.uchart_recommendation = request.POST.getlist('uchart_resume')
+        else:
+            uchart.uchart_recommendation = request.POST.getlist('uchart_action')
+
+        uchart.save()
+
+        # return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey})
+        return redirect('coretoolcrud:viewFinalUchart', pkid, pksurveyid )
+    else:
+        return redirect('/logout')
+
+def viewNsampleUchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            uchart = Uchart.objects.get(id = pkid)
+            nos = range(1, int(uchart.uchart_freq) + 1)
+            return render(request,'uchart/nsample_uchart.html',{'nos':nos, 'uchart':uchart})
+        
+        except Uchart.DoesNotExist:
+            return redirect('coretoolcrud:viewUchart', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')   
+
+def storeNsampleUchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        uchart = Uchart.objects.get(id = pkid)
+
+        uchart.uchart_nsample = request.POST.getlist('uchart_nsample')
+
+        temp = []
+        for i in uchart.uchart_nsample:
+            temp.append(float(i))
+        
+        uchart.uchart_nsample = temp
+
+        uchart.save()
+
+        return redirect('coretoolcrud:viewAllUchart', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')    
 
 #C Chart
 
@@ -8212,9 +8882,16 @@ def storeCchart(request, pkid, pksurveyid):
         cchart.cchart_survey_id = pksurveyid
         cchart.cchart_sample = request.POST.get('cchart_sample')
         cchart.cchart_freq = request.POST.get('cchart_freq')
+        cchart.cchart_class = request.POST.get('cchart_class')
         cchart.cchart_measured = request.POST.get('cchart_measured')
         cchart.cchart_reviewed = request.POST.get('cchart_reviewed')
         cchart.cchart_reason = request.POST.get('cchart_reason')
+
+        if cchart.cchart_reason == "New Model":
+            cchartlist = Cchart.objects.filter(cchart_survey_id = pksurveyid, cchart_reason = "New Model")
+            if cchartlist:
+                Cchart.objects.filter(cchart_survey_id = pksurveyid, cchart_reason = "New Model").delete()
+
         cchart.save()
 
         return redirect('coretoolcrud:viewAllCchart', cchart.id, pksurveyid)    
@@ -8253,7 +8930,7 @@ def storeAllCchart(request, pkid, pksurveyid):
         # pchart.pchart_defect = pchart.pchart_defect.append(tempdefect)
         cchart.save()
 
-        return redirect('coretoolcrud:viewFinalCchart', pkid, pksurveyid)    
+        return redirect('coretoolcrud:viewCommentCchart', pkid, pksurveyid)    
     else:
         return redirect('/logout')    
 
@@ -8269,19 +8946,29 @@ def deleteCchart(request, pkid, pksurveyid):
 def viewFinalCchart(request, pkid, pksurveyid):
     if 'user' in request.session:
         cchart = Cchart.objects.get(id = pkid)
+        cchart2 = Cchart.objects.get(cchart_survey_id = pksurveyid, cchart_reason = "New Model")
         survey = Survey.objects.get(id = pksurveyid)
         ##############################
 
         all = cchart.cchart_all
+        all2 = cchart2.cchart_all
 
         unittotal = []
         temp = []
+        unittotal2 = []
+        temp2 = []
 
         for i in range(cchart.cchart_freq):
             for j in all:
                 temp.append(j[i])
             unittotal.append(sum(temp))
             temp = []
+        
+        for i in range(cchart2.cchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
         
         sumc = sum(unittotal)
         cbar = sum(unittotal) / len(unittotal)
@@ -8290,18 +8977,29 @@ def viewFinalCchart(request, pkid, pksurveyid):
             lcl = 0
         else:
             lcl = cbar - 3 * cbar ** 0.5
+        
+        cbar2 = sum(unittotal2) / len(unittotal2)
+        ucl2 = cbar2 + 3 * cbar2 ** 0.5
+        if (cbar2 - 3 * cbar2 ** 0.5) < 0:
+            lcl2 = 0
+        else:
+            lcl2 = cbar2 - 3 * cbar2 ** 0.5
 
                 
         cbarlist = []
         ucllist = []
         lcllist = []
         bot = []
+        ucllist2 = []
+        lcllist2 = []
 
         for i in range(cchart.cchart_freq):
             bot.append(i+1)
             cbarlist.append(cbar)
             ucllist.append(ucl)
             lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
 
         ###############################
 
@@ -8311,6 +9009,8 @@ def viewFinalCchart(request, pkid, pksurveyid):
         p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
         p.line(bot, cbarlist, legend_label="C Bar", color="red", line_width=2)
         p.line(bot, unittotal, legend_label="Total Unit", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptcchart, divcchart = components(p)
 
@@ -8343,19 +9043,29 @@ def viewAllCchart(request, pkid, pksurveyid):
 def viewPrintCchart(request, pkid, pksurveyid):
     if 'user' in request.session:
         cchart = Cchart.objects.get(id = pkid)
+        cchart2 = Cchart.objects.get(cchart_survey_id = pksurveyid, cchart_reason = "New Model")
         survey = Survey.objects.get(id = pksurveyid)
         ##############################
 
         all = cchart.cchart_all
+        all2 = cchart2.cchart_all
 
         unittotal = []
         temp = []
+        unittotal2 = []
+        temp2 = []
 
         for i in range(cchart.cchart_freq):
             for j in all:
                 temp.append(j[i])
             unittotal.append(sum(temp))
             temp = []
+        
+        for i in range(cchart2.cchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
         
         sumc = sum(unittotal)
         cbar = sum(unittotal) / len(unittotal)
@@ -8364,27 +9074,40 @@ def viewPrintCchart(request, pkid, pksurveyid):
             lcl = 0
         else:
             lcl = cbar - 3 * cbar ** 0.5
+        
+        cbar2 = sum(unittotal2) / len(unittotal2)
+        ucl2 = cbar2 + 3 * cbar2 ** 0.5
+        if (cbar2 - 3 * cbar2 ** 0.5) < 0:
+            lcl2 = 0
+        else:
+            lcl2 = cbar2 - 3 * cbar2 ** 0.5
 
                 
         cbarlist = []
         ucllist = []
         lcllist = []
         bot = []
+        ucllist2 = []
+        lcllist2 = []
 
         for i in range(cchart.cchart_freq):
             bot.append(i+1)
             cbarlist.append(cbar)
             ucllist.append(ucl)
             lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
 
         ###############################
 
 
-        p = figure(title="P Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p = figure(title="C Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
         p.line(bot, ucllist, legend_label="UCL", line_width=2)
         p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
         p.line(bot, cbarlist, legend_label="C Bar", color="red", line_width=2)
         p.line(bot, unittotal, legend_label="Total Unit", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptcchart, divcchart = components(p)
 
@@ -8398,7 +9121,7 @@ def viewPrintCchart(request, pkid, pksurveyid):
         gabung = zip(cchart.cchart_defect, cchart.cchart_all)
         freq = range(1, int(cchart.cchart_freq)+1)
 
-        return render(request,'cchart/print_cchart.html', {'cchart':cchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'cbar':cbar, 'ucl':ucl, 'lcl':lcl, 'scriptcchart':scriptcchart, 'divcchart':divcchart})
+        return render(request,'cchart/print_cchart.html', {'cchart':cchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'cbar':cbar, 'ucl':ucl, 'lcl':lcl, 'sumc':sumc, 'scriptcchart':scriptcchart, 'divcchart':divcchart})
     else:
         return redirect('/logout')
 
@@ -8407,6 +9130,109 @@ def viewListCchart(request, pk):
         cchart = Cchart.objects.filter(cchart_survey_id=pk)
         survey = Survey.objects.get(id = pk)
         return render(request,'cchart/list_cchart.html',{'cchart':cchart, 'survey':survey})
+    else:
+        return redirect('/logout')
+
+def viewCommentCchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        cchart = Cchart.objects.get(id = pkid)
+        cchart2 = Cchart.objects.get(cchart_survey_id = pksurveyid, cchart_reason = "New Model")
+        survey = Survey.objects.get(id = pksurveyid)
+        ##############################
+
+        all = cchart.cchart_all
+        all2 = cchart2.cchart_all
+
+        unittotal = []
+        temp = []
+        unittotal2 = []
+        temp2 = []
+
+        for i in range(cchart.cchart_freq):
+            for j in all:
+                temp.append(j[i])
+            unittotal.append(sum(temp))
+            temp = []
+        
+        for i in range(cchart2.cchart_freq):
+            for j in all2:
+                temp2.append(j[i])
+            unittotal2.append(sum(temp2))
+            temp2 = []
+        
+        sumc = sum(unittotal)
+        cbar = sum(unittotal) / len(unittotal)
+        ucl = cbar + 3 * cbar ** 0.5
+        if (cbar - 3 * cbar ** 0.5) < 0:
+            lcl = 0
+        else:
+            lcl = cbar - 3 * cbar ** 0.5
+        
+        cbar2 = sum(unittotal2) / len(unittotal2)
+        ucl2 = cbar2 + 3 * cbar2 ** 0.5
+        if (cbar2 - 3 * cbar2 ** 0.5) < 0:
+            lcl2 = 0
+        else:
+            lcl2 = cbar2 - 3 * cbar2 ** 0.5
+
+                
+        cbarlist = []
+        ucllist = []
+        lcllist = []
+        bot = []
+        ucllist2 = []
+        lcllist2 = []
+
+        for i in range(cchart.cchart_freq):
+            bot.append(i+1)
+            cbarlist.append(cbar)
+            ucllist.append(ucl)
+            lcllist.append(lcl)
+            ucllist2.append(ucl2)
+            lcllist2.append(lcl2)
+
+        ###############################
+
+
+        p = figure(title="C Chart", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, ucllist, legend_label="UCL", line_width=2)
+        p.line(bot, lcllist, legend_label="LCL", color="green", line_width=2)
+        p.line(bot, cbarlist, legend_label="C Bar", color="red", line_width=2)
+        p.line(bot, unittotal, legend_label="Total Unit", color="yellow", line_width=2)
+        p.line(bot, ucllist2, legend_label="New Model UCL", color="brown", line_width=2)
+        p.line(bot, lcllist2, legend_label="New Model LCL", color="black", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptcchart, divcchart = components(p)
+
+         #####################################
+
+
+
+        #####################################
+
+        
+        gabung = zip(cchart.cchart_defect, cchart.cchart_all)
+        freq = range(1, int(cchart.cchart_freq)+1)
+
+        return render(request,'cchart/comment_cchart.html', {'cchart':cchart, 'survey':survey, 'gabung':gabung, 'freq':freq, 'cbar':cbar, 'ucl':ucl, 'lcl':lcl, 'sumc':sumc, 'scriptcchart':scriptcchart, 'divcchart':divcchart})
+    else:
+        return redirect('/logout')
+
+def storeCommentCchart(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        cchart = Cchart.objects.get(id = pkid)
+
+        resume = request.POST.get('cchart_resume')
+
+        if resume == "Stable":
+            cchart.cchart_recommendation = request.POST.getlist('cchart_resume')
+        else:
+            cchart.cchart_recommendation = request.POST.getlist('cchart_action')
+
+        cchart.save()
+
+        # return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey})
+        return redirect('coretoolcrud:viewFinalCchart', pkid, pksurveyid )
     else:
         return redirect('/logout')
 

@@ -208,8 +208,34 @@
                       </div>
                       <br><br>
 
-                     
-                      
+                      <div class="card">
+                        
+                        <div class="card-body">
+                          
+                          {{divucharth| safe}}
+                          <br><br><br>
+                         
+                         
+                        </div>
+                      </div>
+                      <br><br>
+
+                      <div class="card">
+                        
+                        <div class="card-body">
+                          
+                          
+                          <br><h6>Recommendation</h6>
+                            
+                          {% for ele in uchart.uchart_recommendation %} 
+                          <h6>- {{ ele }}</h6>
+                          {% endfor %}
+                          
+                        </div>
+                      </div>
+
+                      <br><br>
+
                     
                       <a href="{% url 'coretoolcrud:deleteUchart' uchart.id uchart.uchart_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
                       <a href="{% url 'coretoolcrud:viewPrintUchart' uchart.id uchart.uchart_survey_id %}" class="btn btn-info">Print</a>
@@ -226,5 +252,6 @@
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.2.min.js"></script>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.2.min.js"></script>
 {{scriptuchart| safe}}
+{{scriptucharth| safe}}
 </html>
 

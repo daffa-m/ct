@@ -138,6 +138,7 @@ class Pchart(models.Model):
     pchart_measured = models.TextField()
     pchart_reviewed = models.TextField()
     pchart_reason = models.TextField(null=True)
+    pchart_class = models.IntegerField()
 
 class Npchart(models.Model):
     npchart_survey_id = models.IntegerField()
@@ -149,6 +150,7 @@ class Npchart(models.Model):
     npchart_reviewed = models.TextField()
     npchart_reason = models.TextField(null=True)
     npchart_recommendation = models.JSONField(null=True)
+    npchart_class = models.IntegerField()
 
 class Uchart(models.Model):
     uchart_survey_id = models.IntegerField()
@@ -160,6 +162,8 @@ class Uchart(models.Model):
     uchart_reviewed = models.TextField()
     uchart_reason = models.TextField(null=True)
     uchart_recommendation = models.JSONField(null=True)
+    uchart_class = models.IntegerField()
+    uchart_nsample = models.JSONField(null=True)
 
 class Cchart(models.Model):
     cchart_survey_id = models.IntegerField()
@@ -171,6 +175,7 @@ class Cchart(models.Model):
     cchart_reviewed = models.TextField()
     cchart_reason = models.TextField(null=True)
     cchart_recommendation = models.JSONField(null=True)
+    cchart_class = models.IntegerField()
 
 class Survey(models.Model):
     survey_user_id = models.IntegerField()
