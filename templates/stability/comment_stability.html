@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>I-MR</title>
+	<title>Stability</title>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
     <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
     <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
@@ -41,13 +42,24 @@
     .card {
       display:inline-block;
       width:100%;
-    } 
+      } 
+    .btn{
+      margin-right: 1%;
+      margin-left: 1%;
+    }    
+    input{
+      margin-top: 1%;
+      margin-bottom: 1%;
+      margin-right: 1%;
+      margin-left: 1%;
+    }
     table {
         text-align: center;
     }
     table thead th {
         text-align: center;
     }
+
     </style>
     
 </head>
@@ -55,32 +67,31 @@
     <div class="container">
       <div class="invoice-title">
         <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
-            <h2>I-MR</h2><br>
-        <ul class="breadcrumb">
-            <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
-            <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
-            <li><a href="{% url 'coretoolcrud:viewDetailSurvey' imr.imr_survey_id %}">Survey Result</a></li>
-            <li>I-MR Result</li>
-        </ul>
-          {% if messages %}
-          {% for message in messages %}
-          {% if message.tags == 'error' %}
-          <div class="alert alert-danger" role="alert">
+          <h2>Stability</h2><br>
+      <ul class="breadcrumb">
+        <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
+        <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
+        <li><a href="{% url 'coretoolcrud:viewDetailSurvey' stability.stability_survey_id %}">Survey Result</a></li>
+        <li>Fill NP Chart Data</li>
+      </ul>
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">
+          <h7>{{ message }}</h7>
+        </div>
+        {% else %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
             <h7>{{ message }}</h7>
-          </div>
-          {% else %}
-          <div class="alert alert-{{ message.tags }}" role="alert">
-              <h7>{{ message }}</h7>
-          </div>
-          {% endif %}
-          {% endfor %}
-          {% endif %}
-        </nav>
-        
-     
-      <hr>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+      </nav>
+       
+        <hr>
 
-    </div>
+      </div>
 
                 <table class="table table-hover table-bordered results">
                   <thead>
@@ -145,70 +156,57 @@
                 </table>
 
                 <table class="table table-hover table-bordered results">
-                  <thead>
-                    
-                    <tr>
-                        <th scope="col">LSL: {{imr.imr_lsl}}</th>
-                        <th scope="col">USL: {{imr.imr_usl}}</th>
-                        <th scope="col">Num of subgroup: {{imr.imr_subgroup}}</th>
-                        <th scope="col"></th>
-                    </tr>
-                    <tr>
-                        <th scope="col">Cp: {{cp|floatformat:2}}</th>
-                        <th scope="col">Cpk: {{cpk|floatformat:2}}</th>
-                        <th scope="col">Pp: {{pp|floatformat:2}}</th>
-                        <th scope="col">Ppk: {{ppk|floatformat:2}}</th>
-                    </tr>
-                    <tr>
-                        <th scope="col">USL - Xbar2: {{usllsl.0|floatformat:2}}</th>
-                        <th scope="col">Xbar2 - LSL: {{usllsl.1|floatformat:2}}</th>
-                        <th scope="col"></th>
-                        <th scope="col"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                    <thead>
                       
-                    
-                    
-                      
-                  </tbody>
-                </table>
+                      <tr>
+                        <th scope="col">LCL: {{lcl|floatformat:2}}</th>
+                        <th scope="col">UCL: {{ucl|floatformat:2}}</th>
+                        <th scope="col">C Bar: {{cbar|floatformat:2}}</th>
+                        <th scope="col">Sum C: {{sumc|floatformat:2}}</th>
+                        
+                      </tr>
+                     
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                  </table>
 
-                
+                  <h6>Measurement</h6>
+                  <table class="table table-hover table-bordered results" id="table">
+                    <thead>
+                      <tr>
+                        <td scope="col">Defect Name</td>
+                          
+                          {% for i in freq %} 
+                          <td scope="col">{{i}}</td>
+                          {% endfor %}
+                     
+                      </tr>
+                     
+                    </thead>
+                    <tbody>
                   
-                    <h6>Measurement</h6>
-                    <table class="table table-hover table-bordered results" id="table">
-                      <thead>
-                        <tr>
-                          <td scope="col">Days</td>
-                          
-                            <td scope="col">Data</td>
-                        
-                        </tr>
-                       
-                      </thead>
-                      <tbody>
-                    
 
-                        {% for k, l in gabung %} 
-                        <tr>
-                          <td>{{ k }}</td>
-                        
-                          <td>{{l}}</td>
-                        
-                        </tr>
+                      {% for k, l in gabung %} 
+                      <tr>
+                        <td>{{ k }}</td>
+                        {% for m in l %} 
+                        <td>{{m}}</td>
                         {% endfor %}
-                      </tbody>
-                    </table>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+               
 
-                   
-
-                    
+                    <form action="{% url 'coretoolcrud:storeCommentStability' stability.id stability.stability_survey_id %}" method="POST" enctype="multipart/form-data">
+                      {% csrf_token %}
                       <div class="card">
                         
                         <div class="card-body">
                           
-                          {{divxbar| safe}}
+                          {{divcchart| safe}}
                           <br><br><br>
                          
                          
@@ -216,57 +214,81 @@
                       </div>
                       <br><br>
 
-                      <div class="card">
-                        
-                        <div class="card-body">
-                          
-                          {{divsd| safe}}
-                          <br><br><br>
-                         
-                         
-                        </div>
-                      </div>
-                      <br><br>
-                      <form action="{% url 'coretoolcrud:storeCommentImr' imr.id imr.imr_survey_id %}" method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                      <div class="card">
-                        <h5 class="card-header">Recommendation</h5>
-                        <div class="card-body">
-                          
-  
-                          <label for="exampleInputPassword1">Resume Stability of Process</label>
-                             
-                          <br>
-                          <input class="form-check-input" name="imr_stability" type="radio" id="gridCheck1" value="Process Stable">
-                          <label class="form-check-label" for="gridCheck1">
-                            Process Stable
-                          </label><br>
-                          <input class="form-check-input" name="imr_stability" type="radio" id="gridCheck1" value="Process Not Stable">
-                          <label class="form-check-label" for="gridCheck1">
-                            Process Not Stable
-                          </label><br><br>
-
-                         
-                          
-  
-                        </div>
-  
-                      </div>
-                      <br><br>
                     
-                      <button type="submit" class="btn btn-primary">Submit</button>
-                      <br><br>
+                    <div class="card">
+                      <h5 class="card-header">Recommendation</h5>
+                      <div class="card-body">
+                        
+                           
+                        <br>
+                        <input class="form-check-input" name="stability_stable" type="checkbox" id="gridCheck1" value="Stable">
+                        <label class="form-check-label" for="gridCheck1">
+                          Stable
+                        </label><br>
+                        <input class="form-check-input" name="stability_stable" type="checkbox" id="gridCheck1" value="Not Stable">
+                        <label class="form-check-label" for="gridCheck1">
+                          Not Stable
+                        </label>
+
+                        <br>
+                        <input class="form-check-input" name="stability_gauge" type="checkbox" id="gridCheck1" value="Fix Gauge">
+                        <label class="form-check-label" for="gridCheck1">
+                          Fix Gauge
+                        </label><br>
+                        <input class="form-check-input" name="stability_stable" type="checkbox" id="gridCheck1" value="Replace Gauge">
+                        <label class="form-check-label" for="gridCheck1">
+                          Replace Gauge
+                        </label><br>
+                        <input class="form-check-input" name="stability_stable" type="checkbox" id="gridCheck1" value="Allocate Gauge">
+                        <label class="form-check-label" for="gridCheck1">
+                          Allocate Gauge
+                        </label>
+                       
+
+                       
+                      </div>
+
+                    </div>
+                    <br><br><br>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                  </form>
 
         </div>
         
     </div>
 
+
+
+
+
+    <script>
+    $(document).ready(function() {
+    var max_fields = 20;
+    var wrapper = $(".container1");
+    var add_button = $(".add_form_field");
+
+    var x = 1;
+    $(add_button).click(function(e) {
+        e.preventDefault();
+        if (x < max_fields) {
+            x++;
+            $(wrapper).append('<div class="input-group"><input class="form-control" type="text" name="nested_recommendation"/> <a href="#" class="delete btn btn-danger">Delete</a></div>'); //add input box
+        } else {
+            alert('You Reached the limits')
+        }
+    });
+
+    $(wrapper).on("click", ".delete", function(e) {
+        e.preventDefault();
+        $(this).parent('div').remove();
+        x--;
+    })
+});
+    </script>
 </body>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.2.min.js"></script>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.2.min.js"></script>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.2.min.js"></script>
-{{scriptxbar| safe}}
-{{scriptsd| safe}}
+{{scriptcchart| safe}}
 </html>
-

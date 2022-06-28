@@ -12,6 +12,7 @@ from .views import viewPchart, viewFinalPchart, viewPrintPchart, storePchart, st
 from .views import viewNpchart, viewFinalNpchart, viewPrintNpchart, storeNpchart, storeAllNpchart, viewAllNpchart, viewListNpchart, deleteNpchart, viewCommentNpchart, storeCommentNpchart
 from .views import viewUchart, viewFinalUchart, viewPrintUchart, storeUchart, storeAllUchart, viewAllUchart, viewListUchart, deleteUchart, viewCommentUchart, storeCommentUchart, viewNsampleUchart, storeNsampleUchart
 from .views import viewCchart, viewFinalCchart, viewPrintCchart, storeCchart, storeAllCchart, viewAllCchart, viewListCchart, deleteCchart, viewCommentCchart, storeCommentCchart
+from .views import viewStability, viewPrintStability, viewCommentStability, viewFinalStability, storeStability, storeCommentStability, storeAllStability, deleteStability
 from .views import viewListSurvey, viewDetailSurvey, viewSurvey, viewManual, viewEditSurvey, viewEditManual, storeManual, storeSurvey, storeEditManual, storeEditSurvey, deleteSurvey
 from .views import viewLogin, login, logout
 app_name = "coretoolcrud"
@@ -152,5 +153,14 @@ urlpatterns = [
     path('deleteCchart/<int:pkid>/<int:pksurveyid>',deleteCchart,name='deleteCchart'),
     path('viewCommentCchart/<int:pkid>/<int:pksurveyid>',viewCommentCchart,name='viewCommentCchart'),
     path('storeCommentCchart/<int:pkid>/<int:pksurveyid>',storeCommentCchart,name='storeCommentCchart'),
+
+    path('viewStability/<int:pk>',viewStability,name='viewStability'),
+    path('viewPrintStability/<int:pk>',viewPrintStability,name='viewPrintStability'),
+    path('viewCommentStability/<int:pk>',viewCommentStability,name='viewCommentStability'),
+    path('viewFinalStability/<int:pk>',viewFinalStability,name='viewFinalStability'),
+    path('storeStability/<int:pk>',storeStability,name='storeStability'),
+    path('storeAllStability/<int:pk>',storeAllStability,name='storeAllStability'),
+    path('storeCommentStability/<int:pk>',storeCommentStability,name='storeCommentStability'),
+    path('deleteStability/<int:pk>',deleteStability,name='deleteStability'),
 
 ]

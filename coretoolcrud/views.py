@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Npchart, Uchart, Cchart, Survey, User
+from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Npchart, Uchart, Cchart, Stability, Survey, User
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -6192,7 +6192,7 @@ def storeAllVxbarr(request, pkid, pksurveyid):
         vxbarr.vxbarr_all = temptrial
         vxbarr.save()
 
-        return redirect('coretoolcrud:viewCommentVxbarr', pk)    
+        return redirect('coretoolcrud:viewCommentVxbarr', pkid, pksurveyid)    
     else:
         return redirect('/logout')        
 
@@ -6677,17 +6677,18 @@ def viewCommentSbarr(request, pkid, pksurveyid):
 
         subgroup = [[2, 2.2659, 0.7979, 0, 3.267], [3, 1.954, 0.8862, 0, 2.568], [4, 1.628, 0.9213, 0, 2.266], [5, 1.427, 0.94, 0, 2.089], [6, 1.287, 0.9515, 0.03, 1.97], [7, 1.182, 0.9594, 0.118, 1.882], [8, 1.099, 0.965, 0.185, 1.815], [9, 1.032, 0.9693, 0.239, 1.761], [10, 0.975, 0.9727, 0.284, 1.716], [15, 0.789, 0.9823, 0.428, 1.572], [25, 0.606, 0.9896, 0.565, 1.435]]
 
+        a3 = 0
+        c4 = 0
+        b3 = 0
+        b4 = 0
+
         for ele in subgroup:
             if ele[0] == sbarr.sbarr_subgroup:
                 a3 = ele[1]
                 c4 = ele[2]
                 b3 = ele[3]
                 b4 = ele[4]
-            else:
-                a3 = 0
-                c4 = 0
-                b3 = 0
-                b4 = 0
+                
         
         uclx = xbar2 + a3 * sigmabar
         lclx = xbar2 - a3 * sigmabar
@@ -6697,6 +6698,8 @@ def viewCommentSbarr(request, pkid, pksurveyid):
         usllsl = []
         usllsl.append(sbarr.sbarr_usl - xbar2)
         usllsl.append(xbar2 - sbarr.sbarr_lsl)
+
+        print("c4", sbarr.sbarr_subgroup)
 
         cp = (sbarr.sbarr_usl - sbarr.sbarr_lsl) / (6 * sigmabar / c4)
         cpk = min(usllsl) / (3 * sigmabar / c4)
@@ -6797,17 +6800,17 @@ def viewFinalSbarr(request, pkid, pksurveyid):
 
         subgroup = [[2, 2.2659, 0.7979, 0, 3.267], [3, 1.954, 0.8862, 0, 2.568], [4, 1.628, 0.9213, 0, 2.266], [5, 1.427, 0.94, 0, 2.089], [6, 1.287, 0.9515, 0.03, 1.97], [7, 1.182, 0.9594, 0.118, 1.882], [8, 1.099, 0.965, 0.185, 1.815], [9, 1.032, 0.9693, 0.239, 1.761], [10, 0.975, 0.9727, 0.284, 1.716], [15, 0.789, 0.9823, 0.428, 1.572], [25, 0.606, 0.9896, 0.565, 1.435]]
 
+        a3 = 0
+        c4 = 0
+        b3 = 0
+        b4 = 0
+
         for ele in subgroup:
             if ele[0] == sbarr.sbarr_subgroup:
                 a3 = ele[1]
                 c4 = ele[2]
                 b3 = ele[3]
                 b4 = ele[4]
-            else:
-                a3 = 0
-                c4 = 0
-                b3 = 0
-                b4 = 0
         
         uclx = xbar2 + a3 * sigmabar
         lclx = xbar2 - a3 * sigmabar
@@ -6904,17 +6907,17 @@ def viewPrintSbarr(request, pkid, pksurveyid):
 
         subgroup = [[2, 2.2659, 0.7979, 0, 3.267], [3, 1.954, 0.8862, 0, 2.568], [4, 1.628, 0.9213, 0, 2.266], [5, 1.427, 0.94, 0, 2.089], [6, 1.287, 0.9515, 0.03, 1.97], [7, 1.182, 0.9594, 0.118, 1.882], [8, 1.099, 0.965, 0.185, 1.815], [9, 1.032, 0.9693, 0.239, 1.761], [10, 0.975, 0.9727, 0.284, 1.716], [15, 0.789, 0.9823, 0.428, 1.572], [25, 0.606, 0.9896, 0.565, 1.435]]
 
+        a3 = 0
+        c4 = 0
+        b3 = 0
+        b4 = 0
+
         for ele in subgroup:
             if ele[0] == sbarr.sbarr_subgroup:
                 a3 = ele[1]
                 c4 = ele[2]
                 b3 = ele[3]
                 b4 = ele[4]
-            else:
-                a3 = 0
-                c4 = 0
-                b3 = 0
-                b4 = 0
         
         uclx = xbar2 + a3 * sigmabar
         lclx = xbar2 - a3 * sigmabar
@@ -7178,7 +7181,7 @@ def storeCommentImr(request, pkid, pksurveyid):
         imr = Imr.objects.get(id = pkid)
 
         imr.imr_stability = request.POST.get('imr_stability')
-        imr.imr_capability = request.POST.get('imr_capability')
+        
         imr.save()
 
         # return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey})
@@ -7229,6 +7232,27 @@ def viewFinalImr(request, pkid, pksurveyid):
         sigmaest = mrbar / d2
         cp = (imr.imr_usl - imr.imr_lsl) / (6 * sigmaest)
         cpk = min(usllsl) / (3 * sigmaest)
+
+        if imr.imr_reason == "New Model":
+            if pp > 1.1 and ppk > 1.67:
+                imr.imr_capability = "Capable"
+            elif pp > 1.1 and ppk <= 1.67:
+                imr.imr_capability = "Need Adjustment"
+            elif pp <= 1.1 and ppk <= 1.67:
+                imr.imr_capability = "Not Capable"
+            else:
+                imr.imr_capability = "Check The Calculation"
+        else:
+            if cp > 1.1 and cpk > 1.67:
+                imr.imr_capability = "Capable"
+            elif cp > 1.1 and cpk <= 1.67:
+                imr.imr_capability = "Need Adjustment"
+            elif cp <= 1.1 and cpk <= 1.67:
+                imr.imr_capability = "Not Capable"
+            else:
+                imr.imr_capability = "Check The Calculation"
+        
+        imr.save()
 
         ###############################
 
@@ -9236,3 +9260,372 @@ def storeCommentCchart(request, pkid, pksurveyid):
     else:
         return redirect('/logout')
 
+# Stability
+
+def viewStability(request, pk):
+    if 'user' in request.session:
+        try:
+            stability = Stability.objects.get(stability_survey_id = pk)
+            if stability.stability_all:
+                return redirect('coretoolcrud:viewFinalStability', pk)
+            else:
+                survey = Survey.objects.get(id = pksurveyid)
+                sample = stability.stability_sample
+                plan = survey.survey_plan
+                return render(request,'stability/all_stability.html',{'sample':sample, 'plan':plan, 'stability':stability, 'survey':survey})
+            
+        except Stability.DoesNotExist:
+            return render(request,'stability/stability.html',{'pk':pk})
+    else:
+        return redirect('/logout')
+
+def storeStability(request, pk):
+    if 'user' in request.session:
+        try:
+            stability = Stability.objects.get(stability_survey_id = pk)
+            stability.delete()
+        except Stability.DoesNotExist:
+            pass
+
+        stability = Stability()
+        stability.stability_survey_id = pk
+        stability.stability_sample = request.POST.get('stability_sample')
+        stability.stability_measured = request.POST.get('stability_measured')
+        stability.stability_reviewed = request.POST.get('stability_reviewed')
+        stability.stability_reference = request.POST.get('stability_reference')
+
+        stability.save()
+
+        return redirect('coretoolcrud:viewAllStability', pksurveyid)    
+    else:
+        return redirect('/logout')
+
+def storeAllStability(request, pk):
+    if 'user' in request.session:
+        stability = Stability.objects.get(stability_survey_id = pk)
+        tempall = []
+        tempall1 = []
+        tempall2 = []
+
+        tempall = request.POST.getlist('stability_all')
+        for i in range(len(tempall)):
+            tempall1.append(float(tempall[i]))
+
+       
+        tempall2.append(tempall1)
+
+        if stability.stability_all is None:
+            stability.stability_all = tempall2
+        elif stability.stability_all is not None:
+            stability.stability_all.append(tempall1)
+        
+        stability.save()
+
+        return redirect('coretoolcrud:viewCommentStability', pk)    
+    else:
+        return redirect('/logout')    
+
+def deleteStability(request, pk):
+    if 'user' in request.session:
+        stability = Stability.objects.get(stability_survey_id = pk)
+        stability.delete()
+        messages.success(request, "Stability berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pk)
+    else:
+        return redirect('/logout')
+
+def viewFinalStability(request, pk):
+    if 'user' in request.session:
+        stability = Stability.objects.get(stability_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        ##############################
+
+        all = stability.stability_all
+
+        xbar = []
+        r = []
+        allflat = []
+
+        for ele in all:
+            xbar.append(sum(ele) / len(ele))
+            r.append(max(ele) - min(ele))
+            for e in ele:
+                allflat.append(e)
+        
+        ro1 = statistics.stdev(allflat)
+        ro2 = statistics.stdev(xbar)
+
+        xbar2 = sum(xbar) / len(xbar)
+        rbar = sum(r) / len(r)
+
+        table = [[2, 1.88, 0, 3.27], [3, 1.02, 0, 2.57], [4, 0.73, 0, 2.28], [5, 0.58, 0, 2.11], [6, 0.48, 0, 2], [7, 0.42, 0.08, 1.92], [8, 0.37, 0.14, 1.86], [9, 0.34, 0.18, 1.82], [10, 0.31, 0.22, 1.78], [11, 0.29, 0.26, 1.74]]
+
+        a2 = 0
+        d3 = 0
+        d4 = 0
+
+        for ele in table:
+            if ele[0] == n:
+                a2 = ele[1]
+                d3 = ele[2]
+                d4 = ele[3]
+
+        uclx = math.ceil(xbar2 + a2 * rbar)
+        lclx = xbar2 - a2 * rbar
+        uclr = d4 * rbar
+        lclr = rbar * d3
+
+        xbar2list = []
+        rbarlist = []
+        uclxlist = []
+        lclxlist = []
+        uclrlist = []
+        lclrlist = []
+
+        for i in range(t):
+            xbar2list.append(xbar2)
+            rbarlist.append(rbar)
+            uclxlist.append(uclx)
+            lclxlist.append(lclx)
+            uclrlist.append(uclr)
+            lclrlist.append(lclr)
+        
+        bot = []
+        for i in range(len(stability.stability_all)):
+            bot.append(i+1)
+
+
+        ###############################
+
+
+        p = figure(title="Xbar2", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, uclxlist, legend_label="UCLx", line_width=2)
+        p.line(bot, lclxlist, legend_label="LCLx", color="green", line_width=2)
+        p.line(bot, xbar2list, legend_label="Xbar2", color="red", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxbar, divxbar = components(p)
+
+        #####################################
+
+        p = figure(title="Rbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, uclrlist, legend_label="UCLr", line_width=2)
+        p.line(bot, lclrlist, legend_label="LCLr", color="green", line_width=2)
+        p.line(bot, rbarlist, legend_label="Rbar", color="red", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptrbar, divrbar = components(p)
+
+        #####################################
+
+        sample = range(1, int(stability.stability_sample)+1)
+        gabung = zip(sample, stability.stability_all)
+        
+
+        return render(request,'stability/collection_stability.html', {'stability':stability, 'survey':survey, 'gabung':gabung, 'sample':sample, 'xbar':xbar, 'uclx':uclx, 'lclx':lclx, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'rbar':rbar, 'uclr':uclr, 'lclr':lclr, 'scriptrbar':scriptrbar, 'divrbar':divrbar})
+    else:
+        return redirect('/logout')
+
+def viewAllStability(request, pk):
+    if 'user' in request.session:
+        try:
+            stability = Stability.objects.get(stability_survey_id = pk)
+            nos = range(1, int(stability.stability_sample)+1)
+            return render(request,'stability/all_stability.html',{'nos':nos, 'stability':stability})
+        
+        except Stability.DoesNotExist:
+            return redirect('coretoolcrud:viewStability', pk)    
+    else:
+        return redirect('/logout')   
+
+def viewPrintStability(request, pk):
+    if 'user' in request.session:
+        stability = Stability.objects.get(stability_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        ##############################
+
+        all = stability.stability_all
+
+        xbar = []
+        r = []
+        allflat = []
+
+        for ele in all:
+            xbar.append(sum(ele) / len(ele))
+            r.append(max(ele) - min(ele))
+            for e in ele:
+                allflat.append(e)
+        
+        ro1 = statistics.stdev(allflat)
+        ro2 = statistics.stdev(xbar)
+
+        xbar2 = sum(xbar) / len(xbar)
+        rbar = sum(r) / len(r)
+
+        table = [[2, 1.88, 0, 3.27], [3, 1.02, 0, 2.57], [4, 0.73, 0, 2.28], [5, 0.58, 0, 2.11], [6, 0.48, 0, 2], [7, 0.42, 0.08, 1.92], [8, 0.37, 0.14, 1.86], [9, 0.34, 0.18, 1.82], [10, 0.31, 0.22, 1.78], [11, 0.29, 0.26, 1.74]]
+
+        a2 = 0
+        d3 = 0
+        d4 = 0
+
+        for ele in table:
+            if ele[0] == n:
+                a2 = ele[1]
+                d3 = ele[2]
+                d4 = ele[3]
+
+        uclx = math.ceil(xbar2 + a2 * rbar)
+        lclx = xbar2 - a2 * rbar
+        uclr = d4 * rbar
+        lclr = rbar * d3
+
+        xbar2list = []
+        rbarlist = []
+        uclxlist = []
+        lclxlist = []
+        uclrlist = []
+        lclrlist = []
+
+        for i in range(t):
+            xbar2list.append(xbar2)
+            rbarlist.append(rbar)
+            uclxlist.append(uclx)
+            lclxlist.append(lclx)
+            uclrlist.append(uclr)
+            lclrlist.append(lclr)
+        
+        bot = []
+        for i in range(len(stability.stability_all)):
+            bot.append(i+1)
+
+
+        ###############################
+
+
+        p = figure(title="Xbar2", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, uclxlist, legend_label="UCLx", line_width=2)
+        p.line(bot, lclxlist, legend_label="LCLx", color="green", line_width=2)
+        p.line(bot, xbar2list, legend_label="Xbar2", color="red", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxbar, divxbar = components(p)
+
+        #####################################
+
+        p = figure(title="Rbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, uclrlist, legend_label="UCLr", line_width=2)
+        p.line(bot, lclrlist, legend_label="LCLr", color="green", line_width=2)
+        p.line(bot, rbarlist, legend_label="Rbar", color="red", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptrbar, divrbar = components(p)
+
+        #####################################
+
+        sample = range(1, int(stability.stability_sample)+1)
+        gabung = zip(sample, stability.stability_all)
+        
+
+        return render(request,'stability/print_stability.html', {'stability':stability, 'survey':survey, 'gabung':gabung, 'sample':sample, 'xbar':xbar, 'uclx':uclx, 'lclx':lclx, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'rbar':rbar, 'uclr':uclr, 'lclr':lclr, 'scriptrbar':scriptrbar, 'divrbar':divrbar})
+    else:
+        return redirect('/logout')
+
+def viewCommentStability(request, pk):
+    if 'user' in request.session:
+        stability = Stability.objects.get(stability_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        ##############################
+
+        all = stability.stability_all
+
+        xbar = []
+        r = []
+        allflat = []
+
+        for ele in all:
+            xbar.append(sum(ele) / len(ele))
+            r.append(max(ele) - min(ele))
+            for e in ele:
+                allflat.append(e)
+        
+        ro1 = statistics.stdev(allflat)
+        ro2 = statistics.stdev(xbar)
+
+        xbar2 = sum(xbar) / len(xbar)
+        rbar = sum(r) / len(r)
+
+        table = [[2, 1.88, 0, 3.27], [3, 1.02, 0, 2.57], [4, 0.73, 0, 2.28], [5, 0.58, 0, 2.11], [6, 0.48, 0, 2], [7, 0.42, 0.08, 1.92], [8, 0.37, 0.14, 1.86], [9, 0.34, 0.18, 1.82], [10, 0.31, 0.22, 1.78], [11, 0.29, 0.26, 1.74]]
+
+        a2 = 0
+        d3 = 0
+        d4 = 0
+
+        for ele in table:
+            if ele[0] == n:
+                a2 = ele[1]
+                d3 = ele[2]
+                d4 = ele[3]
+
+        uclx = math.ceil(xbar2 + a2 * rbar)
+        lclx = xbar2 - a2 * rbar
+        uclr = d4 * rbar
+        lclr = rbar * d3
+
+        xbar2list = []
+        rbarlist = []
+        uclxlist = []
+        lclxlist = []
+        uclrlist = []
+        lclrlist = []
+
+        for i in range(t):
+            xbar2list.append(xbar2)
+            rbarlist.append(rbar)
+            uclxlist.append(uclx)
+            lclxlist.append(lclx)
+            uclrlist.append(uclr)
+            lclrlist.append(lclr)
+        
+        bot = []
+        for i in range(len(stability.stability_all)):
+            bot.append(i+1)
+
+
+        ###############################
+
+
+        p = figure(title="Xbar2", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, uclxlist, legend_label="UCLx", line_width=2)
+        p.line(bot, lclxlist, legend_label="LCLx", color="green", line_width=2)
+        p.line(bot, xbar2list, legend_label="Xbar2", color="red", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxbar, divxbar = components(p)
+
+        #####################################
+
+        p = figure(title="Rbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, uclrlist, legend_label="UCLr", line_width=2)
+        p.line(bot, lclrlist, legend_label="LCLr", color="green", line_width=2)
+        p.line(bot, rbarlist, legend_label="Rbar", color="red", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptrbar, divrbar = components(p)
+
+        #####################################
+
+        sample = range(1, int(stability.stability_sample)+1)
+        gabung = zip(sample, stability.stability_all)
+        
+
+        return render(request,'stability/comment_stability.html', {'stability':stability, 'survey':survey, 'gabung':gabung, 'sample':sample, 'xbar':xbar, 'uclx':uclx, 'lclx':lclx, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'rbar':rbar, 'uclr':uclr, 'lclr':lclr, 'scriptrbar':scriptrbar, 'divrbar':divrbar})
+    else:
+        return redirect('/logout')
+
+def storeCommentStability(request, pk):
+    if 'user' in request.session:
+        stability = Stability.objects.get(stability_survey_id = pk)
+
+        stability.stability_stable = request.POST.get('stability_stable')
+        stability.stability_gauge = request.POST.get('stability_gauge')
+
+        stability.save()
+
+        # return render(request,'linearity/comment_linearity.html', {'linearity':linearity, 'survey':survey})
+        return redirect('coretoolcrud:viewFinalStability', pk)
+    else:
+        return redirect('/logout')

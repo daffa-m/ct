@@ -227,7 +227,7 @@
                         </div>
                       </div>
                       <br><br>
-                      <form action="{% url 'coretoolcrud:storeCommentSbarr' sbarr.id %}" method="POST" enctype="multipart/form-data">
+                      <form action="{% url 'coretoolcrud:storeCommentSbarr' sbarr.id sbarr.sbarr_survey_id %}" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                       <div class="card">
                         <h5 class="card-header">Recommendation</h5>
@@ -237,11 +237,11 @@
                           <label for="exampleInputPassword1">Resume Stability of Process</label>
                              
                           <br>
-                          <input class="form-check-input" name="sbarr_stability" type="checkbox" id="gridCheck1" value="Process Stable">
+                          <input class="form-check-input" name="sbarr_stability" type="radio" id="gridCheck1" value="Process Stable">
                           <label class="form-check-label" for="gridCheck1">
                             Process Stable
                           </label><br>
-                          <input class="form-check-input" name="sbarr_stability" type="checkbox" id="gridCheck1" value="Process Not Stable">
+                          <input class="form-check-input" name="sbarr_stability" type="radio" id="gridCheck1" value="Process Not Stable">
                           <label class="form-check-label" for="gridCheck1">
                             Process Not Stable
                           </label><br><br>
@@ -249,15 +249,15 @@
                           <label for="exampleInputPassword1">Resume Capability of Process</label>
                              
                           <br>
-                          <input class="form-check-input" name="sbarr_capability" type="checkbox" id="gridCheck1" value="Capable">
+                          <input class="form-check-input" name="sbarr_capability" type="radio" id="gridCheck1" value="Capable">
                           <label class="form-check-label" for="gridCheck1">
                             Capable
                           </label><br>
-                          <input class="form-check-input" name="sbarr_capability" type="checkbox" id="gridCheck1" value="Not Capable">
+                          <input class="form-check-input" name="sbarr_capability" type="radio" id="gridCheck1" value="Not Capable">
                           <label class="form-check-label" for="gridCheck1">
                             Not Capable
                           </label><br>
-                          <input class="form-check-input" name="sbarr_capability" type="checkbox" id="gridCheck1" value="Capable But Need Adjustment">
+                          <input class="form-check-input" name="sbarr_capability" type="radio" id="gridCheck1" value="Capable But Need Adjustment">
                           <label class="form-check-label" for="gridCheck1">
                             Capable But Need Adjustment
                           </label><br>

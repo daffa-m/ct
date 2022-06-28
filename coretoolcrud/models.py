@@ -177,6 +177,16 @@ class Cchart(models.Model):
     cchart_recommendation = models.JSONField(null=True)
     cchart_class = models.IntegerField()
 
+class Stability(models.Model):
+    stability_survey_id = models.IntegerField()
+    stability_sample = models.IntegerField()
+    stability_all = models.JSONField(null=True)
+    stability_measured = models.TextField()
+    stability_reviewed = models.TextField()
+    stability_reference = models.TextField()
+    stability_stable = models.TextField()
+    stability_gauge = models.TextField()
+
 class Survey(models.Model):
     survey_user_id = models.IntegerField()
     survey_date_project = models.DateField()
