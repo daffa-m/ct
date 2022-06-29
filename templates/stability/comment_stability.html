@@ -159,11 +159,16 @@
                     <thead>
                       
                       <tr>
-                        <th scope="col">LCL: {{lcl|floatformat:2}}</th>
-                        <th scope="col">UCL: {{ucl|floatformat:2}}</th>
-                        <th scope="col">C Bar: {{cbar|floatformat:2}}</th>
-                        <th scope="col">Sum C: {{sumc|floatformat:2}}</th>
-                        
+                        <th scope="col">LCLx: {{lclx|floatformat:2}}</th>
+                        <th scope="col">UCLx: {{uclx|floatformat:2}}</th>
+                        <th scope="col">LCLr: {{lclr|floatformat:2}}</th>
+                        <th scope="col">UCLr: {{uclr|floatformat:2}}</th>
+                      </tr>
+                      <tr>
+                        <th scope="col">Xbar2: {{xbar2|floatformat:2}}</th>
+                        <th scope="col">Rbar: {{rbar|floatformat:2}}</th>
+                        <th scope="col">Stdev 1: {{ro1|floatformat:2}}</th>
+                        <th scope="col">Stdev 2: {{ro2|floatformat:2}}</th>
                       </tr>
                      
                     </thead>
@@ -178,7 +183,7 @@
                       <tr>
                         <td scope="col">Defect Name</td>
                           
-                          {% for i in freq %} 
+                          {% for i in nsample %} 
                           <td scope="col">{{i}}</td>
                           {% endfor %}
                      
@@ -200,13 +205,25 @@
                   </table>
                
 
-                    <form action="{% url 'coretoolcrud:storeCommentStability' stability.id stability.stability_survey_id %}" method="POST" enctype="multipart/form-data">
+                    <form action="{% url 'coretoolcrud:storeCommentStability' stability.stability_survey_id %}" method="POST" enctype="multipart/form-data">
                       {% csrf_token %}
                       <div class="card">
                         
                         <div class="card-body">
                           
-                          {{divcchart| safe}}
+                          {{divxbar| safe}}
+                          <br><br><br>
+                         
+                         
+                        </div>
+                      </div>
+                      <br><br>
+
+                      <div class="card">
+                        
+                        <div class="card-body">
+                          
+                          {{divrbar| safe}}
                           <br><br><br>
                          
                          
@@ -219,27 +236,29 @@
                       <h5 class="card-header">Recommendation</h5>
                       <div class="card-body">
                         
+                        <label for="exampleInputPassword1">Stability</label>
                            
                         <br>
-                        <input class="form-check-input" name="stability_stable" type="checkbox" id="gridCheck1" value="Stable">
+                        <input class="form-check-input" name="stability_stable" type="radio" id="gridCheck1" value="Stable">
                         <label class="form-check-label" for="gridCheck1">
                           Stable
                         </label><br>
-                        <input class="form-check-input" name="stability_stable" type="checkbox" id="gridCheck1" value="Not Stable">
+                        <input class="form-check-input" name="stability_stable" type="radio" id="gridCheck1" value="Not Stable">
                         <label class="form-check-label" for="gridCheck1">
                           Not Stable
-                        </label>
+                        </label><br>
 
+                        <label for="exampleInputPassword1">Gauge</label>
                         <br>
-                        <input class="form-check-input" name="stability_gauge" type="checkbox" id="gridCheck1" value="Fix Gauge">
+                        <input class="form-check-input" name="stability_gauge" type="radio" id="gridCheck2" value="Fix Gauge">
                         <label class="form-check-label" for="gridCheck1">
                           Fix Gauge
                         </label><br>
-                        <input class="form-check-input" name="stability_stable" type="checkbox" id="gridCheck1" value="Replace Gauge">
+                        <input class="form-check-input" name="stability_gauge" type="radio" id="gridCheck2" value="Replace Gauge">
                         <label class="form-check-label" for="gridCheck1">
                           Replace Gauge
                         </label><br>
-                        <input class="form-check-input" name="stability_stable" type="checkbox" id="gridCheck1" value="Allocate Gauge">
+                        <input class="form-check-input" name="stability_gauge" type="radio" id="gridCheck2" value="Allocate Gauge">
                         <label class="form-check-label" for="gridCheck1">
                           Allocate Gauge
                         </label>
@@ -290,5 +309,6 @@
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.2.min.js"></script>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.2.min.js"></script>
-{{scriptcchart| safe}}
+{{scriptxbar| safe}}
+{{scriptrbar| safe}}
 </html>

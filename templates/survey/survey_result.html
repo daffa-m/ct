@@ -181,6 +181,8 @@
                         <h3 class="card-title"><a href="{% url 'coretoolcrud:viewListUchart' survey.id %}">{{ study }}</a></h3>
                         {% elif study == "C Chart" %}
                         <h3 class="card-title"><a href="{% url 'coretoolcrud:viewListCchart' survey.id %}">{{ study }}</a></h3>
+                        {% elif study == "Stability" %}
+                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewStability' survey.id %}">{{ study }}</a></h3>
                         {% else %}
                         <h3 class="card-title">{{ study }}</h3>
                         {% endif %}

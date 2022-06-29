@@ -83,7 +83,7 @@
           <hr>
 
         </div>
-        <form action="{% url 'coretoolcrud:storeAllStability' stability.id stability.stability_survey_id %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'coretoolcrud:storeAllStability' stability.stability_survey_id %}" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           
         <table class="table table-hover table-bordered results" id="table">

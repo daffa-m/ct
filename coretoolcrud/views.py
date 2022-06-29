@@ -9296,7 +9296,7 @@ def storeStability(request, pk):
 
         stability.save()
 
-        return redirect('coretoolcrud:viewAllStability', pksurveyid)    
+        return redirect('coretoolcrud:viewAllStability', pk)    
     else:
         return redirect('/logout')
 
@@ -9352,8 +9352,12 @@ def viewFinalStability(request, pk):
             for e in ele:
                 allflat.append(e)
         
-        ro1 = statistics.stdev(allflat)
-        ro2 = statistics.stdev(xbar)
+        if len(xbar) > 1:
+            ro1 = statistics.stdev(allflat)
+            ro2 = statistics.stdev(xbar)
+        else:
+            ro1 = 0
+            ro2 = 0
 
         xbar2 = sum(xbar) / len(xbar)
         rbar = sum(r) / len(r)
@@ -9365,7 +9369,7 @@ def viewFinalStability(request, pk):
         d4 = 0
 
         for ele in table:
-            if ele[0] == n:
+            if ele[0] == stability.stability_sample:
                 a2 = ele[1]
                 d3 = ele[2]
                 d4 = ele[3]
@@ -9382,7 +9386,7 @@ def viewFinalStability(request, pk):
         uclrlist = []
         lclrlist = []
 
-        for i in range(t):
+        for i in range(len(stability.stability_all)):
             xbar2list.append(xbar2)
             rbarlist.append(rbar)
             uclxlist.append(uclx)
@@ -9402,6 +9406,7 @@ def viewFinalStability(request, pk):
         p.line(bot, uclxlist, legend_label="UCLx", line_width=2)
         p.line(bot, lclxlist, legend_label="LCLx", color="green", line_width=2)
         p.line(bot, xbar2list, legend_label="Xbar2", color="red", line_width=2)
+        p.line(bot, xbar, legend_label="Xbar", color="gray", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptxbar, divxbar = components(p)
 
@@ -9411,16 +9416,18 @@ def viewFinalStability(request, pk):
         p.line(bot, uclrlist, legend_label="UCLr", line_width=2)
         p.line(bot, lclrlist, legend_label="LCLr", color="green", line_width=2)
         p.line(bot, rbarlist, legend_label="Rbar", color="red", line_width=2)
+        p.line(bot, r, legend_label="R", color="gray", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptrbar, divrbar = components(p)
 
         #####################################
 
-        sample = range(1, int(stability.stability_sample)+1)
-        gabung = zip(sample, stability.stability_all)
+        nsample = range(1, int(stability.stability_sample)+1)
+        ntime = range(1, len(stability.stability_all)+1)
+        gabung = zip(nsample, stability.stability_all)
         
 
-        return render(request,'stability/collection_stability.html', {'stability':stability, 'survey':survey, 'gabung':gabung, 'sample':sample, 'xbar':xbar, 'uclx':uclx, 'lclx':lclx, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'rbar':rbar, 'uclr':uclr, 'lclr':lclr, 'scriptrbar':scriptrbar, 'divrbar':divrbar})
+        return render(request,'stability/collection_stability.html', {'stability':stability, 'survey':survey, 'gabung':gabung, 'nsample':nsample, 'ntime':ntime, 'xbar2':xbar2, 'uclx':uclx, 'lclx':lclx, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'rbar':rbar, 'uclr':uclr, 'lclr':lclr, 'scriptrbar':scriptrbar, 'divrbar':divrbar, 'ro1':ro1, 'ro2':ro2})
     else:
         return redirect('/logout')
 
@@ -9454,8 +9461,12 @@ def viewPrintStability(request, pk):
             for e in ele:
                 allflat.append(e)
         
-        ro1 = statistics.stdev(allflat)
-        ro2 = statistics.stdev(xbar)
+        if len(xbar) > 1:
+            ro1 = statistics.stdev(allflat)
+            ro2 = statistics.stdev(xbar)
+        else:
+            ro1 = 0
+            ro2 = 0
 
         xbar2 = sum(xbar) / len(xbar)
         rbar = sum(r) / len(r)
@@ -9467,7 +9478,7 @@ def viewPrintStability(request, pk):
         d4 = 0
 
         for ele in table:
-            if ele[0] == n:
+            if ele[0] == stability.stability_sample:
                 a2 = ele[1]
                 d3 = ele[2]
                 d4 = ele[3]
@@ -9484,7 +9495,7 @@ def viewPrintStability(request, pk):
         uclrlist = []
         lclrlist = []
 
-        for i in range(t):
+        for i in range(len(stability.stability_all)):
             xbar2list.append(xbar2)
             rbarlist.append(rbar)
             uclxlist.append(uclx)
@@ -9499,11 +9510,11 @@ def viewPrintStability(request, pk):
 
         ###############################
 
-
         p = figure(title="Xbar2", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Value', x_axis_label='Days')
         p.line(bot, uclxlist, legend_label="UCLx", line_width=2)
         p.line(bot, lclxlist, legend_label="LCLx", color="green", line_width=2)
         p.line(bot, xbar2list, legend_label="Xbar2", color="red", line_width=2)
+        p.line(bot, xbar, legend_label="Xbar", color="gray", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptxbar, divxbar = components(p)
 
@@ -9513,16 +9524,18 @@ def viewPrintStability(request, pk):
         p.line(bot, uclrlist, legend_label="UCLr", line_width=2)
         p.line(bot, lclrlist, legend_label="LCLr", color="green", line_width=2)
         p.line(bot, rbarlist, legend_label="Rbar", color="red", line_width=2)
+        p.line(bot, r, legend_label="R", color="gray", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptrbar, divrbar = components(p)
 
         #####################################
 
-        sample = range(1, int(stability.stability_sample)+1)
-        gabung = zip(sample, stability.stability_all)
+        nsample = range(1, int(stability.stability_sample)+1)
+        ntime = range(1, len(stability.stability_all)+1)
+        gabung = zip(nsample, stability.stability_all)
         
 
-        return render(request,'stability/print_stability.html', {'stability':stability, 'survey':survey, 'gabung':gabung, 'sample':sample, 'xbar':xbar, 'uclx':uclx, 'lclx':lclx, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'rbar':rbar, 'uclr':uclr, 'lclr':lclr, 'scriptrbar':scriptrbar, 'divrbar':divrbar})
+        return render(request,'stability/print_stability.html', {'stability':stability, 'survey':survey, 'gabung':gabung, 'nsample':nsample, 'ntime':ntime, 'xbar2':xbar2, 'uclx':uclx, 'lclx':lclx, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'rbar':rbar, 'uclr':uclr, 'lclr':lclr, 'scriptrbar':scriptrbar, 'divrbar':divrbar, 'ro1':ro1, 'ro2':ro2})
     else:
         return redirect('/logout')
 
@@ -9544,8 +9557,12 @@ def viewCommentStability(request, pk):
             for e in ele:
                 allflat.append(e)
         
-        ro1 = statistics.stdev(allflat)
-        ro2 = statistics.stdev(xbar)
+        if len(xbar) > 1:
+            ro1 = statistics.stdev(allflat)
+            ro2 = statistics.stdev(xbar)
+        else:
+            ro1 = 0
+            ro2 = 0
 
         xbar2 = sum(xbar) / len(xbar)
         rbar = sum(r) / len(r)
@@ -9557,7 +9574,7 @@ def viewCommentStability(request, pk):
         d4 = 0
 
         for ele in table:
-            if ele[0] == n:
+            if ele[0] == stability.stability_sample:
                 a2 = ele[1]
                 d3 = ele[2]
                 d4 = ele[3]
@@ -9574,7 +9591,7 @@ def viewCommentStability(request, pk):
         uclrlist = []
         lclrlist = []
 
-        for i in range(t):
+        for i in range(len(stability.stability_all)):
             xbar2list.append(xbar2)
             rbarlist.append(rbar)
             uclxlist.append(uclx)
@@ -9586,7 +9603,6 @@ def viewCommentStability(request, pk):
         for i in range(len(stability.stability_all)):
             bot.append(i+1)
 
-
         ###############################
 
 
@@ -9594,6 +9610,7 @@ def viewCommentStability(request, pk):
         p.line(bot, uclxlist, legend_label="UCLx", line_width=2)
         p.line(bot, lclxlist, legend_label="LCLx", color="green", line_width=2)
         p.line(bot, xbar2list, legend_label="Xbar2", color="red", line_width=2)
+        p.line(bot, xbar, legend_label="Xbar", color="gray", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptxbar, divxbar = components(p)
 
@@ -9603,16 +9620,18 @@ def viewCommentStability(request, pk):
         p.line(bot, uclrlist, legend_label="UCLr", line_width=2)
         p.line(bot, lclrlist, legend_label="LCLr", color="green", line_width=2)
         p.line(bot, rbarlist, legend_label="Rbar", color="red", line_width=2)
+        p.line(bot, r, legend_label="R", color="gray", line_width=2)
         p.xaxis.major_label_orientation = "vertical"
         scriptrbar, divrbar = components(p)
 
         #####################################
 
-        sample = range(1, int(stability.stability_sample)+1)
-        gabung = zip(sample, stability.stability_all)
+        nsample = range(1, int(stability.stability_sample)+1)
+        ntime = range(1, len(stability.stability_all)+1)
+        gabung = zip(nsample, stability.stability_all)
         
 
-        return render(request,'stability/comment_stability.html', {'stability':stability, 'survey':survey, 'gabung':gabung, 'sample':sample, 'xbar':xbar, 'uclx':uclx, 'lclx':lclx, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'rbar':rbar, 'uclr':uclr, 'lclr':lclr, 'scriptrbar':scriptrbar, 'divrbar':divrbar})
+        return render(request,'stability/comment_stability.html', {'stability':stability, 'survey':survey, 'gabung':gabung, 'nsample':nsample, 'ntime':ntime, 'xbar2':xbar2, 'uclx':uclx, 'lclx':lclx, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'rbar':rbar, 'uclr':uclr, 'lclr':lclr, 'scriptrbar':scriptrbar, 'divrbar':divrbar, 'ro1':ro1, 'ro2':ro2})
     else:
         return redirect('/logout')
 

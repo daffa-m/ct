@@ -12,7 +12,7 @@ from .views import viewPchart, viewFinalPchart, viewPrintPchart, storePchart, st
 from .views import viewNpchart, viewFinalNpchart, viewPrintNpchart, storeNpchart, storeAllNpchart, viewAllNpchart, viewListNpchart, deleteNpchart, viewCommentNpchart, storeCommentNpchart
 from .views import viewUchart, viewFinalUchart, viewPrintUchart, storeUchart, storeAllUchart, viewAllUchart, viewListUchart, deleteUchart, viewCommentUchart, storeCommentUchart, viewNsampleUchart, storeNsampleUchart
 from .views import viewCchart, viewFinalCchart, viewPrintCchart, storeCchart, storeAllCchart, viewAllCchart, viewListCchart, deleteCchart, viewCommentCchart, storeCommentCchart
-from .views import viewStability, viewPrintStability, viewCommentStability, viewFinalStability, storeStability, storeCommentStability, storeAllStability, deleteStability
+from .views import viewStability, viewPrintStability, viewCommentStability, viewFinalStability, viewAllStability, storeStability, storeCommentStability, storeAllStability, deleteStability
 from .views import viewListSurvey, viewDetailSurvey, viewSurvey, viewManual, viewEditSurvey, viewEditManual, storeManual, storeSurvey, storeEditManual, storeEditSurvey, deleteSurvey
 from .views import viewLogin, login, logout
 app_name = "coretoolcrud"
@@ -158,6 +158,7 @@ urlpatterns = [
     path('viewPrintStability/<int:pk>',viewPrintStability,name='viewPrintStability'),
     path('viewCommentStability/<int:pk>',viewCommentStability,name='viewCommentStability'),
     path('viewFinalStability/<int:pk>',viewFinalStability,name='viewFinalStability'),
+    path('viewAllStability/<int:pk>',viewAllStability,name='viewAllStability'),
     path('storeStability/<int:pk>',storeStability,name='storeStability'),
     path('storeAllStability/<int:pk>',storeAllStability,name='storeAllStability'),
     path('storeCommentStability/<int:pk>',storeCommentStability,name='storeCommentStability'),
