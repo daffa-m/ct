@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Npchart, Uchart, Cchart, Stability, Survey, User
+from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Npchart, Uchart, Cchart, Stability, Kappa, Kendall, Survey, User
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -29,6 +29,7 @@ from bokeh.embed import components
 from bokeh.models import LinearAxis
 from calendar import monthrange
 import statistics
+import pyirr
 
 from random import randint
 
@@ -9269,7 +9270,7 @@ def viewStability(request, pk):
             if stability.stability_all:
                 return redirect('coretoolcrud:viewFinalStability', pk)
             else:
-                survey = Survey.objects.get(id = pksurveyid)
+                survey = Survey.objects.get(id = pk)
                 sample = stability.stability_sample
                 plan = survey.survey_plan
                 return render(request,'stability/all_stability.html',{'sample':sample, 'plan':plan, 'stability':stability, 'survey':survey})
@@ -9648,3 +9649,253 @@ def storeCommentStability(request, pk):
         return redirect('coretoolcrud:viewFinalStability', pk)
     else:
         return redirect('/logout')
+
+#Kappa
+
+def viewKappa(request, pk):
+    if 'user' in request.session:
+        try:
+            kappa = Kappa.objects.get(kappa_survey_id = pk)
+            if kappa.kappa_all:
+                return redirect('coretoolcrud:viewFinalKappa', pk)
+            else:
+                survey = Survey.objects.get(id = pk)
+                plan = survey.survey_plan
+                return render(request,'kappa/all_kappa.html',{'plan':plan, 'kappa':kappa, 'survey':survey})
+            
+        except Kappa.DoesNotExist:
+            return render(request,'kappa/kappa.html',{'pk':pk})
+    else:
+        return redirect('/logout')
+
+def storeKappa(request, pk):
+    if 'user' in request.session:
+        try:
+            kappa = Kappa.objects.get(kappa_survey_id = pk)
+            kappa.delete()
+        except Kappa.DoesNotExist:
+            pass
+
+        kappa = Kappa()
+        kappa.kappa_survey_id = pk
+        kappa.kappa_nkaryawan = request.POST.get('kappa_nkaryawan')
+        kappa.kappa_npart = request.POST.get('kappa_npart')
+        kappa.kappa_ntrial = request.POST.get('kappa_ntrial')
+        kappa.kappa_karyawan = request.POST.getlist('kappa_karyawan')
+
+        kappa.save()
+
+        return redirect('coretoolcrud:viewAllKappa', pk)    
+    else:
+        return redirect('/logout')
+
+def storeAllKappa(request, pk):
+    if 'user' in request.session:
+        kappa = Kappa.objects.get(kappa_survey_id = pk)
+        tempall = []
+        tempall1 = []
+        tempall2 = []
+
+        tempall = request.POST.getlist('kappa_all')
+        for i in range(len(tempall)):
+            tempall1.append(float(tempall[i]))
+
+       
+        tempall2.append(tempall1)
+
+        if kappa.kappa_all is None:
+            kappa.kappa_all = tempall2
+        elif kappa.kappa_all is not None:
+            kappa.kappa_all.append(tempall1)
+        
+        kappa.save()
+
+        return redirect('coretoolcrud:viewFinalKappa', pk)    
+    else:
+        return redirect('/logout')    
+
+def deleteKappa(request, pk):
+    if 'user' in request.session:
+        kappa = Kappa.objects.get(kappa_survey_id = pk)
+        kappa.delete()
+        messages.success(request, "Kappa berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pk)
+    else:
+        return redirect('/logout')
+
+def viewFinalKappa(request, pk):
+    if 'user' in request.session:
+        kappa = Kappa.objects.get(kappa_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        ##############################
+
+        
+
+        #####################################
+
+        nsample = range(1, int(kappa.kappa_sample)+1)
+        ntime = range(1, len(kappa.kappa_all)+1)
+        gabung = zip(nsample, kappa.kappa_all)
+        
+
+        return render(request,'kappa/collection_kappa.html', {'kappa':kappa})
+    else:
+        return redirect('/logout')
+
+def viewAllKappa(request, pk):
+    if 'user' in request.session:
+        try:
+            kappa = Kappa.objects.get(kappa_survey_id = pk)
+            nos = range(1, int(kappa.kappa_npart * kappa.kappa_ntrial)+1)
+            return render(request,'stability/all_stability.html',{'nos':nos, 'kappa':kappa})
+        
+        except Kappa.DoesNotExist:
+            return redirect('coretoolcrud:viewKappa', pk)    
+    else:
+        return redirect('/logout')   
+
+def viewPrintKappa(request, pk):
+    if 'user' in request.session:
+        kappa = Kappa.objects.get(kappa_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        ##############################
+
+        
+
+        #####################################
+
+        nsample = range(1, int(kappa.kappa_sample)+1)
+        ntime = range(1, len(kappa.kappa_all)+1)
+        gabung = zip(nsample, kappa.kappa_all)
+        
+
+        return render(request,'kappa/print_kappa.html', {'kappa':kappa})
+    else:
+        return redirect('/logout')
+
+
+#Kendall
+
+def viewKendall(request, pk):
+    if 'user' in request.session:
+        try:
+            kendall = Kendall.objects.get(kendall_survey_id = pk)
+            if kendall.kendall_all:
+                return redirect('coretoolcrud:viewFinalKendall', pk)
+            else:
+                survey = Survey.objects.get(id = pk)
+                plan = survey.survey_plan
+                return render(request,'kendall/all_kendall.html',{'plan':plan, 'kendall':kendall, 'survey':survey})
+            
+        except Kendall.DoesNotExist:
+            return render(request,'kendall/kendall.html',{'pk':pk})
+    else:
+        return redirect('/logout')
+
+def storeKendall(request, pk):
+    if 'user' in request.session:
+        try:
+            kendall = Kendall.objects.get(kendall_survey_id = pk)
+            kendall.delete()
+        except Kendall.DoesNotExist:
+            pass
+
+        kendall = Kendall()
+        kendall.kendall_survey_id = pk
+        kendall.kendall_nkaryawan = request.POST.get('kendall_nkaryawan')
+        kendall.kendall_npart = request.POST.get('kendall_npart')
+        kendall.kendall_ntrial = request.POST.get('kendall_ntrial')
+        kendall.kendall_karyawan = request.POST.getlist('kendall_karyawan')
+
+        kendall.save()
+
+        return redirect('coretoolcrud:viewAllKendall', pk)    
+    else:
+        return redirect('/logout')
+
+def storeAllKendall(request, pk):
+    if 'user' in request.session:
+        kendall = Kendall.objects.get(kendall_survey_id = pk)
+        tempall = []
+        tempall1 = []
+        tempall2 = []
+
+        tempall = request.POST.getlist('kendall_all')
+        for i in range(len(tempall)):
+            tempall1.append(float(tempall[i]))
+
+       
+        tempall2.append(tempall1)
+
+        if kendall.kendall_all is None:
+            kendall.kendall_all = tempall2
+        elif kendall.kendall_all is not None:
+            kendall.kendall_all.append(tempall1)
+        
+        kendall.save()
+
+        return redirect('coretoolcrud:viewFinalKendall', pk)    
+    else:
+        return redirect('/logout')    
+
+def deleteKendall(request, pk):
+    if 'user' in request.session:
+        kendall = Kendall.objects.get(kendall_survey_id = pk)
+        kendall.delete()
+        messages.success(request, "Kendall berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pk)
+    else:
+        return redirect('/logout')
+
+def viewFinalKendall(request, pk):
+    if 'user' in request.session:
+        kendall = Kendall.objects.get(kendall_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        ##############################
+
+        
+
+        #####################################
+
+        nsample = range(1, int(kendall.kendall_sample)+1)
+        ntime = range(1, len(kendall.kendall_all)+1)
+        gabung = zip(nsample, kendall.kendall_all)
+        
+
+        return render(request,'kendall/collection_kendall.html', {'kendall':kendall})
+    else:
+        return redirect('/logout')
+
+def viewAllKendall(request, pk):
+    if 'user' in request.session:
+        try:
+            kendall = Kendall.objects.get(kendall_survey_id = pk)
+            nos = range(1, int(kendall.kendall_npart * kendall.kendall_ntrial)+1)
+            return render(request,'kendall/all_kendall.html',{'nos':nos, 'kendall':kendall})
+        
+        except Kendall.DoesNotExist:
+            return redirect('coretoolcrud:viewKendall', pk)    
+    else:
+        return redirect('/logout')   
+
+def viewPrintKendall(request, pk):
+    if 'user' in request.session:
+        kendall = Kendall.objects.get(kendall_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        ##############################
+
+        
+
+        #####################################
+
+        nsample = range(1, int(kendall.kendall_sample)+1)
+        ntime = range(1, len(kendall.kendall_all)+1)
+        gabung = zip(nsample, kendall.kendall_all)
+        
+
+        return render(request,'kendall/print_kendall.html', {'kendall':kendall})
+    else:
+        return redirect('/logout')
+
+
+

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Kendall</title>
+    <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+      
+      <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+      <script type='text/javascript'>
+        function addFields(){
+            // Number of inputs to create
+            var number = document.getElementById("member").value;
+            // Container <div> where dynamic content will be placed
+            var container = document.getElementById("container");
+            // Clear previous contents of the container
+            while (container.hasChildNodes()) {
+                container.removeChild(container.lastChild);
+            }
+            for (i=0;i<number;i++){
+                // Append a node with a random text
+                container.appendChild(document.createTextNode("Appraiser " + (i+1)));
+                // Create an <input> element, set its type and name attributes
+                var input = document.createElement("input");
+                input.type = "text";
+                input.className += 'form-control';
+                input.name = "kendall_karyawan";
+                container.appendChild(input);
+                // Append a line break 
+                container.appendChild(document.createElement("br"));
+            }
+        }
+    </script>
+      <style type="text/css" rel="stylesheet">
+      body{
+      padding:20px 20px;
+      }
+      ul.breadcrumb {
+      padding: 10px 16px;
+      list-style: none;
+      background-color: #eee;
+      }
+      ul.breadcrumb li {
+      display: inline;
+      font-size: 18px;
+      }
+      ul.breadcrumb li+li:before {
+      padding: 8px;
+      color: black;
+      content: "/\00a0";
+      }
+      ul.breadcrumb li a {
+      color: #0275d8;
+      text-decoration: none;
+      }
+      ul.breadcrumb li a:hover {
+      color: #01447e;
+      text-decoration: underline;
+      }
+      .separator {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      }
+      .col-xs-6{
+          display:inline-block;
+      }
+      .results tr[visible='false'],
+      .no-result{
+        display:none;
+      }
+
+      .results tr[visible='true']{
+        display:table-row;
+      }
+
+      .counter{
+        padding:8px; 
+        color:#ccc;
+      }
+      </style>
+      
+  </head>
+  <body>
+    <div class="container">
+      <div class="invoice-title">
+        <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
+          <h2>Kendall</h2><br>
+      <ul class="breadcrumb">
+          <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
+          <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
+          <li><a href="{% url 'coretoolcrud:viewDetailSurvey' pk %}">Survey Result</a></li>
+          <li>Fill Kendall Data</li>
+      </ul>
+          {% if messages %}
+          {% for message in messages %}
+          {% if message.tags == 'error' %}
+          <div class="alert alert-danger" role="alert">
+            <h7>{{ message }}</h7>
+          </div>
+          {% else %}
+          <div class="alert alert-{{ message.tags }}" role="alert">
+              <h7>{{ message }}</h7>
+          </div>
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+        </nav>
+        
+     
+      <hr>
+
+    </div>
+        <form action="{% url 'coretoolcrud:storeKendall' pk %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="exampleInputEmail1">Num of Appraiser</label>
+                <input class="form-control" name="kendall_nkaryawan" id="member" type="number" required />
+                <a href="#" id="filldetails" onclick="addFields()">Fill appraiser name</a>
+                <div id="container"/>
+            </div>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Num of Part</label>
+              <input class="form-control" name="kendall_npart" id="demoFormHorizontalEmail" type="number" required />
+          </div>
+          <div class="form-group">
+            <label for="exampleInputEmail1">Num of Trial</label>
+            <input class="form-control" name="kendall_ntrial" id="demoFormHorizontalEmail" type="number" required />
+          </div>
+            
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+   
+
+
+    </div>
+ 
+  </body>
+
+</html>
+
+

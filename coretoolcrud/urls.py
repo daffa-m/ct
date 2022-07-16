@@ -13,6 +13,8 @@ from .views import viewNpchart, viewFinalNpchart, viewPrintNpchart, storeNpchart
 from .views import viewUchart, viewFinalUchart, viewPrintUchart, storeUchart, storeAllUchart, viewAllUchart, viewListUchart, deleteUchart, viewCommentUchart, storeCommentUchart, viewNsampleUchart, storeNsampleUchart
 from .views import viewCchart, viewFinalCchart, viewPrintCchart, storeCchart, storeAllCchart, viewAllCchart, viewListCchart, deleteCchart, viewCommentCchart, storeCommentCchart
 from .views import viewStability, viewPrintStability, viewCommentStability, viewFinalStability, viewAllStability, storeStability, storeCommentStability, storeAllStability, deleteStability
+from .views import viewKappa, viewPrintKappa, viewFinalKappa, viewAllKappa, storeKappa, storeAllKappa, deleteKappa
+from .views import viewKendall, viewPrintKendall, viewFinalKendall, viewAllKendall, storeKendall, storeAllKendall, deleteKendall
 from .views import viewListSurvey, viewDetailSurvey, viewSurvey, viewManual, viewEditSurvey, viewEditManual, storeManual, storeSurvey, storeEditManual, storeEditSurvey, deleteSurvey
 from .views import viewLogin, login, logout
 app_name = "coretoolcrud"
@@ -163,5 +165,21 @@ urlpatterns = [
     path('storeAllStability/<int:pk>',storeAllStability,name='storeAllStability'),
     path('storeCommentStability/<int:pk>',storeCommentStability,name='storeCommentStability'),
     path('deleteStability/<int:pk>',deleteStability,name='deleteStability'),
+
+    path('viewKappa/<int:pk>',viewKappa,name='viewKappa'),
+    path('viewPrintKappa/<int:pk>',viewPrintKappa,name='viewPrintKappa'),
+    path('viewFinalKappa/<int:pk>',viewFinalKappa,name='viewFinalKappa'),
+    path('viewAllKappa/<int:pk>',viewAllKappa,name='viewAllKappa'),
+    path('storeKappa/<int:pk>',storeKappa,name='storeKappa'),
+    path('storeAllKappa/<int:pk>',storeAllKappa,name='storeAllKappa'),
+    path('deleteKappa/<int:pk>',deleteKappa,name='deleteKappa'),
+
+    path('viewKendall/<int:pk>',viewKendall,name='viewKendall'),
+    path('viewPrintKendall/<int:pk>',viewPrintKendall,name='viewPrintKendall'),
+    path('viewFinalKendall/<int:pk>',viewFinalKendall,name='viewFinalKendall'),
+    path('viewAllKendall/<int:pk>',viewAllKendall,name='viewAllKendall'),
+    path('storeKendall/<int:pk>',storeKendall,name='storeKendall'),
+    path('storeAllKendall/<int:pk>',storeAllKendall,name='storeAllKendall'),
+    path('deleteKendall/<int:pk>',deleteKendall,name='deleteKendall'),
 
 ]

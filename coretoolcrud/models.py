@@ -177,6 +177,22 @@ class Cchart(models.Model):
     cchart_recommendation = models.JSONField(null=True)
     cchart_class = models.IntegerField()
 
+class Kendall(models.Model):
+    kendall_survey_id = models.IntegerField()
+    kendall_nkaryawan = models.IntegerField()
+    kendall_npart = models.IntegerField()
+    kendall_ntrial = models.IntegerField()
+    kendall_karyawan = models.JSONField(null=True)
+    kendall_all = models.JSONField(null=True)
+
+class Kappa(models.Model):
+    kappa_survey_id = models.IntegerField()
+    kappa_nkaryawan = models.IntegerField()
+    kappa_npart = models.IntegerField()
+    kappa_ntrial = models.IntegerField()
+    kappa_karyawan = models.JSONField(null=True)
+    kappa_all = models.JSONField(null=True)
+
 class Stability(models.Model):
     stability_survey_id = models.IntegerField()
     stability_sample = models.IntegerField()
