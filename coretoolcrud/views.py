@@ -6,8 +6,8 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 import os
-
-import numpy
+import pyirr
+from pyirr import read_data, kappam_fleiss, kendall, intraclass_correlation
 from numpy import sqrt
 import pandas as pd
 import seaborn as sns
@@ -29,7 +29,7 @@ from bokeh.embed import components
 from bokeh.models import LinearAxis
 from calendar import monthrange
 import statistics
-import pyirr
+
 
 from random import randint
 
@@ -9661,7 +9661,7 @@ def viewKappa(request, pk):
             else:
                 survey = Survey.objects.get(id = pk)
                 plan = survey.survey_plan
-                return render(request,'kappa/all_kappa.html',{'plan':plan, 'kappa':kappa, 'survey':survey})
+                return redirect('coretoolcrud:viewAllKappa', pk)
             
         except Kappa.DoesNotExist:
             return render(request,'kappa/kappa.html',{'pk':pk})
@@ -9692,22 +9692,25 @@ def storeKappa(request, pk):
 def storeAllKappa(request, pk):
     if 'user' in request.session:
         kappa = Kappa.objects.get(kappa_survey_id = pk)
-        tempall = []
-        tempall1 = []
-        tempall2 = []
+        temppart = []
+        temptrial = []
+        tempkaryawan = []
+        iter = 1
 
-        tempall = request.POST.getlist('kappa_all')
-        for i in range(len(tempall)):
-            tempall1.append(float(tempall[i]))
-
-       
-        tempall2.append(tempall1)
-
-        if kappa.kappa_all is None:
-            kappa.kappa_all = tempall2
-        elif kappa.kappa_all is not None:
-            kappa.kappa_all.append(tempall1)
+        kappa.kappa_all = request.POST.getlist('kappa_all')
+        for i in range(int(kappa.kappa_nkaryawan) * int(kappa.kappa_npart) * int(kappa.kappa_ntrial)):
+            if iter % int(kappa.kappa_nkaryawan) != 0:
+                tempkaryawan.append(kappa.kappa_all[i])
+                iter = iter + 1
+            else:
+                tempkaryawan.append(kappa.kappa_all[i])
+                temppart = [float(i) for i in tempkaryawan]
+                temptrial.append(temppart)
+                tempkaryawan = []
+                temppart = []
+                iter = iter + 1
         
+        kappa.kappa_all = temptrial
         kappa.save()
 
         return redirect('coretoolcrud:viewFinalKappa', pk)    
@@ -9728,17 +9731,22 @@ def viewFinalKappa(request, pk):
         kappa = Kappa.objects.get(kappa_survey_id = pk)
         survey = Survey.objects.get(id = pk)
         ##############################
-
-        
+        giro = np.array(kappa.kappa_all)
+        temp2 = giro.tolist()
+        df = pd.DataFrame(temp2)
+        # specifying column names
+        df.columns = kappa.kappa_karyawan
+        res = pyirr.kappam_fleiss(df, detail=True)
+        dfdisplay = res.detail.to_html(classes='table table-hover table-condensed mv-20', index=True)
 
         #####################################
 
-        nsample = range(1, int(kappa.kappa_sample)+1)
-        ntime = range(1, len(kappa.kappa_all)+1)
-        gabung = zip(nsample, kappa.kappa_all)
+        nrepeat = range(1, int(kappa.kappa_ntrial * kappa.kappa_npart)+1)
+        gabung = zip(nrepeat, kappa.kappa_all)
+        
         
 
-        return render(request,'kappa/collection_kappa.html', {'kappa':kappa})
+        return render(request,'kappa/collection_kappa.html', {'kappa':kappa, 'res':res, 'nrepeat':nrepeat, 'gabung':gabung, 'dfdisplay':dfdisplay})
     else:
         return redirect('/logout')
 
@@ -9747,7 +9755,8 @@ def viewAllKappa(request, pk):
         try:
             kappa = Kappa.objects.get(kappa_survey_id = pk)
             nos = range(1, int(kappa.kappa_npart * kappa.kappa_ntrial)+1)
-            return render(request,'stability/all_stability.html',{'nos':nos, 'kappa':kappa})
+            nkaryawan = range(1, int(kappa.kappa_nkaryawan)+1)
+            return render(request,'kappa/all_kappa.html',{'nos':nos, 'nkaryawan':nkaryawan, 'kappa':kappa})
         
         except Kappa.DoesNotExist:
             return redirect('coretoolcrud:viewKappa', pk)    
@@ -9785,7 +9794,7 @@ def viewKendall(request, pk):
             else:
                 survey = Survey.objects.get(id = pk)
                 plan = survey.survey_plan
-                return render(request,'kendall/all_kendall.html',{'plan':plan, 'kendall':kendall, 'survey':survey})
+                return redirect('coretoolcrud:viewAllKendall', pk)
             
         except Kendall.DoesNotExist:
             return render(request,'kendall/kendall.html',{'pk':pk})
@@ -9816,21 +9825,25 @@ def storeKendall(request, pk):
 def storeAllKendall(request, pk):
     if 'user' in request.session:
         kendall = Kendall.objects.get(kendall_survey_id = pk)
-        tempall = []
-        tempall1 = []
-        tempall2 = []
+        temppart = []
+        temptrial = []
+        tempkaryawan = []
+        iter = 1
 
-        tempall = request.POST.getlist('kendall_all')
-        for i in range(len(tempall)):
-            tempall1.append(float(tempall[i]))
-
-       
-        tempall2.append(tempall1)
-
-        if kendall.kendall_all is None:
-            kendall.kendall_all = tempall2
-        elif kendall.kendall_all is not None:
-            kendall.kendall_all.append(tempall1)
+        kendall.kendall_all = request.POST.getlist('kendall_all')
+        for i in range(int(kendall.kendall_nkaryawan) * int(kendall.kendall_npart) * int(kendall.kendall_ntrial)):
+            if iter % int(kendall.kendall_nkaryawan) != 0:
+                tempkaryawan.append(kendall.kendall_all[i])
+                iter = iter + 1
+            else:
+                tempkaryawan.append(kendall.kendall_all[i])
+                temppart = [float(i) for i in tempkaryawan]
+                temptrial.append(temppart)
+                tempkaryawan = []
+                temppart = []
+                iter = iter + 1
+        
+        kendall.kendall_all = temptrial
         
         kendall.save()
 
@@ -9852,17 +9865,20 @@ def viewFinalKendall(request, pk):
         kendall = Kendall.objects.get(kendall_survey_id = pk)
         survey = Survey.objects.get(id = pk)
         ##############################
-
-        
+        giro = np.array(kendall.kendall_all)
+        temp2 = giro.tolist()
+        df = pd.DataFrame(temp2)
+        # specifying column names
+        df.columns = kendall.kendall_karyawan
+        res = pyirr.kendall(df, correct=True)
 
         #####################################
-
-        nsample = range(1, int(kendall.kendall_sample)+1)
-        ntime = range(1, len(kendall.kendall_all)+1)
-        gabung = zip(nsample, kendall.kendall_all)
+        nrepeat = range(1, int(kendall.kendall_ntrial * kendall.kendall_npart)+1)
+        gabung = zip(nrepeat, kendall.kendall_all)
+        
         
 
-        return render(request,'kendall/collection_kendall.html', {'kendall':kendall})
+        return render(request,'kendall/collection_kendall.html', {'kendall':kendall, 'res':res, 'nrepeat':nrepeat, 'gabung':gabung})
     else:
         return redirect('/logout')
 
@@ -9871,7 +9887,8 @@ def viewAllKendall(request, pk):
         try:
             kendall = Kendall.objects.get(kendall_survey_id = pk)
             nos = range(1, int(kendall.kendall_npart * kendall.kendall_ntrial)+1)
-            return render(request,'kendall/all_kendall.html',{'nos':nos, 'kendall':kendall})
+            nkaryawan = range(1, int(kendall.kendall_nkaryawan)+1)
+            return render(request,'kendall/all_kendall.html',{'nos':nos, 'nkaryawan':nkaryawan, 'kendall':kendall})
         
         except Kendall.DoesNotExist:
             return redirect('coretoolcrud:viewKendall', pk)    

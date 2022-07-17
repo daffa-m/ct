@@ -94,8 +94,8 @@
             <thead>
               <tr>
                 <td scope="col">Nama</td>
-                {% for i in part %}
-                  <td scope="col">P-{{i}}</td>
+                {% for i in kendall.kendall_karyawan%}
+                  <td scope="col">{{i}}</td>
                 {% endfor %}
               </tr>
              
@@ -103,16 +103,13 @@
             <tbody>
                 
               
-              
-                {% for nama in namas %} 
-              {% for j in trial %} 
+              {% for j in nos %} 
               <tr>
-                <td>{{nama}}</td>
-                {% for i in part %}
+                <td>{{j}}</td>
+                {% for i in nkaryawan %}
                 <td><input class="form-control" name="kendall_all" id="demoFormHorizontalEmail" type="text" step="any" required /></td>
                 {% endfor %}
               </tr>
-              {% endfor %}
               {% endfor %}
             </tbody>
           </table>
@@ -136,7 +133,7 @@
                setTimeout(function () {
                    var columns = $this.val().split(/\s+/);
                    var i;
-                   var npart = "{{ kendall.kendall_npart }}";
+                   var npart = "{{ kendall.kendall_nkaryawan }}";
                    var input = $this;
                    for (i = 0; i < columns.length; i++) {
                        input.val(columns[i]);
