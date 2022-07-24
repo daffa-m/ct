@@ -9741,12 +9741,16 @@ def viewFinalKappa(request, pk):
 
         #####################################
 
-        nrepeat = range(1, int(kappa.kappa_ntrial * kappa.kappa_npart)+1)
+        nrepeat = []
+        for i in range(1, int(kappa.kappa_npart)+1):
+            for j in range(1, int(kappa.kappa_ntrial)+1):
+                nrepeat.append("Part "+str(i)+" Trial "+str(j))
+        # nrepeat = range(1, int(kappa.kappa_ntrial * kappa.kappa_npart)+1)
         gabung = zip(nrepeat, kappa.kappa_all)
         
         
 
-        return render(request,'kappa/collection_kappa.html', {'kappa':kappa, 'res':res, 'nrepeat':nrepeat, 'gabung':gabung, 'dfdisplay':dfdisplay})
+        return render(request,'kappa/collection_kappa.html', {'survey':survey, 'kappa':kappa, 'res':res, 'nrepeat':nrepeat, 'gabung':gabung, 'dfdisplay':dfdisplay})
     else:
         return redirect('/logout')
 
@@ -9754,7 +9758,12 @@ def viewAllKappa(request, pk):
     if 'user' in request.session:
         try:
             kappa = Kappa.objects.get(kappa_survey_id = pk)
-            nos = range(1, int(kappa.kappa_npart * kappa.kappa_ntrial)+1)
+
+            nos = []
+            for i in range(1, int(kappa.kappa_npart)+1):
+                for j in range(1, int(kappa.kappa_ntrial)+1):
+                    nos.append("Part "+str(i)+" Trial "+str(j))
+            # nos = range(1, int(kappa.kappa_npart * kappa.kappa_ntrial)+1)
             nkaryawan = range(1, int(kappa.kappa_nkaryawan)+1)
             return render(request,'kappa/all_kappa.html',{'nos':nos, 'nkaryawan':nkaryawan, 'kappa':kappa})
         
@@ -9873,12 +9882,17 @@ def viewFinalKendall(request, pk):
         res = pyirr.kendall(df, correct=True)
 
         #####################################
-        nrepeat = range(1, int(kendall.kendall_ntrial * kendall.kendall_npart)+1)
+
+        nrepeat = []
+        for i in range(1, int(kendall.kendall_npart)+1):
+            for j in range(1, int(kendall.kendall_ntrial)+1):
+                nrepeat.append("Part "+str(i)+" Trial "+str(j))
+        # nrepeat = range(1, int(kendall.kendall_ntrial * kendall.kendall_npart)+1)
         gabung = zip(nrepeat, kendall.kendall_all)
         
         
 
-        return render(request,'kendall/collection_kendall.html', {'kendall':kendall, 'res':res, 'nrepeat':nrepeat, 'gabung':gabung})
+        return render(request,'kendall/collection_kendall.html', {'survey':survey, 'kendall':kendall, 'res':res, 'nrepeat':nrepeat, 'gabung':gabung})
     else:
         return redirect('/logout')
 
@@ -9886,7 +9900,12 @@ def viewAllKendall(request, pk):
     if 'user' in request.session:
         try:
             kendall = Kendall.objects.get(kendall_survey_id = pk)
-            nos = range(1, int(kendall.kendall_npart * kendall.kendall_ntrial)+1)
+
+            nos = []
+            for i in range(1, int(kendall.kendall_npart)+1):
+                for j in range(1, int(kendall.kendall_ntrial)+1):
+                    nos.append("Part "+str(i)+" Trial "+str(j))
+            # nos = range(1, int(kendall.kendall_npart * kendall.kendall_ntrial)+1)
             nkaryawan = range(1, int(kendall.kendall_nkaryawan)+1)
             return render(request,'kendall/all_kendall.html',{'nos':nos, 'nkaryawan':nkaryawan, 'kendall':kendall})
         

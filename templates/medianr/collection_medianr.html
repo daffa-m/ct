@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Kendall</title>
+	<title>Median R</title>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
@@ -55,12 +55,12 @@
     <div class="container">
       <div class="invoice-title">
         <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
-            <h2>Kendall</h2><br>
+            <h2>Median R</h2><br>
         <ul class="breadcrumb">
             <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
             <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
-            <li><a href="{% url 'coretoolcrud:viewDetailSurvey' kendall.kendall_survey_id %}">Survey Result</a></li>
-            <li>Kendall Result</li>
+            <li><a href="{% url 'coretoolcrud:viewDetailSurvey' medianr.medianr_survey_id %}">Survey Result</a></li>
+            <li>Median R Result</li>
         </ul>
           {% if messages %}
           {% for message in messages %}
@@ -145,17 +145,26 @@
                 </table>
 
                 <table class="table table-hover table-bordered results">
-                    <h6>{{res.method}}</h6>
                   <thead>
                     
                     <tr>
-                      <th scope="col">Coef: {{res.value|floatformat:3}}</th>
-                      <th scope="col">Chi Sq (14): {{res.statistic|floatformat:3}}</th>
-                      <th scope="col">P Value: {{res.pvalue|floatformat:3}}</th>
-                      <th scope="col">Subject: {{res.subjects|floatformat:3}}</th>
-                      
+                      <th scope="col">LSL: {{medianr.medianr_lsl}}</th>
+                      <th scope="col">USL: {{medianr.medianr_usl}}</th>
+                      <th scope="col">Unit: {{medianr.medianr_unit}}</th>
+                      <th scope="col">Num of subgroup: {{medianr.medianr_subgroup}}</th>
                     </tr>
-                   
+                    <tr>
+                      <th scope="col">Cp: {{cp|floatformat:2}}</th>
+                      <th scope="col">Cpk: {{cpk|floatformat:2}}</th>
+                      <th scope="col">Pp: {{pp|floatformat:2}}</th>
+                      <th scope="col">Ppk: {{ppk|floatformat:2}}</th>
+                    </tr>
+                    <tr>
+                      <th scope="col">USL - Xbar2: {{usllsl.0|floatformat:2}}</th>
+                      <th scope="col">Xbar2 - LSL: {{usllsl.1|floatformat:2}}</th>
+                      <th scope="col"></th>
+                      <th scope="col"></th>
+                    </tr>
                   </thead>
                   <tbody>
                       
@@ -165,12 +174,14 @@
                   </tbody>
                 </table>
 
-                <h6>Measurement</h6>
+                
+                  
+                    <h6>Measurement</h6>
                     <table class="table table-hover table-bordered results" id="table">
                       <thead>
                         <tr>
-                          <td scope="col"></td>
-                          {% for i in kendall.kendall_karyawan %}
+                          <td scope="col">Days</td>
+                          {% for i in subs %}
                             <td scope="col">{{i}}</td>
                           {% endfor %}
                         </tr>
@@ -182,22 +193,64 @@
                         {% for k, l in gabung %} 
                         <tr>
                           <td>{{ k }}</td>
-                          {% for i in l %}
-                         
-                          <td>{{i}}</td>
-
+                          {% for j in l %}
+                          <td>{{j}}</td>
                           {% endfor %}
                         </tr>
                         {% endfor %}
                       </tbody>
                     </table>
-               
+
+                   
+
+                    
+                      <div class="card">
+                        
+                        <div class="card-body">
+                          
+                          {{dimedian| safe}}
+                          <br><br><br>
+                         
+                         
+                        </div>
+                      </div>
+                      <br><br>
+
+                      <div class="card">
+                        
+                        <div class="card-body">
+                          
+                          {{divr| safe}}
+                          <br><br><br>
+                         
+                         
+                        </div>
+                      </div>
                       <br><br>
                      
-                      
+                      <div class="card">
+                        <h5 class="card-header">Recommendation</h5>
+                        <div class="card-body">
+                          
+  
+                          <label for="exampleInputPassword1">Resume Stability of Process</label>
+                             
+                          <br>
+                          <h6>{{medianr.medianr_stability}}</h6><br><br>
+
+                          <label for="exampleInputPassword1">Resume Capability of Process</label>
+                             
+                          <br>
+                          <h6>{{medianr.medianr_capability}}</h6><br>
+                          
+  
+                        </div>
+  
+                      </div>
+                      <br><br>
                     
-                      <a href="{% url 'coretoolcrud:deleteKendall' kendall.kendall_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                      <a href="{% url 'coretoolcrud:viewPrintKendall' kendall.kendall_survey_id %}" class="btn btn-info">Print</a>
+                      <a href="{% url 'coretoolcrud:deleteVxbarr' medianr.id medianr.medianr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    <a href="{% url 'coretoolcrud:viewPrintVxbarr' medianr.id medianr.medianr_survey_id %}" class="btn btn-info">Print</a>
                       <br><br>
 
         </div>
@@ -209,5 +262,7 @@
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.2.min.js"></script>
 <script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.2.min.js"></script>
+{{scriptxbar| safe}}
+{{scriptr| safe}}
 </html>
 

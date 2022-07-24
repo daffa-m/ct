@@ -193,6 +193,19 @@ class Kappa(models.Model):
     kappa_karyawan = models.JSONField(null=True)
     kappa_all = models.JSONField(null=True)
 
+class Medianr(models.Model):
+    medianr_survey_id = models.IntegerField()
+    medianr_lsl = models.IntegerField()
+    medianr_usl = models.IntegerField()
+    medianr_subgroup = models.IntegerField()
+    medianr_unit = models.TextField()
+    medianr_all = models.JSONField(null=True)
+    medianr_measured = models.TextField()
+    medianr_reviewed = models.TextField()
+    medianr_stability = models.TextField(null=True)
+    medianr_capability = models.TextField(null=True)
+    medianr_reason = models.TextField(null=True)
+
 class Stability(models.Model):
     stability_survey_id = models.IntegerField()
     stability_sample = models.IntegerField()
