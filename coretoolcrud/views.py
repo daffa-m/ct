@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Npchart, Uchart, Cchart, Stability, Kappa, Kendall, Survey, User
+from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Npchart, Uchart, Cchart, Stability, Kappa, Kendall, Medianr, Survey, User
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -9933,5 +9933,322 @@ def viewPrintKendall(request, pk):
     else:
         return redirect('/logout')
 
+#Medianr
+
+def viewMedianr(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            medianr = Medianr.objects.get(id = pkid)
+            if medianr.medianr_all:
+                return redirect('coretoolcrud:viewFinalMedianr', pkid, pksurveyid)
+            else:
+                survey = Survey.objects.get(id = pksurveyid)
+                plan = survey.survey_plan
+                return redirect('coretoolcrud:viewAllMedianr', pkid, pksurveyid)
+            
+        except Medianr.DoesNotExist:
+            survey = Survey.objects.get(id = pksurveyid)
+            return render(request,'medianr/medianr.html',{'pkid':pkid, 'pksurveyid':pksurveyid, 'survey':survey})
+    else:
+        return redirect('/logout')
+
+def storeMedianr(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            medianr = Medianr.objects.get(id = pkid)
+            medianr.delete()
+        except Medianr.DoesNotExist:
+            pass
+
+        medianr = Medianr()
+        medianr.medianr_survey_id = pksurveyid
+        medianr.medianr_subgroup = request.POST.get('medianr_subgroup')
+        medianr.medianr_usl = request.POST.get('medianr_usl')
+        medianr.medianr_lsl = request.POST.get('medianr_lsl')
+        medianr.medianr_measured = request.POST.get('medianr_measured')
+        medianr.medianr_reviewed = request.POST.get('medianr_reviewed')
+        medianr.medianr_reason = request.POST.get('medianr_reason')
+
+        medianr.save()
+
+        return redirect('coretoolcrud:viewAllMedianr', medianr.id, pksurveyid)    
+    else:
+        return redirect('/logout')
+
+def viewAllMedianr(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        try:
+            medianr = Medianr.objects.get(id = pkid)
+            survey = Survey.objects.get(id = pksurveyid)
+            month = survey.survey_plan.month
+            year = survey.survey_plan.year
+            days = range(1, monthrange(year, month)[1]+1)
+            subs = range(1, int(medianr.medianr_subgroup)+1)
+            sub = medianr.medianr_subgroup
+            plan = survey.survey_plan
+            return render(request,'medianr/all_medianr.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'medianr':medianr})
+        
+        except Pchart.DoesNotExist:
+            return redirect('coretoolcrud:viewMedianr', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')  
+
+def storeAllMedianr(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        medianr = Medianr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        days = monthrange(year, month)[1]
+        sub = medianr.medianr_subgroup
+        temppart = []
+        temptrial = []
+        iter = 1
+
+        medianr.medianr_all = request.POST.getlist('medianr_all')
+        for i in range(int(days) * int(medianr.medianr_subgroup)):
+            if iter % sub != 0:
+                temppart.append(float(medianr.medianr_all[i]))
+                iter = iter + 1
+            else:
+                temppart.append(float(medianr.medianr_all[i]))
+                temptrial.append(temppart)
+                temppart = []
+                iter = iter + 1
+        
+        temptrial = np.array(temptrial).T.tolist()
+        medianr.medianr_all = temptrial
+        medianr.save()
+
+        return redirect('coretoolcrud:viewFinalMedianr', pkid, pksurveyid)    
+    else:
+        return redirect('/logout')  
+
+def deleteMedianr(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        medianr = Medianr.objects.get(id = pkid)
+        medianr.delete()
+        messages.success(request, "Median R berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pksurveyid)
+    else:
+        return redirect('/logout')
+
+def viewFinalMedianr(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        medianr = Medianr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        nday = monthrange(year, month)[1]
+        ntrial = medianr.medianr_subgroup
+        all = medianr.medianr_all
+        ##############################
+
+        r = []
+        temp = []
+        medr = []
+        for i in range(nday):
+            for j in range(ntrial):
+                temp.append(all[j][i])
+            r.append(max(temp) - min(temp))
+            medr.append(statistics.median(temp))
+            # print(max(temp)-min(temp))
+            temp = []
+        
+        allflat = []
+        for ele in all:
+            for e in ele:
+                allflat.append(e)
+        
+        xbar2 = sum(medr) / nday
+        rbar = sum(r) / nday
+        sigma = statistics.stdev(allflat)
+
+        subgroup = [[2, 3.268, 1.88, 1.128, 0], [3, 2.574, 1.023, 1.693, 0], [4, 2.282, 0.729, 2.059, 0], [5, 2.114, 0.577, 2.326, 0]]
+
+        for ele in subgroup:
+            if ele[0] == ntrial:
+                d2 = ele[3]
+                d4 = ele[1]
+                a2 = ele[2]
+                d3 = ele[4]
+
+        usllsl = []
+        usllsl.append(medianr.medianr_usl - xbar2)
+        usllsl.append(xbar2 - medianr.medianr_lsl)
+
+        uclx = xbar2 + a2 * rbar
+        lclx = xbar2 - a2 * rbar
+        ulcr = d4 * rbar
+        lclr = d3 * rbar
+
+        cp = (medianr.medianr_usl - medianr.medianr_lsl) / (6 * rbar / d2)
+        cpk = min(usllsl) / (3 * rbar / d2)
+        pp = (medianr.medianr_usl - medianr.medianr_lsl) / (6 * sigma)
+        ppk = min(usllsl) / (3 * sigma)
+
+        ###############################
+
+        bot = []
+        xbar2list = []
+        usllist = []
+        lsllist = []
+        xbar2mlist = []
+        xbar2plist = []
+        rbard4list = []
+        rbard3list = []
 
 
+        for i in range(nday):
+            bot.append("T"+str(i+1))
+            xbar2list.append(medianr)
+            usllist.append(medianr.medianr_usl)
+            lsllist.append(medianr.medianr_lsl)
+            xbar2mlist.append(lclx)
+            xbar2plist.append(uclx)
+            rbard4list.append(ulcr)
+            rbard3list.append(lclr)
+
+        allt = np.array(medianr.medianr_all).T.tolist()
+
+        p = figure(title="Median R", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, usllist, legend_label="USL", line_width=2)
+        p.line(bot, lsllist, legend_label="LSL", color="green", line_width=2)
+        p.line(bot, xbar2plist, legend_label="UCLX", color="red", line_width=2)
+        p.line(bot, xbar2mlist, legend_label="LCLX", color="yellow", line_width=2)
+        p.line(bot, medr, legend_label="Median R", color="magenta", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxbar, divxbar = components(p)
+
+        #####################################
+
+        p = figure(title="R", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, rbard4list, legend_label="ULCR", line_width=2)
+        p.line(bot, rbard3list, legend_label="LCLR", line_width=2)
+        p.line(bot, r, legend_label="R", color="green", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptr, divr = components(p)
+
+        #####################################
+
+        
+        gabung = zip(bot, allt)
+        subs = range(1, int(medianr.medianr_subgroup)+1)
+
+        return render(request,'medianr/collection_medianr.html', {'medianr':medianr, 'survey':survey, 'usllsl':usllsl, 'cp':cp, 'cpk':cpk, 'pp':pp, 'ppk':ppk, 'rbar':rbar, 'xbar2':xbar2, 'sigma':sigma, 'uclx':uclx, 'lclx':lclx, 'ulcr':ulcr, 'lclr':lclr, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'scriptr':scriptr, 'divr':divr})
+    else:
+        return redirect('/logout')
+
+def viewPrintMedianr(request, pkid, pksurveyid):
+    if 'user' in request.session:
+        medianr = Medianr.objects.get(id = pkid)
+        survey = Survey.objects.get(id = pksurveyid)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        nday = monthrange(year, month)[1]
+        ntrial = medianr.medianr_subgroup
+        all = medianr.medianr_all
+        ##############################
+
+        r = []
+        temp = []
+        medr = []
+        for i in range(nday):
+            for j in range(ntrial):
+                temp.append(all[j][i])
+            r.append(max(temp) - min(temp))
+            medr.append(statistics.median(temp))
+            # print(max(temp)-min(temp))
+            temp = []
+        
+        allflat = []
+        for ele in all:
+            for e in ele:
+                allflat.append(e)
+        
+        xbar2 = sum(medr) / nday
+        rbar = sum(r) / nday
+        sigma = statistics.stdev(allflat)
+
+        subgroup = [[2, 3.268, 1.88, 1.128, 0], [3, 2.574, 1.023, 1.693, 0], [4, 2.282, 0.729, 2.059, 0], [5, 2.114, 0.577, 2.326, 0]]
+
+        for ele in subgroup:
+            if ele[0] == ntrial:
+                d2 = ele[3]
+                d4 = ele[1]
+                a2 = ele[2]
+                d3 = ele[4]
+
+        usllsl = []
+        usllsl.append(medianr.medianr_usl - xbar2)
+        usllsl.append(xbar2 - medianr.medianr_lsl)
+
+        xbar2m = xbar2 - a2 * rbar 
+        xbar2p = xbar2 + a2 * rbar 
+        rbard4 = rbar * d4
+        rbard3 = rbar * d3
+
+        cp = (medianr.medianr_usl - medianr.medianr_lsl) / (6 * rbar / d2)
+        cpk = min(usllsl) / (3 * rbar / d2)
+        pp = (medianr.medianr_usl - medianr.medianr_lsl) / (6 * sigma)
+        ppk = min(usllsl) / (3 * sigma)
+
+        ###############################
+
+        bot = []
+        xbar2list = []
+        usllist = []
+        lsllist = []
+        xbar2mlist = []
+        xbar2plist = []
+        rbard4list = []
+        rbard3list = []
+
+
+        for i in range(days):
+            bot.append("T"+str(i+1))
+            xbar2list.append(xbar2)
+            usllist.append(medianr.medianr_usl)
+            lsllist.append(medianr.medianr_lsl)
+            xbar2mlist.append(xbar2m)
+            xbar2plist.append(xbar2p)
+            rbard4list.append(rbard4)
+            rbard3list.append(rbard3)
+
+        allt = np.array(medianr.medianr_all).T.tolist()
+
+        p = figure(title="Xbar", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, usllist, legend_label="USL", line_width=2)
+        p.line(bot, lsllist, legend_label="LSL", color="green", line_width=2)
+        p.line(bot, xbar2plist, legend_label="Xbar2 + a2 * Rbar", color="red", line_width=2)
+        p.line(bot, xbar2mlist, legend_label="Xbar2 - a2 * Rbar", color="yellow", line_width=2)
+        p.line(bot, xbar2list, legend_label="Xbar2", color="black", line_width=2)
+        p.line(bot, xbar, legend_label="Xbar", color="magenta", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptxbar, divxbar = components(p)
+
+        #####################################
+
+        p = figure(title="R", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", x_range=bot, y_axis_label='Value', x_axis_label='Days')
+        p.line(bot, rbard4list, legend_label="Rbar . D4", line_width=2)
+        p.line(bot, r, legend_label="R", color="green", line_width=2)
+        p.xaxis.major_label_orientation = "vertical"
+        scriptr, divr = components(p)
+
+        #####################################
+
+        
+        gabung = zip(bot, allt)
+        subs = range(1, int(medianr.medianr_subgroup)+1)
+
+        return render(request,'medianr/print_medianr.html', {'medianr':medianr, 'survey':survey, 'usllsl':usllsl, 'cp':cp, 'cpk':cpk, 'pp':pp, 'ppk':ppk, 'rbar':rbar, 'xbar2':xbar2, 'sigma':sigma, 'uclx':uclx, 'lclx':lclx, 'ulcr':ulcr, 'lclr':lclr, 'gabung':gabung, 'subs':subs, 'scriptxbar':scriptxbar, 'divxbar':divxbar, 'scriptr':scriptr, 'divr':divr})
+    else:
+        return redirect('/logout')
+
+def viewListMedianr(request, pk):
+    if 'user' in request.session:
+        medianr = Medianr.objects.filter(medianr_survey_id=pk)
+        survey = Survey.objects.get(id = pk)
+        return render(request,'medianr/list_medianr.html',{'medianr':medianr, 'survey':survey})
+    else:
+        return redirect('/logout')

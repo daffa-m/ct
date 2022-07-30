@@ -15,6 +15,8 @@ from .views import viewCchart, viewFinalCchart, viewPrintCchart, storeCchart, st
 from .views import viewStability, viewPrintStability, viewCommentStability, viewFinalStability, viewAllStability, storeStability, storeCommentStability, storeAllStability, deleteStability
 from .views import viewKappa, viewPrintKappa, viewFinalKappa, viewAllKappa, storeKappa, storeAllKappa, deleteKappa
 from .views import viewKendall, viewPrintKendall, viewFinalKendall, viewAllKendall, storeKendall, storeAllKendall, deleteKendall
+from .views import viewMedianr, viewFinalMedianr, viewPrintMedianr, storeMedianr, storeAllMedianr, deleteMedianr, viewAllMedianr, viewListMedianr
+# from .views import viewBias, viewPrintBias, viewCommentBias, viewFinalBias, viewAllBias, storeBias, storeCommentBias, storeAllBias, deleteBias
 from .views import viewListSurvey, viewDetailSurvey, viewSurvey, viewManual, viewEditSurvey, viewEditManual, storeManual, storeSurvey, storeEditManual, storeEditSurvey, deleteSurvey
 from .views import viewLogin, login, logout
 app_name = "coretoolcrud"
@@ -181,5 +183,25 @@ urlpatterns = [
     path('storeKendall/<int:pk>',storeKendall,name='storeKendall'),
     path('storeAllKendall/<int:pk>',storeAllKendall,name='storeAllKendall'),
     path('deleteKendall/<int:pk>',deleteKendall,name='deleteKendall'),
+
+    path('viewMedianr/<int:pkid>/<int:pksurveyid>',viewMedianr,name='viewMedianr'),
+    path('viewFinalMedianr/<int:pkid>/<int:pksurveyid>',viewFinalMedianr,name='viewFinalMedianr'),
+    path('storeMedianr/<int:pkid>/<int:pksurveyid>',storeMedianr,name='storeMedianr'),
+    path('viewPrintMedianr/<int:pkid>/<int:pksurveyid>',viewPrintMedianr,name='viewPrintMedianr'),
+    path('storeAllMedianr/<int:pkid>/<int:pksurveyid>',storeAllMedianr,name='storeAllMedianr'),
+    path('deleteMedianr/<int:pkid>/<int:pksurveyid>',deleteMedianr,name='deleteMedianr'),
+    path('viewAllMedianr/<int:pkid>/<int:pksurveyid>',viewAllMedianr,name='viewAllMedianr'),
+    path('viewListMedianr/<int:pk>',viewListMedianr,name='viewListMedianr'),
+
+    # path('viewBias/<int:pk>',viewBias,name='viewBias'),
+    # path('viewPrintBias/<int:pk>',viewPrintBias,name='viewPrintBias'),
+    # path('viewCommentBias/<int:pk>',viewCommentBias,name='viewCommentBias'),
+    # path('viewFinalBias/<int:pk>',viewFinalBias,name='viewFinalBias'),
+    # path('viewAllBias/<int:pk>',viewAllBias,name='viewAllBias'),
+    # path('storeBias/<int:pk>',storeBias,name='storeBias'),
+    # path('storeAllBias/<int:pk>',storeAllBias,name='storeAllBias'),
+    # path('storeCommentBias/<int:pk>',storeCommentBias,name='storeCommentBias'),
+    # path('deleteBias/<int:pk>',deleteBias,name='deleteBias'),
+
 
 ]

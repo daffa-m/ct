@@ -107,7 +107,7 @@
       <hr>
 
         </div>
-        <form action="{% url 'coretoolcrud:storeVxbarr' pkid pksurveyid %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'coretoolcrud:storeMedianr' pkid pksurveyid %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group"><br>
               <label for="exampleInputPassword1">Reason For Rev</label>
@@ -123,19 +123,15 @@
           </div>
             <div class="form-group"><br>
               <label for="exampleInputEmail1">LSL</label>
-              <input class="form-control" name="medianr_lsl" id="demoFormHorizontalEmail" type="number" required />
+              <input class="form-control" name="medianr_lsl" id="demoFormHorizontalEmail" type="number" value="{{survey.survey_range_min}}" required />
           </div>
           <div class="form-group"><br>
             <label for="exampleInputEmail1">USL</label>
-            <input class="form-control" name="medianr_usl" id="demoFormHorizontalEmail" type="number" required />
+            <input class="form-control" name="medianr_usl" id="demoFormHorizontalEmail" type="number" value="{{survey.survey_range_max}}" required />
           </div>
           <div class="form-group"><br>
             <label for="exampleInputEmail1">Number of Subgroup</label>
             <input class="form-control" name="medianr_subgroup" id="demoFormHorizontalEmail" type="number" min="2" max="5" required/>
-          </div>
-          <div class="form-group"><br>
-            <label for="exampleInputEmail1">Unit</label>
-            <input class="form-control" name="medianr_unit" id="demoFormHorizontalEmail" type="text" required />
           </div>
           <div class="form-group"><br>
             <label for="exampleInputEmail1">Input / Measured by</label>

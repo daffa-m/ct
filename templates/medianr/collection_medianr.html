@@ -150,7 +150,7 @@
                     <tr>
                       <th scope="col">LSL: {{medianr.medianr_lsl}}</th>
                       <th scope="col">USL: {{medianr.medianr_usl}}</th>
-                      <th scope="col">Unit: {{medianr.medianr_unit}}</th>
+                      <th scope="col">Xbar2: {{xbar2|floatformat:2}}</th>
                       <th scope="col">Num of subgroup: {{medianr.medianr_subgroup}}</th>
                     </tr>
                     <tr>
@@ -162,8 +162,8 @@
                     <tr>
                       <th scope="col">USL - Xbar2: {{usllsl.0|floatformat:2}}</th>
                       <th scope="col">Xbar2 - LSL: {{usllsl.1|floatformat:2}}</th>
-                      <th scope="col"></th>
-                      <th scope="col"></th>
+                      <th scope="col">Rbar: {{rbar|floatformat:2}}</th>
+                      <th scope="col">Sigma: {{sigma|floatformat:2}}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -208,7 +208,7 @@
                         
                         <div class="card-body">
                           
-                          {{dimedian| safe}}
+                          {{divxbar| safe}}
                           <br><br><br>
                          
                          
@@ -249,8 +249,8 @@
                       </div>
                       <br><br>
                     
-                      <a href="{% url 'coretoolcrud:deleteVxbarr' medianr.id medianr.medianr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                    <a href="{% url 'coretoolcrud:viewPrintVxbarr' medianr.id medianr.medianr_survey_id %}" class="btn btn-info">Print</a>
+                      <a href="{% url 'coretoolcrud:deleteMedianr' medianr.id medianr.medianr_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                    <a href="{% url 'coretoolcrud:viewPrintMedianr' medianr.id medianr.medianr_survey_id %}" class="btn btn-info">Print</a>
                       <br><br>
 
         </div>
