@@ -189,6 +189,8 @@
                         <h3 class="card-title"><a href="{% url 'coretoolcrud:viewKappa' survey.id %}">{{ study }}</a></h3>
                         {% elif study == "Median-R" %}
                         <h3 class="card-title"><a href="{% url 'coretoolcrud:viewListMedianr' survey.id %}">{{ study }}</a></h3>
+                        {% elif study == "Bias" %}
+                        <h3 class="card-title"><a href="{% url 'coretoolcrud:viewBias' survey.id %}">{{ study }}</a></h3>
                         {% else %}
                         <h3 class="card-title">{{ study }}</h3>
                         {% endif %}

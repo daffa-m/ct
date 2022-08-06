@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Bias</title>
+    <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+      <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
+      <style>
+        ul.breadcrumb {
+        padding: 10px 16px;
+        list-style: none;
+        background-color: #eee;
+        }
+        ul.breadcrumb li {
+        display: inline;
+        font-size: 18px;
+        }
+        ul.breadcrumb li+li:before {
+        padding: 8px;
+        color: black;
+        content: "/\00a0";
+        }
+        ul.breadcrumb li a {
+        color: #0275d8;
+        text-decoration: none;
+        }
+        ul.breadcrumb li a:hover {
+        color: #01447e;
+        text-decoration: underline;
+        }
+        .separator {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        }
+
+        .separator::before,
+        .separator::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #000;
+        }
+
+        .separator:not(:empty)::before {
+        margin-right: .25em;
+        }
+
+        .separator:not(:empty)::after {
+        margin-left: .25em;
+        }
+        .ref-table {
+        display:none;
+        }
+      </style>
+      
+  </head>
+  <body>
+    <div class="container">
+        <div class="invoice-title">
+          <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
+            <h2>Bias</h2><br>
+        <ul class="breadcrumb">
+          <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
+          <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
+          <li><a href="{% url 'coretoolcrud:viewDetailSurvey' pk %}">Survey Result</a></li>
+          <li>Fill Bias Data</li>
+        </ul>
+          {% if messages %}
+          {% for message in messages %}
+          {% if message.tags == 'error' %}
+          <div class="alert alert-danger" role="alert">
+            <h7>{{ message }}</h7>
+          </div>
+          {% else %}
+          <div class="alert alert-{{ message.tags }}" role="alert">
+              <h7>{{ message }}</h7>
+          </div>
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+        </nav>
+        
+     
+      <hr>
+
+        </div>
+        <form action="{% url 'coretoolcrud:storeBias' pk %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+            <label for="exampleInputEmail1">Num of Trial</label>
+            <input class="form-control" name="bias_ngauge" id="bias_npart" type="number" min=15 required />
+            </div>
+          <div class="form-group"><br>
+            <label for="exampleInputEmail1">Measured By</label>
+            <input class="form-control" name="bias_measured" id="demoFormHorizontalEmail" type="text" required />
+          </div>
+          <div class="form-group"><br>
+            <label for="exampleInputEmail1">Reviewed By</label>
+            <input class="form-control" name="bias_reviewed" id="demoFormHorizontalEmail" type="text" required />
+          </div>
+          <div class="form-group"><br>
+            <label for="exampleInputEmail1">Reference</label><br>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="bias_ref" id="opt1" value="master" onchange="check()">
+                <label class="form-check-label" for="inlineRadio1">Master</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="bias_ref" id="opt2" value="average" onchange="check()">
+                <label class="form-check-label" for="inlineRadio2">Average Calculation</label>
+            </div>
+          </div> 
+          
+          
+            <br><button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+   
+
+
+    </div>
+ 
+    
+
+
+   
+  </body>
+
+</html>
+
+

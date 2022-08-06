@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Npchart, Uchart, Cchart, Stability, Kappa, Kendall, Medianr, Survey, User
+from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Npchart, Uchart, Cchart, Stability, Kappa, Kendall, Medianr, Bias, Survey, User
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -10250,5 +10250,819 @@ def viewListMedianr(request, pk):
         medianr = Medianr.objects.filter(medianr_survey_id=pk)
         survey = Survey.objects.get(id = pk)
         return render(request,'medianr/list_medianr.html',{'medianr':medianr, 'survey':survey})
+    else:
+        return redirect('/logout')
+
+#Bias
+
+def viewBias(request, pk):
+    if 'user' in request.session:
+        try:
+            bias = Bias.objects.get(bias_survey_id = pk)
+            if bias.bias_all:
+                return redirect('coretoolcrud:viewFinalBias',pk )
+            else:
+                part = range(1, int(bias.bias_ngauge)+1)
+                measurement = range(1, int(bias.bias_ngauge)+1)
+                return render(request,'bias/all_bias.html',{'part':part, 'measurement':measurement, 'bias':bias})
+        except Bias.DoesNotExist:
+            return render(request,'bias/bias.html',{'pk':pk})
+    else:
+        return redirect('/logout')
+
+def viewAverageBias(request):
+    if 'user' in request.session:
+        return render(request,'bias/average_bias.html')
+    else:
+        return redirect('/logout')
+
+def storeBias(request, pk):
+    if 'user' in request.session:
+        try:
+            bias = Bias.objects.get(bias_survey_id = pk)
+            bias.delete()
+        except Bias.DoesNotExist:
+            pass
+            
+        bias = Bias()
+        bias.bias_survey_id = pk
+        bias.bias_ngauge = request.POST.get('bias_ngauge')
+        bias.bias_ref = request.POST.get('bias_ref')
+        bias.bias_measured = request.POST.get('bias_measured')
+        bias.bias_reviewed = request.POST.get('bias_reviewed')
+
+        bias.save()
+        # karyawan = range(int(cross.cross_nkaryawan))
+        # return render(request,'cross/karyawan_cross.html',{'karyawan':karyawan})
+
+        part = range(1, int(bias.bias_ngauge)+1)
+        # measurement = range(int(bias.bias_nmeasurement))
+
+        if bias.bias_ref == "master":
+            return redirect('coretoolcrud:viewMasterBias',pk )
+            
+        else:
+            return redirect('coretoolcrud:viewAverageBias',pk )
+            # return render(request,'bias/all_bias.html',{'part':part, 'measurement':measurement, 'bias':bias})
+    else:
+        return redirect('/logout')
+
+def viewMasterBias(request, pk):
+    if 'user' in request.session:
+        bias = Bias.objects.get(bias_survey_id = pk)
+        part = range(1, int(bias.bias_ngauge)+1)
+        measurement = range(1, int(bias.bias_ngauge)+1)
+        return render(request,'bias/master_bias.html',{'part':part, 'measurement':measurement, 'bias':bias})
+    else:
+        return redirect('/logout')
+
+def viewAverageBias(request, pk):
+    if 'user' in request.session:
+        bias = Bias.objects.get(bias_survey_id = pk)
+        part = range(1, int(bias.bias_npart)+1)
+        measurement = range(1, int(bias.bias_nmeasurement)+1)
+        return render(request,'bias/average_bias.html',{'part':part, 'measurement':measurement, 'bias':bias})
+    else:
+        return redirect('/logout')
+
+def storeMasterBias(request, pk):
+    if 'user' in request.session:
+        bias = Bias.objects.get(bias_survey_id = pk)
+        bias.bias_master = request.POST.get('bias_master')
+        bias.save()
+
+        return redirect('coretoolcrud:viewBias',pk )
+    else:
+        return redirect('/logout')
+
+def storeAverageBias(request, pk):
+    if 'user' in request.session:
+        bias = Bias.objects.get(bias_survey_id = pk)
+        bias.bias_average = request.POST.getlist('bias_average')
+        bias.bias_ave_measured = request.POST.get('bias_ave_measured')
+        bias.bias_ave_sn = request.POST.get('bias_ave_sn')
+        bias.bias_ave_res = request.POST.get('bias_ave_res')
+
+        temppart = []
+        temptrial = []
+        iter = 1
+
+        for i in range(int(bias.bias_npart) * int(bias.bias_nmeasurement)):
+            if iter % int(bias.bias_nmeasurement) != 0:
+                temppart.append(bias.bias_average[i])
+                iter = iter + 1
+            else:
+                if iter % (int(bias.bias_npart) * int(bias.bias_nmeasurement)) == 0:
+                    temppart.append(bias.bias_average[i])
+                    temppart = [float(i) for i in temppart]
+                    temptrial.append(temppart)
+                    temppart = []
+                    iter = iter + 1
+                else:
+                    temppart.append(bias.bias_average[i])
+                    temppart = [float(i) for i in temppart]
+                    temptrial.append(temppart)
+                    temppart = []
+                    iter = iter + 1
+        
+        bias.bias_average = temptrial
+
+        tempmaster = []
+        for ele in bias.bias_average:
+            tempmaster.append(sum(ele) / len(ele))
+
+        bias.bias_master = [float(i) for i in tempmaster]
+        bias.save()
+
+        part = range(1, int(bias.bias_npart)+1)
+        measurement = range(int(bias.bias_nmeasurement))
+        return render(request,'bias/all_bias.html',{'part':part, 'measurement':measurement, 'bias':bias})
+    else:
+        return redirect('/logout')
+
+def storeAllBias(request, pk):
+    if 'user' in request.session:
+        bias = Bias.objects.get(bias_survey_id = pk)
+
+        temppart = []
+        temptrial = []
+        iter = 1
+
+        bias.bias_all = request.POST.getlist('bias_all')
+        for i in range(int(bias.bias_npart) * int(bias.bias_nmeasurement)):
+            if iter % int(bias.bias_nmeasurement) != 0:
+                temppart.append(bias.bias_all[i])
+                iter = iter + 1
+            else:
+                if iter % (int(bias.bias_npart) * int(bias.bias_nmeasurement)) == 0:
+                    temppart.append(bias.bias_all[i])
+                    temppart = [float(i) for i in temppart]
+                    temptrial.append(temppart)
+                    temppart = []
+                    iter = iter + 1
+                else:
+                    temppart.append(bias.bias_all[i])
+                    temppart = [float(i) for i in temppart]
+                    temptrial.append(temppart)
+                    temppart = []
+                    iter = iter + 1
+        
+        bias.bias_all = temptrial
+        bias.save()
+        return redirect('coretoolcrud:viewCommentBias', pk)
+    else:
+        return redirect('/logout')
+
+def viewCommentBias(request, pk):
+    if 'user' in request.session:
+        bias = Bias.objects.get(bias_survey_id = pk)
+        bias.bias_master = [float(i) for i in bias.bias_master]
+        avemaster = sum(bias.bias_master) / len(bias.bias_master)
+
+        xbar = []
+        for i in bias.bias_all:
+            xbar.append(sum(i) / len(i))
+        
+        stdev = []
+        for i in bias.bias_all:
+            stdev.append(np.std(i, ddof=1))
+        
+        n1 = []
+        for i in range(int(bias.bias_npart)):
+            n1.append(abs((xbar[i] - bias.bias_master[i]) * 12 ** 0.5 / stdev[i]))
+        
+        pvalue = []
+        for i in range(int(bias.bias_npart)):
+            pvalue.append(stats.t.sf(n1[i], df=int(bias.bias_nmeasurement)-1) * 2)
+        
+        bias = []
+        temp = []
+        for i in  range(int(bias.bias_npart)):
+            for j in  range(int(bias.bias_nmeasurement)):
+                temp.append(bias.bias_all[i][j] - bias.bias_master[i])
+            bias.append(temp)
+            temp = []
+        
+        averagebias = []
+        temp = []
+        for i in range(int(bias.bias_npart)):
+            for j in range(int(bias.bias_nmeasurement)):
+                temp.append(bias[i][j])
+            averagebias.append(sum(temp) / len(temp))
+            temp = []
+
+        avebiasall = sum(averagebias) / len(averagebias)
+
+        x = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(bias.bias_master[j])
+            x.append(temp)
+            temp = []
+        
+        y = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(bias[j][i])
+            y.append(temp)
+            temp = []
+        
+        xy = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(x[i][j] * y[i][j])
+            xy.append(temp)
+            temp = []
+        
+        xx = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(x[i][j] * x[i][j])
+            xx.append(temp)
+            temp = []
+
+        yy = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(y[i][j] * y[i][j])
+            yy.append(temp)
+            temp = []
+        
+        jmlx = 0
+        avex = 0
+        jmly = 0
+        avey = 0
+        jmlxy = 0
+        avexy = 0
+        jmlxx = 0
+        avexx = 0
+        jmlyy = 0
+        aveyy = 0
+        gm = 0
+        gm2 = 0
+        sgm = 0
+
+        for i in x:
+            jmlx = jmlx + sum(i)
+            avex = avex + len(i)
+        avex = jmlx / avex
+
+        for i in y:
+            jmly = jmly + sum(i)
+            avey = avey + len(i)
+        avey = jmly / avey
+
+        for i in xy:
+            jmlxy = jmlxy + sum(i)
+            avexy = avexy + len(i)
+        avexy = jmlxy / avexy
+
+        for i in xx:
+            jmlxx = jmlxx + sum(i)
+            avexx = avexx + len(i)
+        avexx = jmlxx / avexx
+
+        for i in yy:
+            jmlyy = jmlyy + sum(i)
+            aveyy = aveyy + len(i)
+        aveyy = jmlyy / aveyy
+
+        gm = int(bias.bias_npart) * int(bias.bias_nmeasurement)
+        gm2 = gm - 2
+        sgm = 1 / gm2
+
+        a = (jmlxy - (jmlx * jmly / gm)) / (jmlxx - jmlx ** 2 / 60)
+        b = avey - a * avex
+        s = ((jmlyy - b * jmly - a * jmlxy) / gm2) ** 0.5
+
+        temp =(1 - bias.bias_confidence) / 2
+        print("temp", temp)
+        t = stats.t.ppf(1-temp, gm2)
+
+        xoxbar = []
+        xoxbar2 = []
+
+        for i in bias.bias_master:
+            xoxbar.append((i - avemaster) ** 2)
+            xoxbar2.append(((i - avemaster) ** 2) ** 2)
+
+        sumxoxbar = sum(xoxbar) * int(bias.bias_nmeasurement)
+        sumxoxbar2 = sum(xoxbar2)
+
+        rasio = []
+        for i in xoxbar:
+            rasio.append(i / sumxoxbar)
+        
+        sum05 = []
+        for i in rasio:
+            sum05.append((i + sgm) ** 0.5)
+        
+        cbv = []
+        for i in sum05:
+            cbv.append(i * s * t)
+        
+        baxo = []
+        for i in bias.bias_master:
+            baxo.append(b + a * i)
+        
+        upper = []
+        lower = []
+
+        for i in range(int(bias.bias_npart)):
+            upper.append(baxo[i] + cbv[i])
+            lower.append(baxo[i] - cbv[i])
+        
+        print("gm2", gm2)
+        print("i s t", i, s, t)
+
+        tabs = abs(abs(a) / (s / (sumxoxbar ** 0.5)))
+        tb =  abs(b) / (sgm + avemaster ** 2 / sumxoxbar2) ** 0.5 / s
+
+        remarks = []
+        for i in pvalue:
+            if i <= (1 - bias.bias_confidence):
+                remarks.append("Bias Significant")
+            else:
+                remarks.append("Bias Not Significant")
+
+        aven1 = sum(n1) / len(n1)
+        avep = stats.t.sf(aven1, df=int(bias.bias_nmeasurement)-1) * 2
+        conf1 = 1 - bias.bias_confidence
+
+        p = figure(title="Bias", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Bias', x_axis_label='Reference Value')
+        for i in range(int(bias.bias_nmeasurement)):
+            p.scatter(x[i], y[i], marker="circle")
+        
+        p.scatter(bias.bias_master, upper, color="green")
+        p.line(bias.bias_master, upper, color="green", legend_label='Upper', line_width=2)
+        p.scatter(bias.bias_master, lower, color="red")
+        p.line(bias.bias_master, lower, color="red", legend_label='Lower', line_width=2)
+        p.scatter(bias.bias_master, averagebias, color="orange")
+        p.line(bias.bias_master, averagebias, color="orange", legend_label='Average Bias', line_width=2)
+        p.scatter(bias.bias_master, baxo, color="purple")
+        p.line(bias.bias_master, baxo, color="purple", legend_label='Regression', line_width=2)
+        
+        scriptbiasref, divbiasref = components(p)
+
+        survey = Survey.objects.get(id = bias.bias_survey_id)
+        
+        npart = range(1, int(bias.bias_npart)+1)
+        nmeasurement = range(1, int(bias.bias_nmeasurement)+1)
+        gabung = zip(bias.bias_all, range(1, int(bias.bias_npart)+1))
+        gabung2 = zip(bias, range(1, int(bias.bias_npart)+1))
+        gabung3 = zip(xbar, averagebias, range(1, int(bias.bias_npart)+1))
+        gabung4 = zip(bias.bias_master, averagebias, pvalue, remarks)
+        
+
+        return render(request,'bias/comment_bias.html', {'aven1':aven1, 'avep':avep, 'conf1':conf1, 'avebiasall':avebiasall, 'bias':bias, 'survey':survey, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3, 'gabung4':gabung4, 'scriptbiasref':scriptbiasref, 'divbiasref':divbiasref})
+    else:
+        return redirect('/logout')
+
+def storeCommentBias(request, pk):
+    if 'user' in request.session:
+        bias = Bias.objects.get(bias_survey_id = pk)
+
+        bias.bias_biasref = request.POST.get('bias_biasref')
+        bias.bias_recommendation = request.POST.get('bias_recommendation')
+        bias.save()
+
+        # return render(request,'bias/comment_bias.html', {'bias':bias, 'survey':survey})
+        return redirect('coretoolcrud:viewFinalBias',bias.bias_survey_id )
+    else:
+        return redirect('/logout')
+
+def viewFinalBias(request, pk):
+    if 'user' in request.session:
+        bias = Bias.objects.get(bias_survey_id = pk)
+        bias.bias_master = [float(i) for i in bias.bias_master]
+        avemaster = sum(bias.bias_master) / len(bias.bias_master)
+
+        xbar = []
+        for i in bias.bias_all:
+            xbar.append(sum(i) / len(i))
+        
+        stdev = []
+        for i in bias.bias_all:
+            stdev.append(np.std(i, ddof=1))
+        
+        n1 = []
+        for i in range(int(bias.bias_npart)):
+            n1.append(abs((xbar[i] - bias.bias_master[i]) * 12 ** 0.5 / stdev[i]))
+        
+        pvalue = []
+        for i in range(int(bias.bias_npart)):
+            pvalue.append(stats.t.sf(n1[i], df=int(bias.bias_nmeasurement)-1) * 2)
+        
+        bias = []
+        temp = []
+        for i in  range(int(bias.bias_npart)):
+            for j in  range(int(bias.bias_nmeasurement)):
+                temp.append(bias.bias_all[i][j] - bias.bias_master[i])
+            bias.append(temp)
+            temp = []
+        
+
+        averagebias = []
+        temp = []
+        for i in range(int(bias.bias_npart)):
+            for j in range(int(bias.bias_nmeasurement)):
+                temp.append(bias[i][j])
+            averagebias.append(sum(temp) / len(temp))
+            temp = []
+
+        avebiasall = sum(averagebias) / len(averagebias)
+
+        x = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(bias.bias_master[j])
+            x.append(temp)
+            temp = []
+        
+        y = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(bias[j][i])
+            y.append(temp)
+            temp = []
+        
+        xy = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(x[i][j] * y[i][j])
+            xy.append(temp)
+            temp = []
+        
+        xx = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(x[i][j] * x[i][j])
+            xx.append(temp)
+            temp = []
+
+        yy = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(y[i][j] * y[i][j])
+            yy.append(temp)
+            temp = []
+        
+        jmlx = 0
+        avex = 0
+        jmly = 0
+        avey = 0
+        jmlxy = 0
+        avexy = 0
+        jmlxx = 0
+        avexx = 0
+        jmlyy = 0
+        aveyy = 0
+        gm = 0
+        gm2 = 0
+        sgm = 0
+
+        for i in x:
+            jmlx = jmlx + sum(i)
+            avex = avex + len(i)
+        avex = jmlx / avex
+
+        for i in y:
+            jmly = jmly + sum(i)
+            avey = avey + len(i)
+        avey = jmly / avey
+
+        for i in xy:
+            jmlxy = jmlxy + sum(i)
+            avexy = avexy + len(i)
+        avexy = jmlxy / avexy
+
+        for i in xx:
+            jmlxx = jmlxx + sum(i)
+            avexx = avexx + len(i)
+        avexx = jmlxx / avexx
+
+        for i in yy:
+            jmlyy = jmlyy + sum(i)
+            aveyy = aveyy + len(i)
+        aveyy = jmlyy / aveyy
+
+        gm = int(bias.bias_npart) * int(bias.bias_nmeasurement)
+        gm2 = gm - 2
+        sgm = 1 / gm2
+
+        a = (jmlxy - (jmlx * jmly / gm)) / (jmlxx - jmlx ** 2 / 60)
+        b = avey - a * avex
+        s = ((jmlyy - b * jmly - a * jmlxy) / gm2) ** 0.5
+
+        temp =(1 - bias.bias_confidence) / 2
+        print("temp", temp)
+        t = stats.t.ppf(1-temp, gm2)
+
+        xoxbar = []
+        xoxbar2 = []
+
+        for i in bias.bias_master:
+            xoxbar.append((i - avemaster) ** 2)
+            xoxbar2.append(((i - avemaster) ** 2) ** 2)
+
+        sumxoxbar = sum(xoxbar) * int(bias.bias_nmeasurement)
+        sumxoxbar2 = sum(xoxbar2)
+
+        rasio = []
+        for i in xoxbar:
+            rasio.append(i / sumxoxbar)
+        
+        sum05 = []
+        for i in rasio:
+            sum05.append((i + sgm) ** 0.5)
+        
+        cbv = []
+        for i in sum05:
+            cbv.append(i * s * t)
+        
+        baxo = []
+        for i in bias.bias_master:
+            baxo.append(b + a * i)
+        
+        upper = []
+        lower = []
+
+        for i in range(int(bias.bias_npart)):
+            upper.append(baxo[i] + cbv[i])
+            lower.append(baxo[i] - cbv[i])
+        
+        # print("gm2", gm2)
+        # print("i s t", i, s, t)
+
+        tabs = abs(abs(a) / (s / (sumxoxbar ** 0.5)))
+        tb =  abs(b) / (sgm + avemaster ** 2 / sumxoxbar2) ** 0.5 / s
+
+        remarks = []
+        for i in pvalue:
+            if i <= (1 - bias.bias_confidence):
+                remarks.append("Bias Significant")
+            else:
+                remarks.append("Bias Not Significant")
+        
+        aven1 = sum(n1) / len(n1)
+        avep = stats.t.sf(aven1, df=int(bias.bias_nmeasurement)-1) * 2
+        conf1 = 1 - bias.bias_confidence
+
+        p = figure(title="Bias", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Bias', x_axis_label='Reference Value')
+        for i in range(int(bias.bias_nmeasurement)):
+            p.scatter(x[i], y[i], marker="circle")
+        
+        p.scatter(bias.bias_master, upper, color="green")
+        p.line(bias.bias_master, upper, color="green", legend_label='Upper', line_width=2)
+        p.scatter(bias.bias_master, lower, color="red")
+        p.line(bias.bias_master, lower, color="red", legend_label='Lower', line_width=2)
+        p.scatter(bias.bias_master, averagebias, color="orange")
+        p.line(bias.bias_master, averagebias, color="orange", legend_label='Average Bias', line_width=2)
+        p.scatter(bias.bias_master, baxo, color="purple")
+        p.line(bias.bias_master, baxo, color="purple", legend_label='Regression', line_width=2)
+        
+        scriptbiasref, divbiasref = components(p)
+
+        survey = Survey.objects.get(id = bias.bias_survey_id)
+        
+        npart = range(1, int(bias.bias_npart)+1)
+        nmeasurement = range(1, int(bias.bias_nmeasurement)+1)
+        gabung = zip(bias.bias_all, range(1, int(bias.bias_npart)+1))
+        gabung2 = zip(bias, range(1, int(bias.bias_npart)+1))
+        gabung3 = zip(xbar, averagebias, range(1, int(bias.bias_npart)+1))
+        gabung4 = zip(bias.bias_master, averagebias, pvalue, remarks)
+        
+        print(x)
+
+        return render(request,'bias/collection_bias.html', {'aven1':aven1, 'avep':avep, 'conf1':conf1, 'avebiasall':avebiasall, 'bias':bias, 'survey':survey, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3, 'gabung4':gabung4, 'scriptbiasref':scriptbiasref, 'divbiasref':divbiasref})
+    else:
+        return redirect('/logout')
+
+def viewPrintBias(request, pk):
+    if 'user' in request.session:
+        bias = Bias.objects.get(bias_survey_id = pk)
+        bias.bias_master = [float(i) for i in bias.bias_master]
+        avemaster = sum(bias.bias_master) / len(bias.bias_master)
+
+        xbar = []
+        for i in bias.bias_all:
+            xbar.append(sum(i) / len(i))
+        
+        stdev = []
+        for i in bias.bias_all:
+            stdev.append(np.std(i, ddof=1))
+        
+        n1 = []
+        for i in range(int(bias.bias_npart)):
+            n1.append(abs((xbar[i] - bias.bias_master[i]) * 12 ** 0.5 / stdev[i]))
+        
+        pvalue = []
+        for i in range(int(bias.bias_npart)):
+            pvalue.append(stats.t.sf(n1[i], df=int(bias.bias_nmeasurement)-1) * 2)
+        
+        bias = []
+        temp = []
+        for i in  range(int(bias.bias_npart)):
+            for j in  range(int(bias.bias_nmeasurement)):
+                temp.append(bias.bias_all[i][j] - bias.bias_master[i])
+            bias.append(temp)
+            temp = []
+        
+
+        averagebias = []
+        temp = []
+        for i in range(int(bias.bias_npart)):
+            for j in range(int(bias.bias_nmeasurement)):
+                temp.append(bias[i][j])
+            averagebias.append(sum(temp) / len(temp))
+            temp = []
+
+        avebiasall = sum(averagebias) / len(averagebias)
+
+        x = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(bias.bias_master[j])
+            x.append(temp)
+            temp = []
+        
+        y = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(bias[j][i])
+            y.append(temp)
+            temp = []
+        
+        xy = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(x[i][j] * y[i][j])
+            xy.append(temp)
+            temp = []
+        
+        xx = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(x[i][j] * x[i][j])
+            xx.append(temp)
+            temp = []
+
+        yy = []
+        temp = []
+        for i in range(int(bias.bias_nmeasurement)):
+            for j in range(int(bias.bias_npart)):
+                temp.append(y[i][j] * y[i][j])
+            yy.append(temp)
+            temp = []
+        
+        jmlx = 0
+        avex = 0
+        jmly = 0
+        avey = 0
+        jmlxy = 0
+        avexy = 0
+        jmlxx = 0
+        avexx = 0
+        jmlyy = 0
+        aveyy = 0
+        gm = 0
+        gm2 = 0
+        sgm = 0
+
+        for i in x:
+            jmlx = jmlx + sum(i)
+            avex = avex + len(i)
+        avex = jmlx / avex
+
+        for i in y:
+            jmly = jmly + sum(i)
+            avey = avey + len(i)
+        avey = jmly / avey
+
+        for i in xy:
+            jmlxy = jmlxy + sum(i)
+            avexy = avexy + len(i)
+        avexy = jmlxy / avexy
+
+        for i in xx:
+            jmlxx = jmlxx + sum(i)
+            avexx = avexx + len(i)
+        avexx = jmlxx / avexx
+
+        for i in yy:
+            jmlyy = jmlyy + sum(i)
+            aveyy = aveyy + len(i)
+        aveyy = jmlyy / aveyy
+
+        gm = int(bias.bias_npart) * int(bias.bias_nmeasurement)
+        gm2 = gm - 2
+        sgm = 1 / gm2
+
+        a = (jmlxy - (jmlx * jmly / gm)) / (jmlxx - jmlx ** 2 / 60)
+        b = avey - a * avex
+        s = ((jmlyy - b * jmly - a * jmlxy) / gm2) ** 0.5
+
+        temp =(1 - bias.bias_confidence) / 2
+        print("temp", temp)
+        t = stats.t.ppf(1-temp, gm2)
+
+        xoxbar = []
+        xoxbar2 = []
+
+        for i in bias.bias_master:
+            xoxbar.append((i - avemaster) ** 2)
+            xoxbar2.append(((i - avemaster) ** 2) ** 2)
+
+        sumxoxbar = sum(xoxbar) * int(bias.bias_nmeasurement)
+        sumxoxbar2 = sum(xoxbar2)
+
+        rasio = []
+        for i in xoxbar:
+            rasio.append(i / sumxoxbar)
+        
+        sum05 = []
+        for i in rasio:
+            sum05.append((i + sgm) ** 0.5)
+        
+        cbv = []
+        for i in sum05:
+            cbv.append(i * s * t)
+        
+        baxo = []
+        for i in bias.bias_master:
+            baxo.append(b + a * i)
+        
+        upper = []
+        lower = []
+
+        for i in range(int(bias.bias_npart)):
+            upper.append(baxo[i] + cbv[i])
+            lower.append(baxo[i] - cbv[i])
+        
+        # print("gm2", gm2)
+        # print("i s t", i, s, t)
+
+        tabs = abs(abs(a) / (s / (sumxoxbar ** 0.5)))
+        tb =  abs(b) / (sgm + avemaster ** 2 / sumxoxbar2) ** 0.5 / s
+
+        remarks = []
+        for i in pvalue:
+            if i <= (1 - bias.bias_confidence):
+                remarks.append("Bias Significant")
+            else:
+                remarks.append("Bias Not Significant")
+        
+        aven1 = sum(n1) / len(n1)
+        avep = stats.t.sf(aven1, df=int(bias.bias_nmeasurement)-1) * 2
+        conf1 = 1 - bias.bias_confidence
+
+        p = figure(title="Bias", tools="pan,wheel_zoom,box_zoom,reset,hover", sizing_mode="stretch_width", y_axis_label='Bias', x_axis_label='Reference Value')
+        for i in range(int(bias.bias_nmeasurement)):
+            p.scatter(x[i], y[i], marker="circle")
+        
+        p.scatter(bias.bias_master, upper, color="green")
+        p.line(bias.bias_master, upper, color="green", legend_label='Upper', line_width=2)
+        p.scatter(bias.bias_master, lower, color="red")
+        p.line(bias.bias_master, lower, color="red", legend_label='Lower', line_width=2)
+        p.scatter(bias.bias_master, averagebias, color="orange")
+        p.line(bias.bias_master, averagebias, color="orange", legend_label='Average Bias', line_width=2)
+        p.scatter(bias.bias_master, baxo, color="purple")
+        p.line(bias.bias_master, baxo, color="purple", legend_label='Regression', line_width=2)
+
+        scriptbiasref, divbiasref = components(p)
+
+        survey = Survey.objects.get(id = bias.bias_survey_id)
+        
+        npart = range(1, int(bias.bias_npart)+1)
+        nmeasurement = range(1, int(bias.bias_nmeasurement)+1)
+        gabung = zip(bias.bias_all, range(1, int(bias.bias_npart)+1))
+        gabung2 = zip(bias, range(1, int(bias.bias_npart)+1))
+        gabung3 = zip(xbar, averagebias, range(1, int(bias.bias_npart)+1))
+        gabung4 = zip(bias.bias_master, averagebias, pvalue, remarks)
+
+        return render(request,'bias/print_bias.html', {'aven1':aven1, 'avep':avep, 'conf1':conf1, 'avebiasall':avebiasall, 'bias':bias, 'survey':survey, 'a':a, 'b':b, 's':s, 't':t, 'tabs':tabs, 'tb':tb, 'npart':npart, 'nmeasurement':nmeasurement, 'gabung':gabung, 'gabung2':gabung2, 'gabung3':gabung3, 'gabung4':gabung4, 'scriptbiasref':scriptbiasref, 'divbiasref':divbiasref})
+    else:
+        return redirect('/logout')
+
+def deleteBias(request, pk):
+    if 'user' in request.session:
+        bias = Bias.objects.get(bias_survey_id = pk)
+        bias.delete()
+        messages.success(request, "Bias berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pk)
     else:
         return redirect('/logout')

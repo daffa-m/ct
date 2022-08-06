@@ -203,6 +203,23 @@ class Medianr(models.Model):
     medianr_reviewed = models.TextField()
     medianr_reason = models.TextField(null=True)
 
+class Bias(models.Model):
+    bias_survey_id = models.IntegerField()
+    bias_ntrial = models.IntegerField(null=True)
+    bias_master = models.IntegerField(null=True)
+    bias_date = models.DateField(null=True)
+    bias_res = models.FloatField(null=True)
+    bias_ref = models.TextField()
+    bias_sn = models.TextField(null=True)
+    bias_room = models.TextField(null=True)
+    bias_ngauge = models.IntegerField()
+    bias_average = models.JSONField(null=True)
+    bias_all = models.JSONField(null=True)
+    bias_check = models.JSONField(null=True)
+    bias_recommendation = models.TextField(null=True)
+    bias_reviewed = models.TextField()
+    bias_measured = models.TextField()
+
 class Stability(models.Model):
     stability_survey_id = models.IntegerField()
     stability_sample = models.IntegerField()
