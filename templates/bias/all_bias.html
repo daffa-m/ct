@@ -92,10 +92,10 @@
         <table class="table table-hover table-bordered results" id="table">
             <thead>
               <tr>
-                <td scope="col">Sample</td>
-                {% for j in measurement %}
-                <td scope="col">M-{{j}}</td>
-                {% endfor %}
+                <td scope="col">No</td>
+                
+                <td scope="col">Trial</td>
+                
               </tr>
              
             </thead>
@@ -106,9 +106,9 @@
                 {% for i in part %} 
               <tr>
                 <td>S-{{i}}</td>
-                {% for j in measurement %}
+               
                 <td><input class="form-control" name="bias_all" id="demoFormHorizontalEmail" type="text" step="any" required /></td>
-                {% endfor %}
+             
               </tr>
               {% endfor %}
             </tbody>
@@ -133,7 +133,7 @@
                setTimeout(function () {
                    var columns = $this.val().split(/\s+/);
                    var i;
-                   var npart = "{{ bias.bias_ngauge }}";
+                   var npart = 1;
                    var input = $this;
                    for (i = 0; i < columns.length; i++) {
                        input.val(columns[i]);
