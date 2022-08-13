@@ -10270,12 +10270,6 @@ def viewBias(request, pk):
     else:
         return redirect('/logout')
 
-def viewAverageBias(request):
-    if 'user' in request.session:
-        return render(request,'bias/average_bias.html')
-    else:
-        return redirect('/logout')
-
 def storeBias(request, pk):
     if 'user' in request.session:
         try:
@@ -10290,6 +10284,7 @@ def storeBias(request, pk):
         bias.bias_ref = request.POST.get('bias_ref')
         bias.bias_measured = request.POST.get('bias_measured')
         bias.bias_reviewed = request.POST.get('bias_reviewed')
+        bias.bias_method = request.POST.get('bias_method')
 
         bias.save()
         # karyawan = range(int(cross.cross_nkaryawan))
@@ -10319,8 +10314,8 @@ def viewMasterBias(request, pk):
 def viewAverageBias(request, pk):
     if 'user' in request.session:
         bias = Bias.objects.get(bias_survey_id = pk)
-        part = range(1, int(bias.bias_npart)+1)
-        measurement = range(1, int(bias.bias_nmeasurement)+1)
+        part = range(1, int(bias.bias_ngauge)+1)
+        measurement = range(1, int(bias.bias_ngauge)+1)
         return render(request,'bias/average_bias.html',{'part':part, 'measurement':measurement, 'bias':bias})
     else:
         return redirect('/logout')
@@ -10338,45 +10333,22 @@ def storeMasterBias(request, pk):
 def storeAverageBias(request, pk):
     if 'user' in request.session:
         bias = Bias.objects.get(bias_survey_id = pk)
-        bias.bias_average = request.POST.getlist('bias_average')
+        bias.bias_average = [float(i) for i in request.POST.getlist('bias_average')]
+        # bias.bias_average = request.POST.getlist('bias_average')
         bias.bias_ave_measured = request.POST.get('bias_ave_measured')
-        bias.bias_ave_sn = request.POST.get('bias_ave_sn')
-        bias.bias_ave_res = request.POST.get('bias_ave_res')
-
-        temppart = []
-        temptrial = []
-        iter = 1
-
-        for i in range(int(bias.bias_npart) * int(bias.bias_nmeasurement)):
-            if iter % int(bias.bias_nmeasurement) != 0:
-                temppart.append(bias.bias_average[i])
-                iter = iter + 1
-            else:
-                if iter % (int(bias.bias_npart) * int(bias.bias_nmeasurement)) == 0:
-                    temppart.append(bias.bias_average[i])
-                    temppart = [float(i) for i in temppart]
-                    temptrial.append(temppart)
-                    temppart = []
-                    iter = iter + 1
-                else:
-                    temppart.append(bias.bias_average[i])
-                    temppart = [float(i) for i in temppart]
-                    temptrial.append(temppart)
-                    temppart = []
-                    iter = iter + 1
+        bias.bias_sn = request.POST.get('bias_sn')
+        bias.bias_ntrial = request.POST.get('bias_ntrial')
+        bias.bias_res = request.POST.get('bias_res')
+        bias.bias_date = request.POST.get('bias_date')
+        bias.bias_room = request.POST.get('bias_room')
+        bias.bias_master = sum(bias.bias_average) / len(bias.bias_average)
         
-        bias.bias_average = temptrial
 
-        tempmaster = []
-        for ele in bias.bias_average:
-            tempmaster.append(sum(ele) / len(ele))
 
-        bias.bias_master = [float(i) for i in tempmaster]
+
         bias.save()
 
-        part = range(1, int(bias.bias_npart)+1)
-        measurement = range(int(bias.bias_nmeasurement))
-        return render(request,'bias/all_bias.html',{'part':part, 'measurement':measurement, 'bias':bias})
+        return redirect('coretoolcrud:viewBias',pk )
     else:
         return redirect('/logout')
 
@@ -10397,14 +10369,15 @@ def viewCommentBias(request, pk):
         # master = [float(i) for i in bias.bias_master]
         master = bias.bias_master
         ndata = bias.bias_ngauge
+        trial = [float(i) for i in bias.bias_all]
 
-        bias = []
+        biaslist = []
         for i in trial:
-            bias.append(i - master)
+            biaslist.append(i - master)
         
         xbar = sum(trial) / ndata
-        biasave = sum(bias) / ndata
-        r = statistics.stdev(bias)
+        biasave = sum(biaslist) / ndata
+        r = statistics.stdev(biaslist)
         t = stats.t.ppf(1-0.025, ndata-1)
         rb = r / ndata ** 0.5
         tbias = abs(biasave / rb)
@@ -10417,13 +10390,20 @@ def viewCommentBias(request, pk):
         else:
             remark = "T Tabel > T Bias, Bias is Significant"
 
-        survey = Survey.objects.get(id = bias.bias_survey_id)
-        
-        nmeasurement = range(1, int(bias.bias_ngauge)+1)
-        gabung = zip(bias.bias_all, range(1, int(bias.bias_ngauge)+1), bias)
-        
+        if rangemin < 0 and rangemax > 0:
+            remark2 = "0 is On Range, Bias is Not Significant"
+        else:
+            remark2 = "0 is Not On Range, Bias is Significant"
 
-        return render(request,'bias/comment_bias.html', {'xbar':xbar, 'biasave':biasave, 'r':r, 't':t, 'tbias':tbias, 'survey':survey, 'p':p, 'remark':remark, 'gabung':gabung})
+        survey = Survey.objects.get(id = pk)
+        
+        # nmeasurement = range(1, int(bias.bias_ngauge)+1)
+        gabung = zip(trial, range(1, int(ndata)+1), biaslist)
+        
+        if bias.bias_method == "range":
+            return render(request,'bias/comment_range_bias.html', {'bias':bias, 'xbar':xbar, 'biasave':biasave, 'r':r, 't':t, 'tbias':tbias, 'survey':survey, 'p':p, 'rangemin':rangemin, 'rangemax':rangemax, 'remark':remark, 'remark2':remark2, 'gabung':gabung})
+        else:
+            return render(request,'bias/comment_master_bias.html', {'bias':bias, 'xbar':xbar, 'biasave':biasave, 'r':r, 't':t, 'tbias':tbias, 'survey':survey, 'p':p, 'rangemin':rangemin, 'rangemax':rangemax, 'remark':remark, 'remark2':remark2, 'gabung':gabung})
     else:
         return redirect('/logout')
 

@@ -86,7 +86,6 @@
         <form action="{% url 'coretoolcrud:storeAverageLinearity' linearity.linearity_survey_id %}" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           
-        
           <div class="form-group"><br>
             <label for="exampleInputEmail1">Measured By</label>
             <input class="form-control" name="linearity_ave_measured" id="demoFormHorizontalEmail" type="text" required />

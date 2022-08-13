@@ -159,26 +159,28 @@
                   <table class="table table-hover table-bordered results">
                     <thead>
                       <tr>
-                        <th scope="col"></th>
                         <th scope="col">Reason For Study: Review Alat</th>
                         <th scope="col">Alpha: 5%</th>
                         <th scope="col">Num Trial: {{bias.bias_ngauge}}</th>
                         <th scope="col">Reference: {{bias.bias_master}}</th>
+                        <th scope="col">Source: {{bias.bias_ref}}</th>
                       </tr>
                       <tr>
                         <th scope="col">Measured By: {{bias.bias_measured}}</th>
                         <th scope="col">Reviewed By: {{bias.bias_reviewed}}</th>
                         <th scope="col">t: {{t|floatformat:2}}</th>
-                        <th scope="col">t bias: {{tbias|floatformat:2}}</th>
-                        <th scope="col">P Value: {{p|floatformat:2}}</th>
+                        <th scope="col">Lower Range: {{rangemin|floatformat:2}}</th>
+                        <th scope="col">Upper Range: {{rangemax|floatformat:2}}</th>
                       </tr>
+                      {% if bias.bias_ref == "average" %}
                       <tr>
-                        <th scope="col"></th>
+                        <th scope="col">Average Measured By: {{bias.bias_ave_measured}}</th>
                         <th scope="col">Serial Number Gauge: {{bias.bias_sn}}</th>
                         <th scope="col">Resolution: {{bias.bias_res}}</th>
                         <th scope="col">Date Average Measured: </th>
                         <th scope="col">Room: {{bias.bias_room}}</th>
                       </tr>
+                      {% endif %}
                       
                       
                     </thead>
@@ -193,10 +195,10 @@
                     <table class="table table-hover table-bordered results" id="table">
                       <thead>
                         <tr>
-                          <td scope="col"></td>
-                          {% for i in nmeasurement %}
-                            <td scope="col">M-{{i}}</td>
-                          {% endfor %}
+                          <td scope="col">No</td>
+                          <td scope="col">Trial</td>
+                          <td scope="col">Bias</td>
+                          
                         </tr>
                        
                       </thead>
@@ -204,52 +206,27 @@
                     
   
                         
-                        {% for j, k in gabung %} 
+                        {% for j, k, l in gabung %} 
                         <tr>
-                          <td>S-{{k}}</td>
-                          {% for i in j %}
-                          <td>{{i}}</td>
-                          {% endfor %}
+                          <td>{{k}}</td>
+                          <td>{{j}}</td>
+                          <td>{{l}}</td>
+                       
                         </tr>
                        
                         {% endfor %}
                       </tbody>
                     </table>
   
-                    <h6>Bias</h6>
-                    <table class="table table-hover table-bordered results">
-                      <thead>
-                        <tr>
-                          <td scope="col"></td>
-                          {% for i in nmeasurement %}
-                            <td scope="col">M-{{i}}</td>
-                          {% endfor %}
-                        </tr>
-                       
-                      </thead>
-                      <tbody>
-                    
-  
-                        
-                        {% for j, k in gabung2 %} 
-                        <tr>
-                          <td>S-{{k}}</td>
-                          {% for i in j %}
-                          <td>{{i|floatformat:2 }}</td>
-                          {% endfor %}
-                        </tr>
-                       
-                        {% endfor %}
-                      </tbody>
-                    </table>
+                   
   
                     
                     <table class="table table-hover table-bordered results">
                       <thead>
                         <tr>
-                          <td scope="col"></td>
-                            <td scope="col">Xbar</td>
-                            <td scope="col">Average Bias</td>
+                          
+                            <td scope="col">Result</td>
+                            <td scope="col">{{remark2}}</td>
                         </tr>
                       </thead>
                       <tbody>
@@ -264,60 +241,73 @@
                       </tbody>
                     </table>
   
-                    <h6>Gage Bias</h6>
-                    <table class="table table-hover table-bordered results">
-                      <thead>
-                        <tr>
-                            <td scope="col">Reference</td>
-                            <td scope="col">Bias</td>
-                            <td scope="col">P</td>
-                            <td scope="col">Remarks</td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Average</td>
-                          <td>{{avebiasall|floatformat:2}}</td>
-                          <td>{{avep|floatformat:2}}</td>
-                          {% if avep <= conf1 %}
-                          <td>Bias Significant</td>
-                          {% else %}
-                          <td>Bias Not Significant</td>
-                          {% endif %}
-                        </tr>
-                        {% for i, j, k, l in gabung4 %} 
-                        <tr>
-                          <td>{{i|floatformat:2 }}</td>
-                          <td>{{j|floatformat:2 }}</td>
-                          <td>{{k|floatformat:2 }}</td>
-                          <td>{{l}}</td>
-                        </tr>
-                        {% endfor %}
-                      </tbody>
-                    </table>
+                   
   
-                     
+                    {% if remark2 == "0 is Not On Range, Bias is Significant"%}
                       
                       <br><br>
 
                       <form action="{% url 'coretoolcrud:storeCommentBias' bias.bias_survey_id %}" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                     <div class="card">
-                      <h5 class="card-header">Recommendation</h5>
+                      <h5 class="card-header">First Make Sure</h5>
                       <div class="card-body">
-                          <div class="form-check">
-                            <input class="form-check-input" type="radio" name="bias_recommendation" value="Repair / needs to be recalibrated to achieve zero bias through the modification of the hardware, software or both.">
-                            <label class="form-check-label" for="inlineRadio1">Repair / needs to be recalibrated to achieve zero bias through the modification of the hardware, software or both.</label>
+                          <div class="form-group">
+                            <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Repair / needs to be recalibrated to achieve zero bias through the modification of the hardware, software or both.">
+                            <label class="form-check-label" for="inlineRadio1">No error in master or reference value, recheck with mastering procedure</label>
                         </div>
-                        <div class="form-check">
-                        <input class="form-check-input" type="radio" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
-                        <label class="form-check-label" for="inlineRadio2">Gauge / Measurement can be used on range ...</label>
-                      </div>
+                        <div class="form-group">
+                        <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                        <label class="form-check-label" for="inlineRadio1">Instrument not worn</label>
+                        </div>
+                        <div class="form-group">
+                          <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                          <label class="form-check-label" for="inlineRadio1">Instrument already calibrated properly</label>
+                        </div>
+                        <div class="form-group">
+                          <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                          <label class="form-check-label" for="inlineRadio1">Instrument did not made to wrong dimension</label>
+                        </div>
+                        <div class="form-group">
+                          <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                          <label class="form-check-label" for="inlineRadio1">Instrument measuring the right characteristic</label>
+                        </div>
+                        <div class="form-group">
+                          <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                          <label class="form-check-label" for="inlineRadio1">Instrument used properly by the appraiser</label>
+                        </div>
+                        <div class="form-group">
+                          <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                          <label class="form-check-label" for="inlineRadio1">Instrument correction algorithm already correct</label>
+                        </div>
                       </div>
                     </div>
-                    <br><br><br>
+                    <br><br>
                     <button type="submit" class="btn btn-primary">Submit</button>
+                    <br><br>
                   </form>
+
+                  <form action="{% url 'coretoolcrud:storeCommentBias' bias.bias_survey_id %}" method="POST" enctype="multipart/form-data">
+                 
+                  <div class="card">
+                    <h5 class="card-header">Recommendation</h5>
+                    <div class="card-body">
+                        <div class="form-group">
+                          <input class="form-check-input" type="radio" name="bias_recommendation" value="Repair / needs to be recalibrated to achieve zero bias through the modification of the hardware, software or both.">
+                          <label class="form-check-label" for="inlineRadio1">Fix measurement</label>
+                      </div>
+                      <div class="form-group">
+                      <input class="form-check-input" type="radio" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                      <label class="form-check-label" for="inlineRadio2">Keep using gauge on condition ...</label>
+                    </div>
+                    </div>
+                    
+                  </div>
+                  <br><br>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <br><br>
+                </form>
+                  {% endif %}
 
         </div>
         

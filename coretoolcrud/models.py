@@ -219,6 +219,8 @@ class Bias(models.Model):
     bias_recommendation = models.TextField(null=True)
     bias_reviewed = models.TextField()
     bias_measured = models.TextField()
+    bias_ave_measured = models.TextField()
+    bias_method = models.TextField()
 
 class Stability(models.Model):
     stability_survey_id = models.IntegerField()

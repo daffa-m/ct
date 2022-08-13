@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Bias</title>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">  
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-widgets-2.4.2.min.css" rel=”stylesheet” type=”text/css”>
+    <style type="text/css" rel="stylesheet">
+    ul.breadcrumb {
+    padding: 10px 16px;
+    list-style: none;
+    background-color: #eee;
+    }
+    ul.breadcrumb li {
+    display: inline;
+    font-size: 18px;
+    }
+    ul.breadcrumb li+li:before {
+    padding: 8px;
+    color: black;
+    content: "/\00a0";
+    }
+    ul.breadcrumb li a {
+    color: #0275d8;
+    text-decoration: none;
+    }
+    ul.breadcrumb li a:hover {
+    color: #01447e;
+    text-decoration: underline;
+    }
+    .invoice-title h2, .invoice-title h3 {
+    display: inline-block;
+    }
+    h6 {
+    color: red;
+    }
+    .card {
+      display:inline-block;
+      width:100%;
+      } 
+    .btn{
+      margin-right: 1%;
+      margin-left: 1%;
+    }    
+    input{
+      margin-top: 1%;
+      margin-bottom: 1%;
+      margin-right: 1%;
+      margin-left: 1%;
+    }
+    table {
+        text-align: center;
+    }
+    table thead th {
+        text-align: center;
+    }
+
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+      <div class="invoice-title">
+        <nav aria-label="breadcrumb" class="main-breadcrumb"><br>
+          <h2>Bias</h2><br>
+      <ul class="breadcrumb">
+        <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
+        <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
+        <li><a href="{% url 'coretoolcrud:viewDetailSurvey' bias.bias_survey_id %}">Survey Result</a></li>
+        <li>Fill Bias Data</li>
+      </ul>
+        {% if messages %}
+        {% for message in messages %}
+        {% if message.tags == 'error' %}
+        <div class="alert alert-danger" role="alert">
+          <h7>{{ message }}</h7>
+        </div>
+        {% else %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+            <h7>{{ message }}</h7>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+      </nav>
+       
+        <hr>
+
+      </div>
+
+                  <table class="table table-hover table-bordered results">
+                    <thead>
+                      <tr>
+                        <th scope="col">Measurement</th>
+                        <th scope="col">Identifying Character</th>
+                        <th scope="col">Part Information</th>
+                        <th scope="col">Statistical Study</th>
+                      </tr>
+                      
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Name: {{ survey.survey_name }}</td>
+                            <td>Character: {{ survey.survey_character }}</td>
+                            <td>Date Project: {{ survey.survey_date_project }}</td>
+                            <td>Plan Date: {{ survey.survey_plan }}</td>
+                        </tr>
+                        <tr>
+                            <td>Serial Number: {{ survey.survey_sn }}</td>
+                            <td>Category: {{ survey.survey_category }}</td>
+                            <td>Customer Name: {{ survey.survey_cust_name }}</td>
+                            <td>Actual Date: {{ survey.survey_actual }}</td>
+                        </tr>
+                        <tr>
+                            <td>Resolution: {{ survey.survey_resolution }}</td>
+                            <td>Process Name: {{ survey.survey_process_name }}</td>
+                            <td>Part Name: {{ survey.survey_part_name }}</td>
+                            <td>Reason For Rev: {{ survey.survey_reason }}</td>
+                        </tr>
+                        <tr>
+                            <td>Unit: {{ survey.survey_unit }}</td>
+                            <td>Symbol: {{ survey.survey_symbol }}</td>
+                            <td>Part Number: {{ survey.survey_part_number }}</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>Next Calibration Date: {{ survey.survey_next_cal }}</td>
+                            <td>Reference: {{ survey.survey_ref }}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Range (Max to Min): {{ survey.survey_range_max }} to {{ survey.survey_range_min }}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>FMEA Number: {{ survey.survey_fmea }}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Control Plan Number: {{ survey.survey_control_plan }}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                  </table>
+
+                  
+                  <table class="table table-hover table-bordered results">
+                    <thead>
+                      <tr>
+                        <th scope="col">Reason For Study: Review Alat</th>
+                        <th scope="col">Alpha: 5%</th>
+                        <th scope="col">Num Trial: {{bias.bias_ngauge}}</th>
+                        <th scope="col">Reference: {{bias.bias_master}}</th>
+                        <th scope="col">Source: {{bias.bias_ref}}</th>
+                      </tr>
+                      <tr>
+                        <th scope="col">Measured By: {{bias.bias_measured}}</th>
+                        <th scope="col">Reviewed By: {{bias.bias_reviewed}}</th>
+                        <th scope="col">t: {{t|floatformat:2}}</th>
+                        <th scope="col">t bias: {{tbias|floatformat:2}}</th>
+                        <th scope="col">P Value: {{p|floatformat:2}}</th>
+                      </tr>
+                      {% if bias.bias_ref == "average" %}
+                      <tr>
+                        <th scope="col">Average Measured By: {{bias.bias_ave_measured}}</th>
+                        <th scope="col">Serial Number Gauge: {{bias.bias_sn}}</th>
+                        <th scope="col">Resolution: {{bias.bias_res}}</th>
+                        <th scope="col">Date Average Measured: </th>
+                        <th scope="col">Room: {{bias.bias_room}}</th>
+                      </tr>
+                      {% endif %}
+                    </thead>
+                    <tbody>
+                        
+                      
+                      
+                        
+                    </tbody>
+                  </table>
+                  <h6>Measurement</h6>
+                    <table class="table table-hover table-bordered results" id="table">
+                      <thead>
+                        <tr>
+                          <td scope="col">No</td>
+                          <td scope="col">Trial</td>
+                          <td scope="col">Bias</td>
+                          
+                        </tr>
+                       
+                      </thead>
+                      <tbody>
+                    
+  
+                        
+                        {% for j, k, l in gabung %} 
+                        <tr>
+                          <td>{{k}}</td>
+                          <td>{{j}}</td>
+                          <td>{{l}}</td>
+                       
+                        </tr>
+                       
+                        {% endfor %}
+                      </tbody>
+                    </table>
+  
+                   
+  
+                    
+                    <table class="table table-hover table-bordered results">
+                      <thead>
+                        <tr>
+                          
+                            <td scope="col">Result</td>
+                            <td scope="col">{{remark}}</td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for j, k, l in gabung3 %} 
+                        <tr>
+                          <td>S-{{l}}</td>
+                          <td>{{j|floatformat:2 }}</td>
+                          <td>{{k|floatformat:2 }}</td>
+                        </tr>
+                       
+                        {% endfor %}
+                      </tbody>
+                    </table>
+  
+                   
+  
+                    {% if remark == "T Tabel > T Bias, Bias is Significant"%}
+                      
+                      <br><br>
+
+                      <form action="{% url 'coretoolcrud:storeCommentBias' bias.bias_survey_id %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                    <div class="card">
+                      <h5 class="card-header">First Make Sure</h5>
+                      <div class="card-body">
+                          <div class="form-group">
+                            <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Repair / needs to be recalibrated to achieve zero bias through the modification of the hardware, software or both.">
+                            <label class="form-check-label" for="inlineRadio1">No error in master or reference value, recheck with mastering procedure</label>
+                        </div>
+                        <div class="form-group">
+                        <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                        <label class="form-check-label" for="inlineRadio1">Instrument not worn</label>
+                        </div>
+                        <div class="form-group">
+                          <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                          <label class="form-check-label" for="inlineRadio1">Instrument already calibrated properly</label>
+                        </div>
+                        <div class="form-group">
+                          <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                          <label class="form-check-label" for="inlineRadio1">Instrument did not made to wrong dimension</label>
+                        </div>
+                        <div class="form-group">
+                          <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                          <label class="form-check-label" for="inlineRadio1">Instrument measuring the right characteristic</label>
+                        </div>
+                        <div class="form-group">
+                          <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                          <label class="form-check-label" for="inlineRadio1">Instrument used properly by the appraiser</label>
+                        </div>
+                        <div class="form-group">
+                          <input class="form-check-input" type="checkbox" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                          <label class="form-check-label" for="inlineRadio1">Instrument correction algorithm already correct</label>
+                        </div>
+                      </div>
+                    </div>
+                    <br><br>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <br><br>
+                  </form>
+
+                  <form action="{% url 'coretoolcrud:storeCommentBias' bias.bias_survey_id %}" method="POST" enctype="multipart/form-data">
+                 
+                  <div class="card">
+                    <h5 class="card-header">Recommendation</h5>
+                    <div class="card-body">
+                        <div class="form-group">
+                          <input class="form-check-input" type="radio" name="bias_recommendation" value="Repair / needs to be recalibrated to achieve zero bias through the modification of the hardware, software or both.">
+                          <label class="form-check-label" for="inlineRadio1">Fix measurement</label>
+                      </div>
+                      <div class="form-group">
+                      <input class="form-check-input" type="radio" name="bias_recommendation" value="Gauge / Measurement can be used on range ...">
+                      <label class="form-check-label" for="inlineRadio2">Keep using gauge on condition ...</label>
+                    </div>
+                    </div>
+                    
+                  </div>
+                  <br><br>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <br><br>
+                </form>
+                  {% endif %}
+
+        </div>
+        
+    </div>
+</body>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-2.4.2.min.js"></script>
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-2.4.2.min.js"></script>
+{{scriptbiasref| safe}}
+</html>
