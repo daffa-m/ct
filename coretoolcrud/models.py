@@ -222,6 +222,16 @@ class Bias(models.Model):
     bias_ave_measured = models.TextField()
     bias_method = models.TextField()
 
+class Resolusi(models.Model):
+    resolusi_survey_id = models.IntegerField()
+    resolusi_subgroup = models.IntegerField()
+    resolusi_nday = models.IntegerField()
+    resolusi_all = models.JSONField(null=True)
+    resolusi_reviewed = models.TextField()
+    resolusi_measured = models.TextField()
+    resolusi_unit = models.TextField()
+    resolusi_res = models.FloatField(null=True)
+
 class Stability(models.Model):
     stability_survey_id = models.IntegerField()
     stability_sample = models.IntegerField()
