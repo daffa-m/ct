@@ -15,6 +15,7 @@ from .views import viewCchart, viewFinalCchart, viewPrintCchart, storeCchart, st
 from .views import viewStability, viewPrintStability, viewCommentStability, viewFinalStability, viewAllStability, storeStability, storeCommentStability, storeAllStability, deleteStability
 from .views import viewKappa, viewPrintKappa, viewFinalKappa, viewAllKappa, storeKappa, storeAllKappa, deleteKappa
 from .views import viewKendall, viewPrintKendall, viewFinalKendall, viewAllKendall, storeKendall, storeAllKendall, deleteKendall
+from .views import viewResolusi, viewPrintResolusi, viewFinalResolusi, viewAllResolusi, storeResolusi, storeAllResolusi, deleteResolusi
 from .views import viewMedianr, viewFinalMedianr, viewPrintMedianr, storeMedianr, storeAllMedianr, deleteMedianr, viewAllMedianr, viewListMedianr
 from .views import viewBias, viewPrintBias, viewAverageBias, viewMasterBias, viewCommentBias, viewFinalBias, storeBias, storeMasterBias, storeAverageBias, storeCommentBias, storeAllBias, deleteBias
 from .views import viewListSurvey, viewDetailSurvey, viewSurvey, viewManual, viewEditSurvey, viewEditManual, storeManual, storeSurvey, storeEditManual, storeEditSurvey, deleteSurvey
@@ -206,5 +207,12 @@ urlpatterns = [
     path('storeCommentBias/<int:pk>',storeCommentBias,name='storeCommentBias'),
     path('deleteBias/<int:pk>',deleteBias,name='deleteBias'),
 
+    path('viewResolusi/<int:pk>',viewResolusi,name='viewResolusi'),
+    path('viewPrintResolusi/<int:pk>',viewPrintResolusi,name='viewPrintResolusi'),
+    path('viewFinalResolusi/<int:pk>',viewFinalResolusi,name='viewFinalResolusi'),
+    path('viewAllResolusi/<int:pk>',viewAllResolusi,name='viewAllResolusi'),
+    path('storeResolusi/<int:pk>',storeResolusi,name='storeResolusi'),
+    path('storeAllResolusi/<int:pk>',storeAllResolusi,name='storeAllResolusi'),
+    path('deleteResolusi/<int:pk>',deleteResolusi,name='deleteResolusi'),
 
 ]

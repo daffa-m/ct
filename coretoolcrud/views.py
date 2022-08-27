@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Npchart, Uchart, Cchart, Stability, Kappa, Kendall, Medianr, Bias, Survey, User
+from .models import Xbarr, Cross, Nested, Linearity, Vxbarr, Sbarr, Imr, Pchart, Npchart, Uchart, Cchart, Stability, Kappa, Kendall, Medianr, Bias, Resolusi, Survey, User
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
@@ -10848,5 +10848,193 @@ def deleteBias(request, pk):
         bias.delete()
         messages.success(request, "Bias berhasil dihapus")
         return redirect('coretoolcrud:viewDetailSurvey', pk)
+    else:
+        return redirect('/logout')
+
+#Resolusi
+
+def viewResolusi(request, pk):
+    if 'user' in request.session:
+        try:
+            resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
+            if resolusi.resolusi_all:
+                return redirect('coretoolcrud:viewFinalResolusi', pk)
+            else:
+                survey = Survey.objects.get(id = pk)
+                plan = survey.survey_plan
+                return redirect('coretoolcrud:viewAllResolusi', pk)
+            
+        except Resolusi.DoesNotExist:
+            return render(request,'resolusi/resolusi.html',{'pk':pk})
+    else:
+        return redirect('/logout')
+
+def storeResolusi(request, pk):
+    if 'user' in request.session:
+        try:
+            resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
+            resolusi.delete()
+        except Resolusi.DoesNotExist:
+            pass
+
+        resolusi = Resolusi()
+        resolusi.resolusi_survey_id = pk
+        resolusi.resolusi_subgroup = request.POST.get('resolusi_subgroup')
+        resolusi.resolusi_nday = request.POST.get('resolusi_nday')
+        resolusi.resolusi_res = request.POST.get('resolusi_res')
+        resolusi.resolusi_unit = request.POST.get('resolusi_unit')
+        resolusi.resolusi_measured = request.POST.get('resolusi_measured')
+        resolusi.resolusi_reviewed = request.POST.get('resolusi_reviewed')
+
+        resolusi.save()
+
+        return redirect('coretoolcrud:viewAllResolusi', pk)    
+    else:
+        return redirect('/logout')
+
+def storeAllResolusi(request, pk):
+    if 'user' in request.session:
+        # vxbarr = Vxbarr.objects.get(id = pkid)
+        # survey = Survey.objects.get(id = pksurveyid)
+        resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        month = survey.survey_plan.month
+        year = survey.survey_plan.year
+        # days = monthrange(year, month)[1]
+        days = resolusi.resolusi_nday
+        sub = resolusi.resolusi_subgroup
+        temppart = []
+        temptrial = []
+        iter = 1
+
+        resolusi.resolusi_all = request.POST.getlist('resolusi_all')
+        for i in range(int(days) * int(resolusi.resolusi_subgroup)):
+            if iter % sub != 0:
+                temppart.append(float(resolusi.resolusi_all[i]))
+                iter = iter + 1
+            else:
+                temppart.append(float(resolusi.resolusi_all[i]))
+                temptrial.append(temppart)
+                temppart = []
+                iter = iter + 1
+        
+        temptrial = np.array(temptrial).T.tolist()
+        resolusi.resolusi_all = temptrial
+        resolusi.save()
+
+        return redirect('coretoolcrud:viewFinalResolusi', pk)    
+    else:
+        return redirect('/logout')          
+
+def deleteResolusi(request, pk):
+    if 'user' in request.session:
+        resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
+        resolusi.delete()
+        messages.success(request, "Resolusi berhasil dihapus")
+        return redirect('coretoolcrud:viewDetailSurvey', pk)
+    else:
+        return redirect('/logout')
+
+def viewFinalResolusi(request, pk):
+    if 'user' in request.session:
+        resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        ##############################
+
+        all = resolusi.resolusi_all
+        nday = resolusi.resolusi_nday
+        subgroup = resolusi.resolusi_subgroup
+
+        r = []
+        temp = []
+        xbar = []
+        for i in range(nday):
+            for j in range(subgroup):
+                temp.append(all[j][i])
+            r.append(max(temp) - min(temp))
+            xbar.append(sum(temp) / subgroup)
+            # print(max(temp)-min(temp))
+            temp = []
+
+        allflat = []
+        for ele in all:
+            for e in ele:
+                allflat.append(e)
+
+
+        xbar2 = sum(xbar) / nday
+        rbar = sum(r) / nday
+        stdev = statistics.stdev(xbar)   
+
+        table = [[2, 1.128], [3, 1.693], [4, 2.059], [5, 2.326]]
+
+        d2 = 0
+
+        for ele in table:
+            if ele[0] == subgroup:
+                d2 = ele[1]
+
+
+        var = 6 * stdev
+        stdevd2 = rbar / d2
+        vard2 = 6 * stdevd2
+
+
+        #####################################
+        
+        allt = np.array(resolusi.resolusi_all).T.tolist()
+        gabung = zip(range(1, int(resolusi.resolusi_nday)+1), allt)
+        subs = range(1, int(resolusi.resolusi_subgroup)+1)
+        
+
+        return render(request,'resolusi/collection_resolusi.html', {'survey':survey, 'resolusi':resolusi, 'subs':subs, 'stdev':stdev, 'var':var, 'stdevd2':stdevd2, 'vard2':vard2, 'xbar2':xbar2, 'rbar':rbar, 'gabung':gabung})
+    else:
+        return redirect('/logout')
+
+def viewAllResolusi(request, pk):
+    if 'user' in request.session:
+        try:
+            # vxbarr = Vxbarr.objects.get(id = pkid)
+            # survey = Survey.objects.get(id = pksurveyid)
+            resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
+            survey = Survey.objects.get(id = pk)
+            month = survey.survey_plan.month
+            year = survey.survey_plan.year
+            # days = range(1, monthrange(year, month)[1]+1)
+            days = range(1, int(resolusi.resolusi_nday)+1)
+            subs = range(1, int(resolusi.resolusi_subgroup)+1)
+            sub = resolusi.resolusi_subgroup
+            plan = survey.survey_plan
+            return render(request,'resolusi/all_resolusi.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'resolusi':resolusi})
+        
+        except Resolusi.DoesNotExist:
+            return redirect('coretoolcrud:viewResolusi', pk)    
+    else:
+        return redirect('/logout')   
+
+def viewPrintResolusi(request, pk):
+    if 'user' in request.session:
+        resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
+        survey = Survey.objects.get(id = pk)
+        ##############################
+        giro = np.array(resolusi.resolusi_all)
+        temp2 = giro.tolist()
+        df = pd.DataFrame(temp2)
+        # specifying column names
+        df.columns = resolusi.resolusi_karyawan
+        res = pyirr.resolusi(df, correct=True)
+
+        #####################################
+
+        nrepeat = []
+        for i in range(1, int(resolusi.resolusi_npart)+1):
+            for j in range(1, int(resolusi.resolusi_ntrial)+1):
+                nrepeat.append("Part "+str(i)+" Trial "+str(j))
+        # nrepeat = range(1, int(resolusi.resolusi_ntrial * resolusi.resolusi_npart)+1)
+        gabung = zip(nrepeat, resolusi.resolusi_all)
+        
+        
+
+        return render(request,'resolusi/print_resolusi.html', {'survey':survey, 'resolusi':resolusi, 'res':res, 'nrepeat':nrepeat, 'gabung':gabung})
     else:
         return redirect('/logout')

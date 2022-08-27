@@ -83,7 +83,7 @@
       <hr>
 
         </div>
-        <form action="{% url 'coretoolcrud:storeStability' pk %}" method="POST" enctype="multipart/form-data">
+        <form action="{% url 'coretoolcrud:storeResolusi' pk %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
           <div class="form-group"><br>
             <label for="exampleInputEmail1">Unit</label>
@@ -94,12 +94,12 @@
             <input class="form-control" name="resolusi_subgroup" id="demoFormHorizontalEmail" type="number" min="2" max="5" required/>
           </div>
           <div class="form-group"><br>
-            <label for="exampleInputEmail1">Number of P</label>
-            <input class="form-control" name="stability_sample" id="demoFormHorizontalEmail" type="number" min="2" max="5" required/>
+            <label for="exampleInputEmail1">Number of Days</label>
+            <input class="form-control" name="resolusi_nday" id="demoFormHorizontalEmail" type="number" required/>
           </div>
           <div class="form-group"><br>
             <label for="exampleInputEmail1">Resolusi Alat</label>
-            <input class="form-control" name="resolusi_res" id="demoFormHorizontalEmail" type="number" required/>
+            <input class="form-control" name="resolusi_res" id="demoFormHorizontalEmail" type="number" step="any" required/>
           </div>
           <div class="form-group"><br>
             <label for="exampleInputEmail1">Input / Measured by</label>

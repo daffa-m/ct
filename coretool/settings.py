@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://again-prospective-vintage-nasdaq.trycloudflare.com']
+CSRF_TRUSTED_ORIGINS = ['https://platform-cycles-bears-ict.trycloudflare.com']
 
 
 # Application definition
