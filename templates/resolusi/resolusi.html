@@ -60,9 +60,8 @@
             <h2>Resolusi Alat</h2><br>
         <ul class="breadcrumb">
           <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
-          <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
-          <li><a href="{% url 'coretoolcrud:viewDetailSurvey' pk %}">Survey Result</a></li>
-          <li>Fill Stability Data</li>
+          <li><a href="{% url 'coretoolcrud:viewListResolusi' %}">List Resolusi Alat</a></li>
+          <li>Fill Resolusi Alat Data</li>
         </ul>
           {% if messages %}
           {% for message in messages %}
@@ -85,6 +84,13 @@
         </div>
         <form action="{% url 'coretoolcrud:storeResolusi' pk %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
+
+            <div class="form-group"><br>
+              <label for="exampleInputEmail1">Part Information</label><br>
+              <label for="exampleInputEmail1">Project Date</label>
+              <input class="form-control" name="resolusi_unit" id="demoFormHorizontalEmail" type="date" required/>
+            </div>
+          
           <div class="form-group"><br>
             <label for="exampleInputEmail1">Unit</label>
             <input class="form-control" name="resolusi_unit" id="demoFormHorizontalEmail" type="text" required/>

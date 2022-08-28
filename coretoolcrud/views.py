@@ -10853,6 +10853,13 @@ def deleteBias(request, pk):
 
 #Resolusi
 
+def viewListResolusi(request):
+    if 'user' in request.session:
+        resolusi = Resolusi.objects.filter(resolusi_user_id=request.session['id'])
+        return render(request,'resolusi/list_resolusi.html',{'resolusi':resolusi})
+    else:
+        return redirect('/logout')
+
 def viewResolusi(request, pk):
     if 'user' in request.session:
         try:
@@ -10878,6 +10885,9 @@ def storeResolusi(request, pk):
             pass
 
         resolusi = Resolusi()
+        user = User.objects.get(user_username=request.session['user'])
+
+        resolusi.resolusi_user_id = user.id
         resolusi.resolusi_survey_id = pk
         resolusi.resolusi_subgroup = request.POST.get('resolusi_subgroup')
         resolusi.resolusi_nday = request.POST.get('resolusi_nday')
