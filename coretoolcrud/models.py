@@ -232,7 +232,7 @@ class Resolusi(models.Model):
     resolusi_unit = models.TextField()
     resolusi_res = models.FloatField(null=True)
     resolusi_part_info = models.TextField(null=True)
-    resolusi_project_date = models.TextField(null=True)
+    resolusi_project_date = models.DateField(null=True)
     resolusi_customer = models.TextField(null=True)
     resolusi_part_name = models.TextField(null=True)
     resolusi_part_number = models.TextField(null=True)
@@ -247,6 +247,8 @@ class Resolusi(models.Model):
     resolusi_measurement = models.TextField(null=True)
     resolusi_sn = models.TextField(null=True)
     resolusi_next_cal = models.DateField(null=True)
+    resolusi_study_date = models.DateField(null=True)
+    resolusi_reason = models.TextField(null=True)
     resolusi_user_id = models.TextField(null=True)
 
 class Stability(models.Model):

@@ -10863,7 +10863,7 @@ def viewListResolusi(request):
 def viewResolusi(request, pk):
     if 'user' in request.session:
         try:
-            resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
+            resolusi = Resolusi.objects.get(id = pk)
             if resolusi.resolusi_all:
                 return redirect('coretoolcrud:viewFinalResolusi', pk)
             else:
@@ -10879,15 +10879,15 @@ def viewResolusi(request, pk):
 def storeResolusi(request, pk):
     if 'user' in request.session:
         try:
-            resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
+            resolusi = Resolusi.objects.get(id = pk)
             resolusi.delete()
         except Resolusi.DoesNotExist:
             pass
 
         resolusi = Resolusi()
-        user = User.objects.get(user_username=request.session['user'])
+        # user = User.objects.get(user_username=request.session['user'])
 
-        resolusi.resolusi_user_id = user.id
+        # resolusi.resolusi_user_id = user.id
         resolusi.resolusi_survey_id = pk
         resolusi.resolusi_subgroup = request.POST.get('resolusi_subgroup')
         resolusi.resolusi_nday = request.POST.get('resolusi_nday')
@@ -10896,9 +10896,27 @@ def storeResolusi(request, pk):
         resolusi.resolusi_measured = request.POST.get('resolusi_measured')
         resolusi.resolusi_reviewed = request.POST.get('resolusi_reviewed')
 
+        resolusi.resolusi_project_date = request.POST.get('resolusi_project_date')
+        resolusi.resolusi_customer = request.POST.get('resolusi_customer')
+        resolusi.resolusi_part_name = request.POST.get('resolusi_part_name')
+        resolusi.resolusi_part_number = request.POST.get('resolusi_part_number')
+        resolusi.resolusi_process_name = request.POST.get('resolusi_process_name')
+        resolusi.resolusi_character = request.POST.get('resolusi_character')
+        resolusi.resolusi_category = request.POST.get('resolusi_category')
+        resolusi.resolusi_symbol = request.POST.get('resolusi_symbol')
+        resolusi.resolusi_fmea = request.POST.get('resolusi_fmea')
+        resolusi.resolusi_cpn = request.POST.get('resolusi_cpn')
+        resolusi.resolusi_range_max = request.POST.get('resolusi_range_max')
+        resolusi.resolusi_measurement = request.POST.get('resolusi_measurement')
+        resolusi.resolusi_sn = request.POST.get('resolusi_sn')
+        resolusi.resolusi_next_cal = request.POST.get('resolusi_next_cal')
+        resolusi.resolusi_study_date = request.POST.get('resolusi_study_date')
+        resolusi.resolusi_reason = request.POST.get('resolusi_reason')
+        resolusi.resolusi_user_id = request.session['id']
+
         resolusi.save()
 
-        return redirect('coretoolcrud:viewAllResolusi', pk)    
+        return redirect('coretoolcrud:viewAllResolusi', resolusi.id)    
     else:
         return redirect('/logout')
 
@@ -10906,10 +10924,7 @@ def storeAllResolusi(request, pk):
     if 'user' in request.session:
         # vxbarr = Vxbarr.objects.get(id = pkid)
         # survey = Survey.objects.get(id = pksurveyid)
-        resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
-        month = survey.survey_plan.month
-        year = survey.survey_plan.year
+        resolusi = Resolusi.objects.get(id = pk)
         # days = monthrange(year, month)[1]
         days = resolusi.resolusi_nday
         sub = resolusi.resolusi_subgroup
@@ -10938,17 +10953,17 @@ def storeAllResolusi(request, pk):
 
 def deleteResolusi(request, pk):
     if 'user' in request.session:
-        resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
+        resolusi = Resolusi.objects.get(id = pk)
         resolusi.delete()
         messages.success(request, "Resolusi berhasil dihapus")
-        return redirect('coretoolcrud:viewDetailSurvey', pk)
+        return redirect('coretoolcrud:viewListResolusi')
     else:
         return redirect('/logout')
 
 def viewFinalResolusi(request, pk):
     if 'user' in request.session:
-        resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        resolusi = Resolusi.objects.get(id = pk)
+        # survey = Survey.objects.get(id = pk)
         ##############################
 
         all = resolusi.resolusi_all
@@ -10997,7 +11012,7 @@ def viewFinalResolusi(request, pk):
         subs = range(1, int(resolusi.resolusi_subgroup)+1)
         
 
-        return render(request,'resolusi/collection_resolusi.html', {'survey':survey, 'resolusi':resolusi, 'subs':subs, 'stdev':stdev, 'var':var, 'stdevd2':stdevd2, 'vard2':vard2, 'xbar2':xbar2, 'rbar':rbar, 'gabung':gabung})
+        return render(request,'resolusi/collection_resolusi.html', {'resolusi':resolusi, 'subs':subs, 'stdev':stdev, 'var':var, 'stdevd2':stdevd2, 'vard2':vard2, 'xbar2':xbar2, 'rbar':rbar, 'gabung':gabung})
     else:
         return redirect('/logout')
 
@@ -11006,16 +11021,16 @@ def viewAllResolusi(request, pk):
         try:
             # vxbarr = Vxbarr.objects.get(id = pkid)
             # survey = Survey.objects.get(id = pksurveyid)
-            resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
-            survey = Survey.objects.get(id = pk)
-            month = survey.survey_plan.month
-            year = survey.survey_plan.year
+            resolusi = Resolusi.objects.get(id = pk)
+            # survey = Survey.objects.get(id = resolusi.resolusi_survey_id)
+            # month = survey.survey_plan.month
+            # year = survey.survey_plan.year
             # days = range(1, monthrange(year, month)[1]+1)
             days = range(1, int(resolusi.resolusi_nday)+1)
             subs = range(1, int(resolusi.resolusi_subgroup)+1)
             sub = resolusi.resolusi_subgroup
-            plan = survey.survey_plan
-            return render(request,'resolusi/all_resolusi.html',{'days':days, 'subs':subs, 'sub':sub, 'plan':plan, 'resolusi':resolusi})
+            
+            return render(request,'resolusi/all_resolusi.html',{'days':days, 'subs':subs, 'sub':sub, 'resolusi':resolusi})
         
         except Resolusi.DoesNotExist:
             return redirect('coretoolcrud:viewResolusi', pk)    

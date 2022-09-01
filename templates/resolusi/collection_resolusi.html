@@ -58,8 +58,7 @@
             <h2>Resolusi Alat</h2><br>
         <ul class="breadcrumb">
             <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">Home</a></li>
-            <li><a href="{% url 'coretoolcrud:viewListSurvey' %}">List Survey</a></li>
-            <li><a href="{% url 'coretoolcrud:viewDetailSurvey' resolusi.resolusi_survey_id %}">Survey Result</a></li>
+            <li><a href="{% url 'coretoolcrud:viewListResolusi' %}">List Resolusi Alat</a></li>
             <li>Resolusi Alat Result</li>
         </ul>
           {% if messages %}
@@ -94,50 +93,44 @@
                   </thead>
                   <tbody>
                       <tr>
-                          <td>Name: {{ survey.survey_name }}</td>
-                          <td>Character: {{ survey.survey_character }}</td>
-                          <td>Date Project: {{ survey.survey_date_project }}</td>
-                          <td>Plan Date: {{ survey.survey_plan }}</td>
+                          <td>Name: {{ resolusi.resolusi_measurement }}</td>
+                          <td>Character: {{ resolusi.resolusi_character }}</td>
+                          <td>Date Project: {{ resolusi.resolusi_project_date }}</td>
+                          <td>Study Date: {{ resolusi.resolusi_study_date }}</td>
                       </tr>
                       <tr>
-                          <td>Serial Number: {{ survey.survey_sn }}</td>
-                          <td>Category: {{ survey.survey_category }}</td>
-                          <td>Customer Name: {{ survey.survey_cust_name }}</td>
-                          <td>Actual Date: {{ survey.survey_actual }}</td>
+                          <td>Serial Number: {{ resolusi.resolusi_sn }}</td>
+                          <td>Category: {{ resolusi.resolusi_category }}</td>
+                          <td>Part Number: {{ resolusi.resolusi_part_number }}</td>
+                          <td>Reason For Rev: {{ resolusi.resolusi_reason }}</td>
                       </tr>
                       <tr>
-                          <td>Resolution: {{ survey.survey_resolusi }}</td>
-                          <td>Process Name: {{ survey.survey_process_name }}</td>
-                          <td>Part Name: {{ survey.survey_part_name }}</td>
-                          <td>Reason For Rev: {{ survey.survey_reason }}</td>
-                      </tr>
-                      <tr>
-                          <td>Unit: {{ survey.survey_unit }}</td>
-                          <td>Symbol: {{ survey.survey_symbol }}</td>
-                          <td>Part Number: {{ survey.survey_part_number }}</td>
+                          <td>Resolution: {{ resolusi.resolusi_res }}</td>
+                          <td>Process Name: {{ resolusi.resolusi_process_name }}</td>
+                          <td>Part Name: {{ resolusi.resolusi_part_name }}</td>
                           <td></td>
                       </tr>
                       <tr>
-                          <td>Next Calibration Date: {{ survey.survey_next_cal }}</td>
-                          <td>Reference: {{ survey.survey_ref }}</td>
+                          <td>Unit: {{ resolusi.resolusi_unit }}</td>
+                          <td>Symbol: {{ resolusi.resolusi_symbol }}</td>
                           <td></td>
                           <td></td>
                       </tr>
                       <tr>
-                          <td></td>
-                          <td>Range (Max to Min): {{ survey.survey_range_max }} to {{ survey.survey_range_min }}</td>
+                          <td>Next Calibration Date: {{ resolusi.resolusi_next_cal }}</td>
+                          <td>Control Plan Number: {{ resolusi.resolusi_cpn }}</td>
                           <td></td>
                           <td></td>
                       </tr>
                       <tr>
                           <td></td>
-                          <td>FMEA Number: {{ survey.survey_fmea }}</td>
+                          <td>Range (Max to Min): {{ resolusi.resolusi_range_max }} to {{ resolusi.resolusi_range_min }}</td>
                           <td></td>
                           <td></td>
                       </tr>
                       <tr>
                           <td></td>
-                          <td>Control Plan Number: {{ survey.survey_control_plan }}</td>
+                          <td>FMEA Number: {{ resolusi.resolusi_fmea }}</td>
                           <td></td>
                           <td></td>
                       </tr>
@@ -160,7 +153,7 @@
                       <th scope="col">Var (6 * Rbar / d2): {{vard2|floatformat:2}}</th>
                     </tr>
                     <tr>
-                      <th scope="col">Required Resolution: </th>
+                      <th scope="col"></th>
                       <th scope="col"></th>
                       <th scope="col">Measured By: {{resolusi.resolusi_measured}}</th>
                       <th scope="col">Reviewed By: {{resolusi.resolusi_reviewed}}</th>
@@ -249,8 +242,8 @@
                       </div>
                       <br><br> -->
                     
-                      <a href="{% url 'coretoolcrud:deleteResolusi' resolusi.resolusi_survey_id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                      <a href="{% url 'coretoolcrud:viewPrintResolusi' resolusi.resolusi_survey_id %}" class="btn btn-info">Print</a>
+                      <a href="{% url 'coretoolcrud:deleteResolusi' resolusi.id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                      <a href="{% url 'coretoolcrud:viewPrintResolusi' resolusi.id %}" class="btn btn-info">Print</a>
                       <br><br>
 
         </div>
