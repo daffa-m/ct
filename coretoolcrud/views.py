@@ -10260,7 +10260,7 @@ def viewBias(request, pk):
         try:
             bias = Bias.objects.get(bias_survey_id = pk)
             if bias.bias_all:
-                return redirect('coretoolcrud:viewFinalBias',pk )
+                return redirect('coretoolcrud:viewCommentBias',pk )
             else:
                 part = range(1, int(bias.bias_ngauge)+1)
                 measurement = range(1, int(bias.bias_ngauge)+1)
@@ -10323,7 +10323,7 @@ def viewAverageBias(request, pk):
 def storeMasterBias(request, pk):
     if 'user' in request.session:
         bias = Bias.objects.get(bias_survey_id = pk)
-        bias.bias_master = request.POST.get('bias_master')
+        bias.bias_master = float(request.POST.get('bias_master'))
         bias.save()
 
         return redirect('coretoolcrud:viewBias',pk )
@@ -10423,12 +10423,20 @@ def storeCommentBias(request, pk):
 def viewFinalBias(request, pk):
     if 'user' in request.session:
         bias = Bias.objects.get(bias_survey_id = pk)
-        bias.bias_master = [float(i) for i in bias.bias_master]
-        avemaster = sum(bias.bias_master) / len(bias.bias_master)
+        # bias.bias_master = [float(i) for i in bias.bias_master]
+        # avemaster = sum(bias.bias_master) / len(bias.bias_master)
 
+        bias.bias_all = [float(i) for i in bias.bias_all]
+        print("bias_all", bias.bias_all)
         xbar = []
-        for i in bias.bias_all:
-            xbar.append(sum(i) / len(i))
+
+        if isinstance(bias.bias_all[0], list):
+            for i in bias.bias_all:
+                xbar.append(sum(i) / len(i))
+        else:
+            for i in bias.bias_all:
+                xbar.append(sum(bias.bias_all) / len(bias.bias_all))
+
         
         stdev = []
         for i in bias.bias_all:

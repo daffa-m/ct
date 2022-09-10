@@ -101,7 +101,7 @@
                 <tr>
                   <td>Master</td>
                   
-                  <td><input class="form-control" name="bias_master" id="demoFormHorizontalEmail" type="text" step="any" required /></td>
+                  <td><input class="form-control" name="bias_master" id="demoFormHorizontalEmail" type="number" step="any" required /></td>
                   
                 </tr>
                 
@@ -119,128 +119,6 @@
 
     </div>
  
-
-    <script>
-      $(document).ready(function() {
-           $('td input').bind('paste', null, function (e) {
-               $this = $(this);
-               setTimeout(function () {
-                   var columns = $this.val().split(/\s+/);
-                   var i;
-                   var npart = "{{ cross.cross_npart }}";
-                   var input = $this;
-                   for (i = 0; i < columns.length; i++) {
-                       input.val(columns[i]);
-                       if( i % npart !== npart - 1){
-                           input = input.parent().next().find('input');
-                           } else{
-                               input = input.parent().parent().next().find('input');
-                           }
-                       }
-               }, 0);
-           });
-       } );
-   
-       var active = 0;
-   //$('#navigate td').each(function(idx){$(this).html(idx);});
-   rePosition();
-   
-   $(document).keydown(function(e) {
-     var inp = String.fromCharCode(event.keyCode);
-     if (!(/[a-zA-Z0-9-_ ]/.test(inp) || event.keyCode == 96)) {
-       reCalculate(e);
-       rePosition();
-       // if key is an arrow key, don't type the user input.
-       // if it is any other key (a, b, c, etc)
-       // edit the text
-       if (e.keyCode > 36 && e.keyCode < 41) {
-         return false;
-       }
-     }
-   });
-   
-   $('td').click(function() {
-     active = $(this).closest('table tbody').find('td').index(this);
-     rePosition();
-   });
-   
-   
-   function reCalculate(e) {
-     var rows = $('#table tbody tr').length;
-     var columns = $('#table tbody tr:eq(0) td').length;
-     var temp;
-   
-     if (e.keyCode == 37) { //move left or wrap
-       temp = active;
-       while (temp > 0) {
-         temp = temp - 1;
-         // only advance if there is an input field in the td
-         if ($('#table tbody tr td').eq(temp).find('input').length != 0) {
-           active = temp;
-           break;
-         }
-       }
-     }
-     if (e.keyCode == 38) { // move up
-       temp = active;
-       while (temp - columns >= 0) {
-         temp = temp - columns;
-         // only advance if there is an input field in the td
-         if ($('#table tbody tr td').eq(temp).find('input').length != 0) {
-           active = temp;
-           break;
-         }
-       }
-     }
-     if (e.keyCode == 39) { // move right or wrap
-       temp = active;
-       while (temp < (columns * rows) - 1) {
-         temp = temp + 1;
-         // only advance if there is an input field in the td
-         if ($('#table tbody tr td').eq(temp).find('input').length != 0) {
-           active = temp;
-           break;
-         }
-       }
-     }
-     if (e.keyCode == 40) { // move down
-       temp = active;
-       while (temp + columns <= (rows * columns) - 1) {
-         temp = temp + columns;
-         // only advance if there is an input field in the td
-         if ($('#table tbody tr td').eq(temp).find('input').length != 0) {
-           active = temp;
-           break;
-         }
-       }
-     }
-   }
-   
-   function rePosition() {
-     $("#input1, #input3").prop("disabled", true);
-   
-     console.log(active);
-     $('.active').removeClass('active');
-     $('#table tbody tr td').eq(active).addClass('active');
-     $('#table tbody tr td').find('input').removeClass('textClass');
-     $('#table tbody tr td').eq(active).find('input').addClass('textClass');
-     $('#table tbody tr td').eq(active).find('input').select();
-     var input = $('#table tbody tr td').eq(active).find('input').focus();
-     scrollInView();
-   }
-   
-   function scrollInView() {
-     var target = $('#table tbody tr td:eq(' + active + ')');
-     if (target.length) {
-       var top = target.offset().top;
-   
-       $('html,body').stop().animate({
-         scrollTop: top - 100
-       }, 400);
-       return false;
-     }
-   }
-    </script>
 
   </body>
 
