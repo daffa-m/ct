@@ -29,6 +29,8 @@ from bokeh.embed import components
 from bokeh.models import LinearAxis
 from calendar import monthrange
 import statistics
+from hashlib import sha256
+# from ipware import get_client_ip
 
 
 from random import randint
@@ -49,29 +51,46 @@ def viewLogin(request):
 
 def login(request):
     uname = request.POST.get('uname')
-    password = request.POST.get('password')
+    # password = request.POST.get('password')
+    password = sha256(request.POST.get('password').encode('utf-8')).hexdigest().upper()
+    
+    # ip, is_routable = get_client_ip(request)
+    # print('ip addr ', ip, is_routable)
+
+    print('password ', sha256(request.POST.get('password').encode('utf-8')).hexdigest())
     check = User.objects.filter(user_username=uname, user_password=password)
 
     if check:
+        user = User.objects.get(user_username=uname)
         if 'user' in request.session:
             if request.session['user'] == uname:
-                messages.error(request, "Akun sedang digunakan di perangkat lain")
+                messages.error(request, "Silahkan login ulang")
                 return redirect('/logout')
+        # elif user.user_islogin:
+        #     messages.error(request, "Akun sedang digunakan di perangkat lain. Logout akun terlebih dahulu")
+        #     return redirect('/')
         else:
-            user = User.objects.get(user_username=uname)
+            # user = User.objects.get(user_username=uname)
             request.session['user'] = uname
             request.session['company'] = user.user_company
             request.session['id'] = user.id
             request.session['role'] = user.user_role
+            user.user_islogin = True
+            user.save()
 
         return redirect('/viewListSurvey')
     else:
         messages.error(request, "Username atau password salah")
-        return redirect('/logout')
+        return redirect('/')
 
 def logout(request):
+    
     try:
+        # user = User.objects.get(user_username=request.session['user'])
+        # user.user_islogin = False
+        # user.save()
         del request.session['user']
+        
     except:
         return redirect('/')
     return redirect('/logout')
@@ -11047,8 +11066,9 @@ def viewAllResolusi(request, pk):
 
 def viewPrintResolusi(request, pk):
     if 'user' in request.session:
-        resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
-        survey = Survey.objects.get(id = pk)
+        # resolusi = Resolusi.objects.get(resolusi_survey_id = pk)
+        resolusi = Resolusi.objects.get(id = pk)
+        # survey = Survey.objects.get(id = pk)
         ##############################
         giro = np.array(resolusi.resolusi_all)
         temp2 = giro.tolist()

@@ -243,7 +243,7 @@
                       <br><br> -->
                     
                       <a href="{% url 'coretoolcrud:deleteResolusi' resolusi.id %}" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                      <a href="{% url 'coretoolcrud:viewPrintResolusi' resolusi.id %}" class="btn btn-info">Print</a>
+                      {% comment %} <a href="{% url 'coretoolcrud:viewPrintResolusi' resolusi.id %}" class="btn btn-info">Print</a> {% endcomment %}
                       <br><br>
 
         </div>

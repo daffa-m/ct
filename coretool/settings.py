@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['https://platform-cycles-bears-ict.trycloudflare.com']
+CSRF_TRUSTED_ORIGINS = ['https://consistently-heater-hamilton-priorities.trycloudflare.com']
 
 
 # Application definition
@@ -147,3 +147,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SESSION_EXPIRE_SECONDS = 3600
 SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+
+SESSION_TIMEOUT_REDIRECT = '/logout'

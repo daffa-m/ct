@@ -12,6 +12,7 @@ class User(models.Model):
     user_password = models.TextField()
     user_role = models.TextField()
     user_company = models.TextField()
+    user_islogin = models.BooleanField()
 
 
 class Xbarr(models.Model):
